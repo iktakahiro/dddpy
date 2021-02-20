@@ -1,11 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 
 from dddpy.domain.book.book import Book
-
-Base = declarative_base()
+from dddpy.infrastructure.sqlite.database import Base
 
 
 class BookDTO(Base):
@@ -13,18 +11,9 @@ class BookDTO(Base):
 
     __tablename__ = "book"
 
-    isbn = Column(
-        String,
-        primary_key=True,
-    )
-    title = Column(
-        String,
-        nullable=False,
-    )
-    page = Column(
-        Integer,
-        nullable=False,
-    )
+    isbn = Column(String, primary_key=True)
+    title = Column(String, nullable=False)
+    page = Column(Integer, nullable=False)
     read_page = Column(
         Integer,
         nullable=False,
@@ -42,18 +31,6 @@ class BookDTO(Base):
         nullable=False,
         onupdate=datetime.utcnow(),
     )
-
-    def __init__(
-        self,
-        isbn: str,
-        title: str,
-        page: int,
-        read_page: int,
-    ):
-        self.isbn: str = isbn
-        self.title: str = title
-        self.page: int = page
-        self.read_page: int = read_page
 
     def to_entity(self) -> Book:
         return Book(

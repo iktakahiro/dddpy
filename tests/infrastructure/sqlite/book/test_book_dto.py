@@ -1,7 +1,7 @@
 import pytest
 
-from dddpy.infrastructure.sqlite.book.book_dto import BookDTO, from_entity
 from dddpy.domain.book.book import Book
+from dddpy.infrastructure.sqlite.book.book_dto import BookDTO, from_entity
 
 
 class TestBookDTO:

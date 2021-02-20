@@ -1,4 +1,3 @@
-#
 class Book:
     """Book represents your collection of books as an entity."""
 
@@ -6,6 +5,11 @@ class Book:
         self.isbn: str = isbn
         self.title: str = title
         self.page: int = page
+        try:
+            self._validate_read_page(read_page)
+        except:
+            raise
+
         self._read_page: int = read_page
 
     def __eq__(self, o: object) -> bool:
@@ -20,10 +24,16 @@ class Book:
 
     @read_page.setter
     def read_page(self, p: int):
-        if p < 0 or p > self.page:
-            raise ValueError(f"read_page must be between 0 and {self.page}.")
+        try:
+            self._validate_read_page(p)
+        except:
+            raise
 
         self._read_page = p
+
+    def _validate_read_page(self, read_page):
+        if read_page < 0 or read_page > self.page:
+            raise ValueError(f"read_page must be between 0 and {self.page}.")
 
     def is_already_read(self) -> bool:
         return self.page == self._read_page
