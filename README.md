@@ -1,1 +1,1 @@
-# python-ddd-fastapi
+# Python DDD example using FastAPI
