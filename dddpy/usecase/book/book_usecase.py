@@ -20,15 +20,15 @@ class BookUseCaseUnitOfWork(ABC):
 
     @abstractmethod
     def begin(self):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def commit(self):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def rollback(self):
-        pass
+        raise NotImplementedError
 
 
 class BookUseCase(ABC):
@@ -41,19 +41,19 @@ class BookUseCase(ABC):
         title: str,
         page: int,
     ) -> Optional[Book]:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def fetch_book_by_isbn(self, isbn: str) -> Optional[Book]:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def fetch_books(self) -> List[Book]:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def delete_book_by_isbn(self, isbn: str):
-        pass
+        raise NotImplementedError
 
 
 class BookUseCaseImpl(BookUseCase):

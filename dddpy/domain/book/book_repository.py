@@ -9,16 +9,16 @@ class BookRepository(ABC):
 
     @abstractmethod
     def create(self, book: Book):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def find_by_isbn(self, isbn: str) -> Optional[Book]:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def find_all(self) -> List[Book]:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def delete_by_isbn(self, isbn: str):
-        pass
+        raise NotImplementedError
