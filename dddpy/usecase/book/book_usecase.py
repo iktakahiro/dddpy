@@ -57,7 +57,7 @@ class BookUseCase(ABC):
 
 
 class BookUseCaseImpl(BookUseCase):
-    """BookUseCaseImpl implements a usecase inteface related Book entity."""
+    """BookUseCaseImpl implements usecases related Book entity."""
 
     def __init__(self, uow: BookUseCaseUnitOfWork):
         self.uow: BookUseCaseUnitOfWork = uow

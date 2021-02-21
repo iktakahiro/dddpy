@@ -11,7 +11,7 @@ from dddpy.usecase.book.book_usecase import BookUseCaseUnitOfWork
 
 
 class BookRepositoryImpl(BookRepository):
-    """BookRepositoryImpl implements of BookRepository to execute CRUD operations with RDBMS."""
+    """BookRepositoryImpl implements CRUD operations related Book entity using SQLAlchemy."""
 
     def __init__(self, session: Session):
         self.session: Session = session

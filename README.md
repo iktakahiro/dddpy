@@ -19,7 +19,7 @@ Directory structure:
 │   │       ├── book
 │   │       │   ├── book_dto.py  # DTO
 │   │       │   └── book_repository.py  # Repository implementation
-│   │       └── database.py  # Settings for SqlAlchemy
+│   │       └── database.py  # Settings for SQLAlchemy
 │   ├── presentation
 │   │   └── schema  # Schemas for the RESTful API
 │   │       └── book
@@ -35,11 +35,11 @@ Directory structure:
 
 DTO (Data Transfer Object) is a good practice to isolate domain objects from the infrastructuer layer.
 
-On a minimum MVC architecture, models often inherit a base class provided by a O/R Mappaer. But in that case, the domain layer would be dependent on the outer layer. The same can be said for Python applications using SqlAlchemy.
+On a minimum MVC architecture, models often inherit a base class provided by a O/R Mappaer. But in that case, the domain layer would be dependent on the outer layer. The same can be said for Python applications using SQLAlchemy.
 
 To solve this problem, we can simply set two rules:
 
-1. A Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SqlAlchemy Base class.
+1. A Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SQLAlchemy Base class.
 2. A Data transfer Objects extend the O/R mapper class.
 
 ### UoW (Unit of Work)
