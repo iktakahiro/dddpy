@@ -1,5 +1,11 @@
 from pydantic import BaseModel, Field
 
+from dddpy.domain.book.book_exeption import (
+    BookAlreadyExistsError,
+    BookNotFoundError,
+    BooksNotFoundError,
+)
+
 
 class BookBaseSchema(BaseModel):
     """BookBaseSchema represents base data structure of a book."""
@@ -28,3 +34,15 @@ class BookReadSchema(BookBaseSchema):
     read_page: int = Field(ge=0, example=120)
     created_at: int = Field(example=1136214245000)
     updated_at: int = Field(example=1136214245000)
+
+
+class BookNotFoundErrorMessage(BaseModel):
+    detail: str = Field(example=BookNotFoundError.message)
+
+
+class BooksNotFoundErrorMessage(BaseModel):
+    detail: str = Field(example=BooksNotFoundError.message)
+
+
+class BookAlreadyExistsErrorMessage(BaseModel):
+    detail: str = Field(example=BookAlreadyExistsError.message)

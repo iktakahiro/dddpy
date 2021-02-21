@@ -11,7 +11,7 @@ from dddpy.domain.book.book_exeption import (
 )
 from dddpy.infrastructure.sqlite.book.book_repository import BookRepositoryWithSession
 from dddpy.infrastructure.sqlite.database import SessionLocal
-from dddpy.presentation.schema.book.book_schema import BookCreateSchema, BookReadSchema
+from dddpy.presentation.schema.book.book_schema import BookAlreadyExistsErrorMessage, BookCreateSchema, BookNotFoundErrorMessage, BookReadSchema, BooksNotFoundErrorMessage
 from dddpy.usecase.book.book_usecase import (
     BookUseCase,
     BookUseCaseImpl,
@@ -19,10 +19,6 @@ from dddpy.usecase.book.book_usecase import (
 )
 
 app = FastAPI()
-
-
-class ErrorMessage(BaseModel):
-    detail: str = Field(example="error message.")
 
 
 def get_session() -> Session:
@@ -44,8 +40,7 @@ def book_usecase(session: Session = Depends(get_session)) -> BookUseCase:
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_409_CONFLICT: {
-            "model": ErrorMessage,
-            "description": BookAlreadyExistsError.message,
+            "model": BookAlreadyExistsErrorMessage,
         },
     },
 )
@@ -78,8 +73,7 @@ async def create_book(
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": ErrorMessage,
-            "description": BooksNotFoundError.message,
+            "model": BooksNotFoundErrorMessage,
         },
     },
 )
@@ -107,8 +101,7 @@ async def get_books(
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": ErrorMessage,
-            "description": BookNotFoundError.message,
+            "model": BookNotFoundErrorMessage,
         },
     },
 )
@@ -136,8 +129,7 @@ async def get_book(
     status_code=status.HTTP_202_ACCEPTED,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": ErrorMessage,
-            "description": BookNotFoundError.message,
+            "model": BookNotFoundErrorMessage,
         },
     },
 )
