@@ -15,9 +15,6 @@ class BookUseCaseUnitOfWork(ABC):
 
     book_repository: BookRepository
 
-    def __exit__(self, *args):
-        self.rollback()
-
     @abstractmethod
     def begin(self):
         raise NotImplementedError
@@ -74,16 +71,15 @@ class BookUseCaseImpl(BookUseCase):
             page=page,
         )
         try:
-            self.uow.begin()
-
             existing_book = self.uow.book_repository.find_by_isbn(isbn)
             if existing_book is not None:
                 raise BookAlreadyExistsError
 
             self.uow.book_repository.create(book)
-            created_book = self.fetch_book_by_isbn(isbn)
-
             self.uow.commit()
+
+            created_book = self.uow.book_repository.find_by_isbn(isbn)
+
         except:
             self.uow.rollback()
             raise
@@ -112,8 +108,6 @@ class BookUseCaseImpl(BookUseCase):
 
     def delete_book_by_isbn(self, isbn: str):
         try:
-            self.uow.begin()
-
             existing_book = self.uow.book_repository.find_by_isbn(isbn)
             if existing_book is None:
                 raise BookNotFoundError

@@ -63,3 +63,51 @@ UoW (Unit of Work) Pattern can be the solution.
 2. Run Remote-Container 
 3. Run `make dev` on the Docker container terminal
 4. Access http://127.0.0.1:8000/docs
+
+### Sample requests for the RESTFul API
+
+* Create a new book
+
+```bash
+curl --location --request POST 'localhost:8000/books' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "isbn": "978-0141983479",
+    "title": "Bullshit Job",
+    "page": 320
+}'
+```
+
+* Response
+
+```json
+{
+    "title": "Bullshit Job",
+    "page": 320,
+    "isbn": "978-0141983479",
+    "read_page": 0,
+    "created_at": 1613917301039,
+    "updated_at": 1613917301039
+}
+```
+
+* Get books:
+
+```bash
+curl --location --request GET 'localhost:8000/books'
+```
+
+* Response:
+
+```json
+[
+    {
+        "title": "Bullshit Job",
+        "page": 320,
+        "isbn": "978-0141983479",
+        "read_page": 0,
+        "created_at": 1613914965673,
+        "updated_at": 1613914965673
+    }
+]
+```

@@ -10,8 +10,14 @@ from dddpy.domain.book.book_exeption import (
     BooksNotFoundError,
 )
 from dddpy.infrastructure.sqlite.book.book_repository import BookRepositoryWithSession
-from dddpy.infrastructure.sqlite.database import SessionLocal
-from dddpy.presentation.schema.book.book_schema import BookAlreadyExistsErrorMessage, BookCreateSchema, BookNotFoundErrorMessage, BookReadSchema, BooksNotFoundErrorMessage
+from dddpy.infrastructure.sqlite.database import SessionLocal, create_tables
+from dddpy.presentation.schema.book.book_schema import (
+    BookAlreadyExistsErrorMessage,
+    BookCreateSchema,
+    BookNotFoundErrorMessage,
+    BookReadSchema,
+    BooksNotFoundErrorMessage,
+)
 from dddpy.usecase.book.book_usecase import (
     BookUseCase,
     BookUseCaseImpl,
@@ -19,6 +25,8 @@ from dddpy.usecase.book.book_usecase import (
 )
 
 app = FastAPI()
+
+create_tables()
 
 
 def get_session() -> Session:
@@ -31,6 +39,7 @@ def get_session() -> Session:
 
 def book_usecase(session: Session = Depends(get_session)) -> BookUseCase:
     uow: BookUseCaseUnitOfWork = BookRepositoryWithSession(session)
+    print(uow)
     return BookUseCaseImpl(uow)
 
 
@@ -59,7 +68,8 @@ async def create_book(
             status_code=status.HTTP_409_CONFLICT,
             detail=e.message,
         )
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -81,13 +91,14 @@ async def get_books(
     book_usecase: BookUseCase = Depends(book_usecase),
 ):
     try:
-        books = book_usecase.create_book()
+        books = book_usecase.fetch_books()
+        print(books[0].isbn)
     except BooksNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.message,
         )
-    except Exception:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -144,7 +155,8 @@ async def delete_book(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.message,
         )
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
