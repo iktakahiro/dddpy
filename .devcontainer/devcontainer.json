@@ -5,8 +5,8 @@
 	"settings": { 
 		"terminal.integrated.shell.linux": null,
 		"python.pythonPath": "/usr/local/bin/python",
-		// "python.linting.pylintPath": "/usr/local/bin/pylint",
-		// "python.linting.enabled": true,
+		"python.linting.pylintPath": "/usr/local/bin/pylint",
+		"python.linting.enabled": true,
 		"python.testing.pytestArgs": [
             "tests", "-vv"
         ],

@@ -26,8 +26,6 @@ class BookCreateSchema(BookBaseSchema):
 class BookUpdateSchema(BookBaseSchema):
     """BookUpdateSchema represents data structure of a put request to update a book."""
 
-    pass
-
 
 class BookReadSchema(BookBaseSchema):
     """BookReadSchema represents data structure of a get request to fetch books."""

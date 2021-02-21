@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, engine
+from sqlalchemy import Column, Integer, String
 
 from dddpy.domain.book.book import Book
-from dddpy.infrastructure.sqlite.database import Base, create_tables
+from dddpy.infrastructure.sqlite.database import Base
 
 
 def unixtimestamp() -> int:

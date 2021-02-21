@@ -1,7 +1,8 @@
+import logging
+from logging import config
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, status
-from pydantic import BaseModel, Field
 from sqlalchemy.orm.session import Session
 
 from dddpy.domain.book.book_exeption import (
@@ -24,6 +25,9 @@ from dddpy.usecase.book.book_usecase import (
     BookUseCaseUnitOfWork,
 )
 
+config.fileConfig("logging.conf", disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
 
 create_tables()
@@ -39,7 +43,6 @@ def get_session() -> Session:
 
 def book_usecase(session: Session = Depends(get_session)) -> BookUseCase:
     uow: BookUseCaseUnitOfWork = BookRepositoryWithSession(session)
-    print(uow)
     return BookUseCaseImpl(uow)
 
 
@@ -69,7 +72,7 @@ async def create_book(
             detail=e.message,
         )
     except Exception as e:
-        print(e)
+        logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -92,13 +95,13 @@ async def get_books(
 ):
     try:
         books = book_usecase.fetch_books()
-        print(books[0].isbn)
     except BooksNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.message,
         )
     except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -127,7 +130,8 @@ async def get_book(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.message,
         )
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -151,12 +155,13 @@ async def delete_book(
     try:
         book_usecase.delete_book_by_isbn(book_id)
     except BookNotFoundError as e:
+        logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.message,
         )
     except Exception as e:
-        print(e)
+        logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
