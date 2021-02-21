@@ -4,6 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
 from dddpy.domain.book.book import Book
+from dddpy.domain.book.book_exeption import BookNotFoundError
 from dddpy.domain.book.book_repository import BookRepository
 from dddpy.infrastructure.sqlite.book.book_dto import BookDTO, from_entity
 from dddpy.usecase.book.book_usecase import BookUseCaseUnitOfWork
@@ -15,14 +16,12 @@ class BookRepositoryImpl(BookRepository):
     def __init__(self, session: Session):
         self.session: Session = session
 
-    def create(self, book: Book) -> Book:
+    def create(self, book: Book):
         book_dto = from_entity(book)
         try:
             self.session.add(book_dto)
         except:
             raise
-
-        return book
 
     def find_by_isbn(self, isbn: str) -> Optional[Book]:
         try:
@@ -46,6 +45,12 @@ class BookRepositoryImpl(BookRepository):
             return []
 
         return list(map(lambda book_dto: book_dto.to_entity(), book_dtos))
+
+    def delete_by_isbn(self, isbn: str):
+        try:
+            self.session.query(BookDTO).filter_by(isbn=isbn).delete()
+        except:
+            raise
 
 
 class BookRepositoryWithSession(BookUseCaseUnitOfWork):

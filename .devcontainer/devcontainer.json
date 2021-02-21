@@ -25,9 +25,7 @@
 		"visualstudioexptteam.vscodeintellicode",
 		"vscodevim.vim"
 	],
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Uncomment the next line to run commands after the container is created - for example installing curl.
+	"forwardPorts": [8000, 8000],
 	"postCreateCommand": "make install",
 
 	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust

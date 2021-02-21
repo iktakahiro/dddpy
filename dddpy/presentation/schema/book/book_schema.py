@@ -1,16 +1,23 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BookBaseSchema(BaseModel):
     """BookBaseSchema represents base data structure of a book."""
 
-    isbn: str
-    title: str
-    page: int
+    title: str = Field(example="Bullshit Jobs")
+    page: int = Field(ge=0, example=320)
 
 
 class BookCreateSchema(BookBaseSchema):
     """BookCreateSchema represents data structure of a post request to create a book."""
+
+    isbn: str = Field(example="978-0141983479")
+
+    pass
+
+
+class BookUpdateSchema(BookBaseSchema):
+    """BookUpdateSchema represents data structure of a put request to update a book."""
 
     pass
 
@@ -18,6 +25,6 @@ class BookCreateSchema(BookBaseSchema):
 class BookReadSchema(BookBaseSchema):
     """BookReadSchema represents data structure of a get request to fetch books."""
 
-    read_page: int
-    created_at: int
-    updated_at: int
+    read_page: int = Field(ge=0, example=120)
+    created_at: int = Field(example=1136214245000)
+    updated_at: int = Field(example=1136214245000)

@@ -2,6 +2,11 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from dddpy.domain.book.book import Book
+from dddpy.domain.book.book_exeption import (
+    BookAlreadyExistsError,
+    BookNotFoundError,
+    BooksNotFoundError,
+)
 from dddpy.domain.book.book_repository import BookRepository
 
 
@@ -30,15 +35,24 @@ class BookUseCase(ABC):
     """BookUseCase defines a usecase inteface related Book entity."""
 
     @abstractmethod
-    def create_book(self, isbn: str, title: str, page: int) -> Book:
+    def create_book(
+        self,
+        isbn: str,
+        title: str,
+        page: int,
+    ) -> Optional[Book]:
         pass
 
     @abstractmethod
-    def fetch_book_by_id(self, id: str) -> Optional[Book]:
+    def fetch_book_by_isbn(self, isbn: str) -> Optional[Book]:
         pass
 
     @abstractmethod
     def fetch_books(self) -> List[Book]:
+        pass
+
+    @abstractmethod
+    def delete_book_by_isbn(self, isbn: str):
         pass
 
 
@@ -53,7 +67,7 @@ class BookUseCaseImpl(BookUseCase):
         isbn: str,
         title: str,
         page: int,
-    ) -> Book:
+    ) -> Optional[Book]:
         book = Book(
             isbn=isbn,
             title=title,
@@ -62,11 +76,12 @@ class BookUseCaseImpl(BookUseCase):
         try:
             self.uow.begin()
 
-            self.uow.book_repository.create(book)
-            created_book = self.fetch_book_by_id(isbn)
+            existing_book = self.uow.book_repository.find_by_isbn(isbn)
+            if existing_book is not None:
+                raise BookAlreadyExistsError
 
-            if created_book is None:
-                raise Exception
+            self.uow.book_repository.create(book)
+            created_book = self.fetch_book_by_isbn(isbn)
 
             self.uow.commit()
         except:
@@ -78,6 +93,8 @@ class BookUseCaseImpl(BookUseCase):
     def fetch_book_by_isbn(self, isbn: str) -> Optional[Book]:
         try:
             book = self.uow.book_repository.find_by_isbn(isbn)
+            if book is None:
+                raise BookNotFoundError
         except:
             raise
 
@@ -86,7 +103,24 @@ class BookUseCaseImpl(BookUseCase):
     def fetch_books(self) -> List[Book]:
         try:
             books = self.uow.book_repository.find_all()
+            if books is None or len(books) == 0:
+                raise BooksNotFoundError
         except:
             raise
 
         return books
+
+    def delete_book_by_isbn(self, isbn: str):
+        try:
+            self.uow.begin()
+
+            existing_book = self.uow.book_repository.find_by_isbn(isbn)
+            if existing_book is None:
+                raise BookNotFoundError
+
+            self.uow.book_repository.delete_by_isbn(isbn)
+
+            self.uow.commit()
+        except:
+            self.uow.rollback()
+            raise

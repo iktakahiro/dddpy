@@ -8,7 +8,7 @@ class BookRepository(ABC):
     """BookRepository defines a repository interface for Book entity."""
 
     @abstractmethod
-    def create(self, book: Book) -> Book:
+    def create(self, book: Book):
         pass
 
     @abstractmethod
@@ -17,4 +17,8 @@ class BookRepository(ABC):
 
     @abstractmethod
     def find_all(self) -> List[Book]:
+        pass
+
+    @abstractmethod
+    def delete_by_isbn(self, isbn: str):
         pass
