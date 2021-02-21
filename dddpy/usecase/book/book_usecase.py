@@ -2,7 +2,28 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from dddpy.domain.book.book import Book
-from dddpy.usecase.transaction_manager import TransactionManager
+from dddpy.domain.book.book_repository import BookRepository
+
+
+class BookUseCaseUnitOfWork(ABC):
+    """BookUseCaseUnitOfWork defines an interface of BookUseCase based on Unit of Work pattern."""
+
+    book_repository: BookRepository
+
+    def __exit__(self, *args):
+        self.rollback()
+
+    @abstractmethod
+    def begin(self):
+        pass
+
+    @abstractmethod
+    def commit(self):
+        pass
+
+    @abstractmethod
+    def rollback(self):
+        pass
 
 
 class BookUseCase(ABC):
@@ -24,8 +45,8 @@ class BookUseCase(ABC):
 class BookUseCaseImpl(BookUseCase):
     """BookUseCaseImpl implements a usecase inteface related Book entity."""
 
-    def __init__(self, tx_manager: TransactionManager):
-        self.tx_manager: TransactionManager = tx_manager
+    def __init__(self, uow: BookUseCaseUnitOfWork):
+        self.uow: BookUseCaseUnitOfWork = uow
 
     def create_book(
         self,
@@ -39,25 +60,24 @@ class BookUseCaseImpl(BookUseCase):
             page=page,
         )
         try:
-            self.tx_manager.begin()
+            self.uow.begin()
 
-            self.tx_manager.book_repository.create(book)
+            self.uow.book_repository.create(book)
             created_book = self.fetch_book_by_id(isbn)
 
             if created_book is None:
                 raise Exception
 
-            self.tx_manager.commit()
+            self.uow.commit()
         except:
-            self.tx_manager.rollback()
+            self.uow.rollback()
             raise
-
 
         return created_book
 
     def fetch_book_by_isbn(self, isbn: str) -> Optional[Book]:
         try:
-            book = self.tx_manager.book_repository.find_by_isbn(isbn)
+            book = self.uow.book_repository.find_by_isbn(isbn)
         except:
             raise
 
@@ -65,7 +85,7 @@ class BookUseCaseImpl(BookUseCase):
 
     def fetch_books(self) -> List[Book]:
         try:
-            books = self.tx_manager.book_repository.find_all()
+            books = self.uow.book_repository.find_all()
         except:
             raise
 

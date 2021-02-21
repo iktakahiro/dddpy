@@ -5,12 +5,7 @@ class Book:
         self.isbn: str = isbn
         self.title: str = title
         self.page: int = page
-        try:
-            self._validate_read_page(read_page)
-        except:
-            raise
-
-        self._read_page: int = read_page
+        self.read_page: int = read_page
 
     def __eq__(self, o: object) -> bool:
         if isinstance(o, Book):
