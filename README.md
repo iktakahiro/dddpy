@@ -2,7 +2,6 @@
 
 *NOTE: This repository is an example to explain 'how to implement DDD architecture on Python web applicaiton'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
 
-
 ## Code Architecture
 
 For this implementation, I've adopted the [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/).
@@ -13,16 +12,16 @@ Directory structure:
 ├── dddpy
 │   ├── domain
 │   │   └── book
-│   │       ├── book.py
-│   │       └── book_repository.py
+│   │       ├── book.py # Entity
+│   │       └── book_repository.py  # Repository Interface
 │   ├── infrastructure
 │   │   └── sqlite
 │   │       ├── book
-│   │       │   ├── book_dto.py
-│   │       │   └── book_repository.py
-│   │       └── database.py
+│   │       │   ├── book_dto.py  # DTO
+│   │       │   └── book_repository.py  # Repository implementation
+│   │       └── database.py  # Settings for SqlAlchemy
 │   ├── presentation
-│   │   └── schema
+│   │   └── schema  # Schemas for the RESTful API
 │   │       └── book
 │   │           └── book_schema.py
 │   └── usecase
@@ -32,20 +31,24 @@ Directory structure:
 └── tests
 ```
 
-### DTO (Data Transfer Object) 
+### DTO (Data Transfer Object)
 
 DTO (Data Transfer Object) is a good practice to isolate domain objects from the infrastructuer layer.
 
-On a minimum MVC architecture, models often extend a base class provided by a O/R Mappaer. But in that case, the domain layer would be dependent on the outer layer.
+On a minimum MVC architecture, models often inherit a base class provided by a O/R Mappaer. But in that case, the domain layer would be dependent on the outer layer. The same can be said for Python applications using SqlAlchemy.
 
 To solve this problem, we can simply set two rules:
 
-1. A domain object **DOES NOT** extend SqlAlchemy Base class.
-2. A Data transfer Object extends SqlAlchemy Base class.
+1. A Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SqlAlchemy Base class.
+2. A Data transfer Objects extend the O/R mapper class.
 
 ### UoW (Unit of Work)
 
-TBD
+Even if we succeed in isolating the domain layer, some issues remains. One of them is how to manage transactions.
+
+UoW (Unit of Work) Pattern can be the solution.
+
+*TBD*
 
 ## Tech Stack
 
