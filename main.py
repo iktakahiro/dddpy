@@ -6,14 +6,14 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm.session import Session
 
 from dddpy.domain.book.book_exeption import (
-    BookAlreadyExistsError,
+    BookIsbnAlreadyExistsError,
     BookNotFoundError,
     BooksNotFoundError,
 )
 from dddpy.infrastructure.sqlite.book.book_repository import BookRepositoryWithSession
 from dddpy.infrastructure.sqlite.database import SessionLocal, create_tables
 from dddpy.presentation.schema.book.book_schema import (
-    BookAlreadyExistsErrorMessage,
+    BookIsbnAlreadyExistsErrorMessage,
     BookCreateSchema,
     BookNotFoundErrorMessage,
     BookReadSchema,
@@ -52,7 +52,7 @@ def book_usecase(session: Session = Depends(get_session)) -> BookUseCase:
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_409_CONFLICT: {
-            "model": BookAlreadyExistsErrorMessage,
+            "model": BookIsbnAlreadyExistsErrorMessage,
         },
     },
 )
@@ -66,7 +66,7 @@ async def create_book(
             title=data.title,
             page=data.page,
         )
-    except BookAlreadyExistsError as e:
+    except BookIsbnAlreadyExistsError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=e.message,
@@ -124,7 +124,7 @@ async def get_book(
     book_usecase: BookUseCase = Depends(book_usecase),
 ):
     try:
-        book = book_usecase.fetch_book_by_isbn(book_id)
+        book = book_usecase.fetch_book_by_id(book_id)
     except BookNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -153,7 +153,7 @@ async def delete_book(
     book_usecase: BookUseCase = Depends(book_usecase),
 ):
     try:
-        book_usecase.delete_book_by_isbn(book_id)
+        book_usecase.delete_book_by_id(book_id)
     except BookNotFoundError as e:
         logger.error(e)
         raise HTTPException(

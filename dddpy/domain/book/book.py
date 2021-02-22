@@ -6,6 +6,7 @@ class Book:
 
     def __init__(
         self,
+        id: str,
         isbn: str,
         title: str,
         page: int,
@@ -13,6 +14,7 @@ class Book:
         created_at: Optional[int] = None,
         updated_at: Optional[int] = None,
     ):
+        self.id: str = id
         self.isbn: str = isbn
         self.title: str = title
         self.page: int = page
@@ -22,7 +24,7 @@ class Book:
 
     def __eq__(self, o: object) -> bool:
         if isinstance(o, Book):
-            return self.isbn == o.isbn
+            return self.id == o.id
 
         return False
 

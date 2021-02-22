@@ -7,6 +7,7 @@ from dddpy.infrastructure.sqlite.book.book_dto import BookDTO, from_entity
 class TestBookDTO:
     def test_to_entity_should_create_entity_instance(self):
         book_dto = BookDTO(
+            id="book_01",
             isbn="978-0141983479",
             title="Bullshit Jobs",
             page=320,
@@ -15,6 +16,7 @@ class TestBookDTO:
 
         book = book_dto.to_entity()
 
+        assert book.id == "book_01"
         assert book.isbn == "978-0141983479"
         assert book.title == "Bullshit Jobs"
         assert book.page == 320
@@ -22,6 +24,7 @@ class TestBookDTO:
 
     def test_from_entity_should_create_dto_instance(self):
         book = Book(
+            id="book_01",
             isbn="978-0141983479",
             title="Bullshit Jobs",
             page=320,
@@ -30,6 +33,7 @@ class TestBookDTO:
 
         book_dto = from_entity(book)
 
+        assert book_dto.id == "book_01"
         assert book_dto.isbn == "978-0141983479"
         assert book_dto.title == "Bullshit Jobs"
         assert book_dto.page == 320

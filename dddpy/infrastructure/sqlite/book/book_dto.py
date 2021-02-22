@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.sql.expression import null
 
 from dddpy.domain.book.book import Book
 from dddpy.infrastructure.sqlite.database import Base
@@ -14,11 +15,15 @@ class BookDTO(Base):
     """BookDTO is a data tranfer object associated with Book entity."""
 
     __tablename__ = "book"
-
-    isbn = Column(
+    id = Column(
         String,
         primary_key=True,
         autoincrement=False,
+    )
+    isbn = Column(
+        String(14),
+        unique=True,
+        nullable=False,
     )
     title = Column(String, nullable=False)
     page = Column(Integer, nullable=False)
@@ -43,6 +48,7 @@ class BookDTO(Base):
 
     def to_entity(self) -> Book:
         return Book(
+            id=self.id,
             isbn=self.isbn,
             title=self.title,
             page=self.page,
@@ -54,6 +60,7 @@ class BookDTO(Base):
 
 def from_entity(book: Book) -> BookDTO:
     return BookDTO(
+        id=book.id,
         isbn=book.isbn,
         title=book.title,
         page=book.page,

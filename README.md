@@ -66,7 +66,7 @@ UoW (Unit of Work) Pattern can be the solution.
 
 ### Sample requests for the RESTFul API
 
-* Create a new book
+* Create a new book:
 
 ```bash
 curl --location --request POST 'localhost:8000/books' \
@@ -78,16 +78,17 @@ curl --location --request POST 'localhost:8000/books' \
 }'
 ```
 
-* Response
+* Response of the POST request:
 
 ```json
 {
+    "id": "HH9uqNdYbjScdiLgaTApcS",
+    "isbn": "978-0141983479",
     "title": "Bullshit Job",
     "page": 320,
-    "isbn": "978-0141983479",
     "read_page": 0,
-    "created_at": 1613917301039,
-    "updated_at": 1613917301039
+    "created_at": 1614007224642,
+    "updated_at": 1614007224642
 }
 ```
 
@@ -97,17 +98,18 @@ curl --location --request POST 'localhost:8000/books' \
 curl --location --request GET 'localhost:8000/books'
 ```
 
-* Response:
+* Response of the GET request:
 
 ```json
 [
     {
+        "id": "e74R3Prx8SfcY8KJFkGVf3",
+        "isbn": "978-0141983479",
         "title": "Bullshit Job",
         "page": 320,
-        "isbn": "978-0141983479",
         "read_page": 0,
-        "created_at": 1613914965673,
-        "updated_at": 1613914965673
+        "created_at": 1614006055213,
+        "updated_at": 1614006055213
     }
 ]
 ```

@@ -22,6 +22,16 @@ class BookRepositoryImpl(BookRepository):
         except:
             raise
 
+    def find_by_id(self, id: str) -> Optional[Book]:
+        try:
+            book_dto = self.session.query(BookDTO).filter_by(id=id).one()
+        except NoResultFound:
+            return None
+        except:
+            raise
+
+        return book_dto.to_entity()
+
     def find_by_isbn(self, isbn: str) -> Optional[Book]:
         try:
             book_dto = self.session.query(BookDTO).filter_by(isbn=isbn).one()
@@ -45,9 +55,9 @@ class BookRepositoryImpl(BookRepository):
 
         return list(map(lambda book_dto: book_dto.to_entity(), book_dtos))
 
-    def delete_by_isbn(self, isbn: str):
+    def delete_by_id(self, id: str):
         try:
-            self.session.query(BookDTO).filter_by(isbn=isbn).delete()
+            self.session.query(BookDTO).filter_by(id=id).delete()
         except:
             raise
 

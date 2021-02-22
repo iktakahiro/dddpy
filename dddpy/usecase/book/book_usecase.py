@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
+import shortuuid
+
 from dddpy.domain.book.book import Book
 from dddpy.domain.book.book_exeption import (
-    BookAlreadyExistsError,
+    BookIsbnAlreadyExistsError,
     BookNotFoundError,
     BooksNotFoundError,
 )
@@ -41,6 +43,10 @@ class BookUseCase(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def fetch_book_by_id(self, id: str) -> Optional[Book]:
+        raise NotImplementedError
+
+    @abstractmethod
     def fetch_book_by_isbn(self, isbn: str) -> Optional[Book]:
         raise NotImplementedError
 
@@ -49,7 +55,7 @@ class BookUseCase(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete_book_by_isbn(self, isbn: str):
+    def delete_book_by_id(self, id: str):
         raise NotImplementedError
 
 
@@ -65,7 +71,10 @@ class BookUseCaseImpl(BookUseCase):
         title: str,
         page: int,
     ) -> Optional[Book]:
+
+        id = shortuuid.uuid()
         book = Book(
+            id=id,
             isbn=isbn,
             title=title,
             page=page,
@@ -73,18 +82,28 @@ class BookUseCaseImpl(BookUseCase):
         try:
             existing_book = self.uow.book_repository.find_by_isbn(isbn)
             if existing_book is not None:
-                raise BookAlreadyExistsError
+                raise BookIsbnAlreadyExistsError
 
             self.uow.book_repository.create(book)
             self.uow.commit()
 
-            created_book = self.uow.book_repository.find_by_isbn(isbn)
+            created_book = self.uow.book_repository.find_by_id(id)
 
         except:
             self.uow.rollback()
             raise
 
         return created_book
+
+    def fetch_book_by_id(self, id: str) -> Optional[Book]:
+        try:
+            book = self.uow.book_repository.find_by_id(id)
+            if book is None:
+                raise BookNotFoundError
+        except:
+            raise
+
+        return book
 
     def fetch_book_by_isbn(self, isbn: str) -> Optional[Book]:
         try:
@@ -106,13 +125,13 @@ class BookUseCaseImpl(BookUseCase):
 
         return books
 
-    def delete_book_by_isbn(self, isbn: str):
+    def delete_book_by_id(self, id: str):
         try:
-            existing_book = self.uow.book_repository.find_by_isbn(isbn)
+            existing_book = self.uow.book_repository.find_by_id(id)
             if existing_book is None:
                 raise BookNotFoundError
 
-            self.uow.book_repository.delete_by_isbn(isbn)
+            self.uow.book_repository.delete_by_id(id)
 
             self.uow.commit()
         except:

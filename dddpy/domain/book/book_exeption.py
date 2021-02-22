@@ -12,8 +12,8 @@ class BooksNotFoundError(Exception):
         return BooksNotFoundError.message
 
 
-class BookAlreadyExistsError(Exception):
+class BookIsbnAlreadyExistsError(Exception):
     message = "The book with the ISBN code you specified already exists."
 
     def __str__(self):
-        return BookAlreadyExistsError.message
+        return BookIsbnAlreadyExistsError.message

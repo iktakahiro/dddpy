@@ -300,6 +300,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "shortuuid"
+version = "1.0.1"
+description = "A generator library for concise, unambiguous and URL-safe UUIDs."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "six"
 version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -424,7 +432,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "2dee867a30eecbf425019f33a71883cbcf06af3dc47c2d3ae38e976997a8e7ba"
+content-hash = "c98ecac71ee1b2a489e053c808a92fae8da390a3a14729235261fe4dbb0bc9ad"
 
 [metadata.files]
 appdirs = [
@@ -660,6 +668,10 @@ regex = [
     {file = "regex-2020.11.13-cp39-cp39-win32.whl", hash = "sha256:f8f295db00ef5f8bae530fc39af0b40486ca6068733fb860b42115052206466f"},
     {file = "regex-2020.11.13-cp39-cp39-win_amd64.whl", hash = "sha256:a15f64ae3a027b64496a71ab1f722355e570c3fac5ba2801cafce846bf5af01d"},
     {file = "regex-2020.11.13.tar.gz", hash = "sha256:83d6b356e116ca119db8e7c6fc2983289d87b27b3fac238cfe5dca529d884562"},
+]
+shortuuid = [
+    {file = "shortuuid-1.0.1-py3-none-any.whl", hash = "sha256:492c7402ff91beb1342a5898bd61ea953985bf24a41cd9f247409aa2e03c8f77"},
+    {file = "shortuuid-1.0.1.tar.gz", hash = "sha256:3c11d2007b915c43bee3e10625f068d8a349e04f0d81f08f5fa08507427ebf1f"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
