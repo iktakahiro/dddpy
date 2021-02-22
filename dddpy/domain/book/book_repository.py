@@ -16,11 +16,15 @@ class BookRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def find_by_isbn(self, id: str) -> Optional[Book]:
+    def find_by_isbn(self, isbn: str) -> Optional[Book]:
         raise NotImplementedError
 
     @abstractmethod
     def find_all(self) -> List[Book]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def update(self, book: Book):
         raise NotImplementedError
 
     @abstractmethod

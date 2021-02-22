@@ -5,6 +5,7 @@ from dddpy.domain.book.book_exeption import (
     BookNotFoundError,
     BooksNotFoundError,
 )
+from dddpy.domain.book.isbn import Isbn
 
 
 class BookCreateSchema(BaseModel):
@@ -18,9 +19,9 @@ class BookCreateSchema(BaseModel):
 class BookUpdateSchema(BaseModel):
     """BookUpdateSchema represents data structure of a put request to update a book."""
 
-    isbn: str = Field(example="978-0141983479")
     title: str = Field(example="Bullshit Jobs")
     page: int = Field(ge=0, example=320)
+    read_page: int = Field(ge=0, example=120)
 
 
 class BookReadSchema(BaseModel):
@@ -38,13 +39,13 @@ class BookReadSchema(BaseModel):
         orm_mode = True
 
 
-class BookNotFoundErrorMessage(BaseModel):
+class ErrorMessageBookNotFound(BaseModel):
     detail: str = Field(example=BookNotFoundError.message)
 
 
-class BooksNotFoundErrorMessage(BaseModel):
+class ErrorMessageBooksNotFound(BaseModel):
     detail: str = Field(example=BooksNotFoundError.message)
 
 
-class BookIsbnAlreadyExistsErrorMessage(BaseModel):
+class ErrorMessageBookIsbnAlreadyExists(BaseModel):
     detail: str = Field(example=BookIsbnAlreadyExistsError.message)

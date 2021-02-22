@@ -5,6 +5,7 @@ from typing import List
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm.session import Session
 
+from dddpy.domain.book.book import Book
 from dddpy.domain.book.book_exeption import (
     BookIsbnAlreadyExistsError,
     BookNotFoundError,
@@ -13,11 +14,12 @@ from dddpy.domain.book.book_exeption import (
 from dddpy.infrastructure.sqlite.book.book_repository import BookRepositoryWithSession
 from dddpy.infrastructure.sqlite.database import SessionLocal, create_tables
 from dddpy.presentation.schema.book.book_schema import (
-    BookIsbnAlreadyExistsErrorMessage,
     BookCreateSchema,
-    BookNotFoundErrorMessage,
     BookReadSchema,
-    BooksNotFoundErrorMessage,
+    BookUpdateSchema,
+    ErrorMessageBookIsbnAlreadyExists,
+    ErrorMessageBookNotFound,
+    ErrorMessageBooksNotFound,
 )
 from dddpy.usecase.book.book_usecase import (
     BookUseCase,
@@ -52,7 +54,7 @@ def book_usecase(session: Session = Depends(get_session)) -> BookUseCase:
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_409_CONFLICT: {
-            "model": BookIsbnAlreadyExistsErrorMessage,
+            "model": ErrorMessageBookIsbnAlreadyExists,
         },
     },
 )
@@ -86,7 +88,7 @@ async def create_book(
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": BooksNotFoundErrorMessage,
+            "model": ErrorMessageBooksNotFound,
         },
     },
 )
@@ -115,16 +117,16 @@ async def get_books(
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": BookNotFoundErrorMessage,
+            "model": ErrorMessageBookNotFound,
         },
     },
 )
 async def get_book(
-    book_id: str,
+    id: str,
     book_usecase: BookUseCase = Depends(book_usecase),
 ):
     try:
-        book = book_usecase.fetch_book_by_id(book_id)
+        book = book_usecase.fetch_book_by_id(id)
     except BookNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -139,23 +141,55 @@ async def get_book(
     return book
 
 
+@app.put(
+    "/books/{book_id}",
+    response_model=BookReadSchema,
+    status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorMessageBookNotFound,
+        },
+    },
+)
+async def update_book(
+    id: str,
+    data: BookUpdateSchema,
+    book_usecase: BookUseCase = Depends(book_usecase),
+):
+    try:
+        updated_book = book_usecase.update_book(
+            id, data.title, data.page, data.read_page
+        )
+    except BookNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return updated_book
+
+
 @app.delete(
     "/books/{book_id}",
     status_code=status.HTTP_202_ACCEPTED,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": BookNotFoundErrorMessage,
+            "model": ErrorMessageBookNotFound,
         },
     },
 )
 async def delete_book(
-    book_id: str,
+    id: str,
     book_usecase: BookUseCase = Depends(book_usecase),
 ):
     try:
-        book_usecase.delete_book_by_id(book_id)
+        book_usecase.delete_book_by_id(id)
     except BookNotFoundError as e:
-        logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.message,

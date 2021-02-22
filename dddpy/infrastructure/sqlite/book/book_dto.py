@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.sql.expression import null
 
 from dddpy.domain.book.book import Book
 from dddpy.infrastructure.sqlite.database import Base
@@ -21,7 +20,7 @@ class BookDTO(Base):
         autoincrement=False,
     )
     isbn = Column(
-        String(14),
+        String(17),
         unique=True,
         nullable=False,
     )
@@ -36,14 +35,11 @@ class BookDTO(Base):
         Integer,
         index=True,
         nullable=False,
-        default=unixtimestamp(),
     )
     updated_at = Column(
         Integer,
         index=True,
         nullable=False,
-        default=unixtimestamp(),
-        onupdate=unixtimestamp(),
     )
 
     def to_entity(self) -> Book:
@@ -59,10 +55,13 @@ class BookDTO(Base):
 
 
 def from_entity(book: Book) -> BookDTO:
+    now = unixtimestamp()
     return BookDTO(
         id=book.id,
         isbn=book.isbn,
         title=book.title,
         page=book.page,
         read_page=book.read_page,
+        created_at=now,
+        updated_at=now,
     )

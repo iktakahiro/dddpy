@@ -34,12 +34,7 @@ class BookUseCase(ABC):
     """BookUseCase defines a usecase inteface related Book entity."""
 
     @abstractmethod
-    def create_book(
-        self,
-        isbn: str,
-        title: str,
-        page: int,
-    ) -> Optional[Book]:
+    def create_book(self, isbn: str, title: str, page: int) -> Optional[Book]:
         raise NotImplementedError
 
     @abstractmethod
@@ -55,6 +50,12 @@ class BookUseCase(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def update_book(
+        self, id: str, title: str, page: int, read_page: int
+    ) -> Optional[Book]:
+        raise NotImplementedError
+
+    @abstractmethod
     def delete_book_by_id(self, id: str):
         raise NotImplementedError
 
@@ -65,20 +66,10 @@ class BookUseCaseImpl(BookUseCase):
     def __init__(self, uow: BookUseCaseUnitOfWork):
         self.uow: BookUseCaseUnitOfWork = uow
 
-    def create_book(
-        self,
-        isbn: str,
-        title: str,
-        page: int,
-    ) -> Optional[Book]:
+    def create_book(self, isbn: str, title: str, page: int) -> Optional[Book]:
 
-        id = shortuuid.uuid()
-        book = Book(
-            id=id,
-            isbn=isbn,
-            title=title,
-            page=page,
-        )
+        uuid = shortuuid.uuid()
+        book = Book(id=uuid, isbn=isbn, title=title, page=page)
         try:
             existing_book = self.uow.book_repository.find_by_isbn(isbn)
             if existing_book is not None:
@@ -87,7 +78,7 @@ class BookUseCaseImpl(BookUseCase):
             self.uow.book_repository.create(book)
             self.uow.commit()
 
-            created_book = self.uow.book_repository.find_by_id(id)
+            created_book = self.uow.book_repository.find_by_id(uuid)
 
         except:
             self.uow.rollback()
@@ -124,6 +115,29 @@ class BookUseCaseImpl(BookUseCase):
             raise
 
         return books
+
+    def update_book(
+        self, id: str, title: str, page: int, read_page: int
+    ) -> Optional[Book]:
+        try:
+            book = self.uow.book_repository.find_by_id(id)
+            if book is None:
+                raise BookNotFoundError
+
+            book.title = title
+            book.page = page
+            book.read_page = read_page
+
+            self.uow.book_repository.update(book)
+
+            updated_book = self.uow.book_repository.find_by_id(book.id)
+
+            self.uow.commit()
+        except:
+            self.uow.rollback()
+            raise
+
+        return updated_book
 
     def delete_book_by_id(self, id: str):
         try:

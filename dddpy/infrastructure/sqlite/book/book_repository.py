@@ -46,7 +46,12 @@ class BookRepositoryImpl(BookRepository):
         self,
     ) -> List[Book]:
         try:
-            book_dtos = self.session.query(BookDTO).order_by(BookDTO.updated_at).all()
+            book_dtos = (
+                self.session.query(BookDTO)
+                .order_by(BookDTO.updated_at)
+                .limit(100)
+                .all()
+            )
         except:
             raise
 
@@ -54,6 +59,17 @@ class BookRepositoryImpl(BookRepository):
             return []
 
         return list(map(lambda book_dto: book_dto.to_entity(), book_dtos))
+
+    def update(self, book: Book):
+        book_dto = from_entity(book)
+        try:
+            _book = self.session.query(BookDTO).filter_by(id=book_dto.id).one()
+            _book.title = book_dto.title
+            _book.page = book_dto.page
+            _book.read_page = book_dto.read_page
+            _book.updated_at = book_dto.updated_at
+        except:
+            raise
 
     def delete_by_id(self, id: str):
         try:
