@@ -57,13 +57,15 @@ class BookCommandUseCase(ABC):
 class BookCommandUseCaseImpl(BookCommandUseCase):
     """BookCommandUseCaseImpl implements a command usecases related Book entity."""
 
-    def __init__(self, uow: BookCommandUseCaseUnitOfWork):
+    def __init__(
+        self,
+        uow: BookCommandUseCaseUnitOfWork,
+    ):
         self.uow: BookCommandUseCaseUnitOfWork = uow
 
     def create_book(
         self, isbn_str: str, title: str, page: int
     ) -> Optional[BookQueryModel]:
-
         try:
             uuid = shortuuid.uuid()
             isbn = Isbn(isbn_str)

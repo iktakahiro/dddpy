@@ -1,12 +1,12 @@
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock
 
 import pytest
 
+from dddpy.domain.book.book_exception import BookNotFoundError
 from dddpy.infrastructure.sqlite.book.book_query_service import BookQueryServiceImpl
 from dddpy.usecase.book.book_query_model import BookQueryModel
-from dddpy.usecase.book.book_query_service import BookQueryService
-from dddpy.usecase.book.book_query_usecase import BookQueryUseCase, BookQueryUseCaseImpl
-from dddpy.domain.book.book_exception import BookNotFoundError
+from dddpy.usecase.book.book_query_usecase import BookQueryUseCaseImpl
+
 
 class TestBookQueryUseCase:
     def test_fetch_book_by_id_should_return_book(self):
@@ -14,16 +14,16 @@ class TestBookQueryUseCase:
         session = MagicMock()
         book_query_service = BookQueryServiceImpl(session)
         book_query_service.find_by_id = Mock(
-                return_value=BookQueryModel(
-                    id="cPqw4yPVUM3fA9sqzpZmkL",
-                    isbn="978-0141983479",
-                    title="Bullshit Job",
-                    page=320,
-                    read_page=126,
-                    created_at=1614051983128,
-                    updated_at=1614056689464,
-                )
+            return_value=BookQueryModel(
+                id="cPqw4yPVUM3fA9sqzpZmkL",
+                isbn="978-0141983479",
+                title="Bullshit Job",
+                page=320,
+                read_page=126,
+                created_at=1614051983128,
+                updated_at=1614056689464,
             )
+        )
 
         book_query_usecase = BookQueryUseCaseImpl(book_query_service)
 
@@ -46,7 +46,8 @@ class TestBookQueryUseCase:
         session = MagicMock()
         book_query_service = BookQueryServiceImpl(session)
         book_query_service.find_all = Mock(
-                return_value=[BookQueryModel(
+            return_value=[
+                BookQueryModel(
                     id="cPqw4yPVUM3fA9sqzpZmkL",
                     isbn="978-0141983479",
                     title="Bullshit Job",
@@ -54,8 +55,9 @@ class TestBookQueryUseCase:
                     read_page=126,
                     created_at=1614051983128,
                     updated_at=1614056689464,
-                )]
-            )
+                )
+            ]
+        )
 
         book_query_usecase = BookQueryUseCaseImpl(book_query_service)
 
