@@ -78,11 +78,7 @@ async def create_book(
     book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
     try:
-        book = book_command_usecase.create_book(
-            isbn_str=data.isbn,
-            title=data.title,
-            page=data.page,
-        )
+        book = book_command_usecase.create_book(data)
     except BookIsbnAlreadyExistsError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -172,9 +168,7 @@ async def update_book(
     book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
     try:
-        updated_book = book_command_usecase.update_book(
-            book_id, data.title, data.page, data.read_page
-        )
+        updated_book = book_command_usecase.update_book(book_id, data)
     except BookNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

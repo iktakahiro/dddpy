@@ -11,6 +11,7 @@ from dddpy.domain.book import (
     Isbn,
 )
 
+from .book_command_model import BookCreateModel, BookUpdateModel
 from .book_query_model import BookReadModel, from_entiry_to_read_model
 
 
@@ -36,15 +37,11 @@ class BookCommandUseCase(ABC):
     """BookCommandUseCase defines a command usecase inteface related Book entity."""
 
     @abstractmethod
-    def create_book(
-        self, isbn_str: str, title: str, page: int
-    ) -> Optional[BookReadModel]:
+    def create_book(self, data: BookCreateModel) -> Optional[BookReadModel]:
         raise NotImplementedError
 
     @abstractmethod
-    def update_book(
-        self, id: str, title: str, page: int, read_page: int
-    ) -> Optional[BookReadModel]:
+    def update_book(self, id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
         raise NotImplementedError
 
     @abstractmethod
@@ -61,13 +58,11 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
     ):
         self.uow: BookCommandUseCaseUnitOfWork = uow
 
-    def create_book(
-        self, isbn_str: str, title: str, page: int
-    ) -> Optional[BookReadModel]:
+    def create_book(self, data: BookCreateModel) -> Optional[BookReadModel]:
         try:
             uuid = shortuuid.uuid()
-            isbn = Isbn(isbn_str)
-            book = Book(id=uuid, isbn=Isbn(isbn_str), title=title, page=page)
+            isbn = Isbn(data.isbn)
+            book = Book(id=uuid, isbn=isbn, title=data.title, page=data.page)
 
             existing_book = self.uow.book_repository.find_by_isbn(isbn.value)
             if existing_book is not None:
@@ -83,9 +78,7 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
 
         return from_entiry_to_read_model(cast(Book, created_book))
 
-    def update_book(
-        self, id: str, title: str, page: int, read_page: int
-    ) -> Optional[BookReadModel]:
+    def update_book(self, id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
         try:
             existing_book = self.uow.book_repository.find_by_id(id)
             if existing_book is None:
@@ -94,9 +87,9 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
             book = Book(
                 id=id,
                 isbn=existing_book.isbn,
-                title=title,
-                page=page,
-                read_page=read_page,
+                title=data.title,
+                page=data.page,
+                read_page=data.read_page,
             )
 
             self.uow.book_repository.update(book)
