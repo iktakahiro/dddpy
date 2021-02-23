@@ -1,16 +1,20 @@
 import pytest
 
 from dddpy.domain.book.book import Book
+from dddpy.domain.book.isbn import Isbn
 
 
 class TestBook:
     def test_constructor_should_create_instance(self):
         book = Book(
-            id="book_01", isbn="978-0141983479", title="Bullshit Jobs", page=320
+            id="book_01",
+            isbn=Isbn("978-0141983479"),
+            title="Bullshit Jobs",
+            page=320,
         )
 
         assert book.id == "book_01"
-        assert book.isbn == "978-0141983479"
+        assert book.isbn == Isbn("978-0141983479")
         assert book.title == "Bullshit Jobs"
         assert book.page == 320
         assert book.read_page == 0
@@ -18,7 +22,7 @@ class TestBook:
     def test_book_entity_should_be_identified_by_id(self):
         book_1 = Book(
             id="book_01",
-            isbn="978-0141983479",
+            isbn=Isbn("978-0141983479"),
             title="Bullshit Jobs",
             page=320,
             read_page=50,
@@ -26,7 +30,7 @@ class TestBook:
 
         book_2 = Book(
             id="book_01",
-            isbn="978-0141983479",
+            isbn=Isbn("978-0141983479"),
             title="Bullshit Jobs",
             page=320,
             read_page=120,
@@ -34,7 +38,7 @@ class TestBook:
 
         book_3 = Book(
             id="book_02",
-            isbn="978-0141983479",
+            isbn=Isbn("978-0141983479"),
             title="Bullshit Jobs",
             page=320,
             read_page=50,
@@ -53,7 +57,10 @@ class TestBook:
     )
     def test_read_page_setter_should_update_value(self, read_page):
         book = Book(
-            id="book_01", isbn="978-0141983479", title="Bullshit Jobs", page=320
+            id="book_01",
+            isbn=Isbn("978-0141983479"),
+            title="Bullshit Jobs",
+            page=320,
         )
 
         book.read_page = read_page
@@ -71,7 +78,10 @@ class TestBook:
         self, read_page
     ):
         book = Book(
-            id="book_0001", isbn="978-0141983479", title="Bullshit Jobs", page=320
+            id="book_0001",
+            isbn=Isbn("978-0141983479"),
+            title="Bullshit Jobs",
+            page=320,
         )
 
         with pytest.raises(ValueError):
@@ -89,7 +99,10 @@ class TestBook:
         self, read_page, expected
     ):
         book = Book(
-            id="book_01", isbn="978-0141983479", title="Bullshit Jobs", page=320
+            id="book_01",
+            isbn=Isbn("978-0141983479"),
+            title="Bullshit Jobs",
+            page=320,
         )
         book.read_page = read_page
 

@@ -8,7 +8,7 @@ class BookRepository(ABC):
     """BookRepository defines a repository interface for Book entity."""
 
     @abstractmethod
-    def create(self, book: Book):
+    def create(self, book: Book) -> Optional[Book]:
         raise NotImplementedError
 
     @abstractmethod
@@ -20,11 +20,7 @@ class BookRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def find_all(self) -> List[Book]:
-        raise NotImplementedError
-
-    @abstractmethod
-    def update(self, book: Book):
+    def update(self, book: Book) -> Optional[Book]:
         raise NotImplementedError
 
     @abstractmethod

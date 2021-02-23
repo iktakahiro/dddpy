@@ -1,17 +1,21 @@
 import logging
 from logging import config
-from typing import List
+from typing import Iterator, List
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm.session import Session
 
-from dddpy.domain.book.book import Book
 from dddpy.domain.book.book_exeption import (
     BookIsbnAlreadyExistsError,
     BookNotFoundError,
     BooksNotFoundError,
 )
-from dddpy.infrastructure.sqlite.book.book_repository import BookRepositoryWithSession
+from dddpy.domain.book.book_repository import BookRepository
+from dddpy.infrastructure.sqlite.book.book_query_service import BookQueryServiceImpl
+from dddpy.infrastructure.sqlite.book.book_repository import (
+    BookCommandUseCaseUnitOfWorkImpl,
+    BookRepositoryImpl,
+)
 from dddpy.infrastructure.sqlite.database import SessionLocal, create_tables
 from dddpy.presentation.schema.book.book_schema import (
     BookCreateSchema,
@@ -21,11 +25,13 @@ from dddpy.presentation.schema.book.book_schema import (
     ErrorMessageBookNotFound,
     ErrorMessageBooksNotFound,
 )
-from dddpy.usecase.book.book_usecase import (
-    BookUseCase,
-    BookUseCaseImpl,
-    BookUseCaseUnitOfWork,
+from dddpy.usecase.book.book_command_usecase import (
+    BookCommandUseCase,
+    BookCommandUseCaseImpl,
+    BookCommandUseCaseUnitOfWork,
 )
+from dddpy.usecase.book.book_query_service import BookQueryService
+from dddpy.usecase.book.book_query_usecase import BookQueryUseCase, BookQueryUseCaseImpl
 
 config.fileConfig("logging.conf", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
@@ -35,7 +41,7 @@ app = FastAPI()
 create_tables()
 
 
-def get_session() -> Session:
+def get_session() -> Iterator[Session]:
     session: Session = SessionLocal()
     try:
         yield session
@@ -43,9 +49,17 @@ def get_session() -> Session:
         session.close()
 
 
-def book_usecase(session: Session = Depends(get_session)) -> BookUseCase:
-    uow: BookUseCaseUnitOfWork = BookRepositoryWithSession(session)
-    return BookUseCaseImpl(uow)
+def book_query_usecase(session: Session = Depends(get_session)) -> BookQueryUseCase:
+    book_query_service: BookQueryService = BookQueryServiceImpl(session)
+    return BookQueryUseCaseImpl(book_query_service)
+
+
+def book_command_usecase(session: Session = Depends(get_session)) -> BookCommandUseCase:
+    book_repository: BookRepository = BookRepositoryImpl(session)
+    uow: BookCommandUseCaseUnitOfWork = BookCommandUseCaseUnitOfWorkImpl(
+        session, book_repository=book_repository
+    )
+    return BookCommandUseCaseImpl(uow)
 
 
 @app.post(
@@ -60,11 +74,11 @@ def book_usecase(session: Session = Depends(get_session)) -> BookUseCase:
 )
 async def create_book(
     data: BookCreateSchema,
-    book_usecase: BookUseCase = Depends(book_usecase),
+    book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
     try:
-        book = book_usecase.create_book(
-            isbn=data.isbn,
+        book = book_command_usecase.create_book(
+            isbn_str=data.isbn,
             title=data.title,
             page=data.page,
         )
@@ -93,10 +107,10 @@ async def create_book(
     },
 )
 async def get_books(
-    book_usecase: BookUseCase = Depends(book_usecase),
+    book_query_usecase: BookQueryUseCase = Depends(book_query_usecase),
 ):
     try:
-        books = book_usecase.fetch_books()
+        books = book_query_usecase.fetch_books()
     except BooksNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -122,11 +136,11 @@ async def get_books(
     },
 )
 async def get_book(
-    id: str,
-    book_usecase: BookUseCase = Depends(book_usecase),
+    book_id: str,
+    book_query_usecase: BookQueryUseCase = Depends(book_query_usecase),
 ):
     try:
-        book = book_usecase.fetch_book_by_id(id)
+        book = book_query_usecase.fetch_book_by_id(book_id)
     except BookNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -152,13 +166,13 @@ async def get_book(
     },
 )
 async def update_book(
-    id: str,
+    book_id: str,
     data: BookUpdateSchema,
-    book_usecase: BookUseCase = Depends(book_usecase),
+    book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
     try:
-        updated_book = book_usecase.update_book(
-            id, data.title, data.page, data.read_page
+        updated_book = book_command_usecase.update_book(
+            book_id, data.title, data.page, data.read_page
         )
     except BookNotFoundError as e:
         raise HTTPException(
@@ -184,11 +198,11 @@ async def update_book(
     },
 )
 async def delete_book(
-    id: str,
-    book_usecase: BookUseCase = Depends(book_usecase),
+    book_id: str,
+    book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
     try:
-        book_usecase.delete_book_by_id(id)
+        book_command_usecase.delete_book_by_id(book_id)
     except BookNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

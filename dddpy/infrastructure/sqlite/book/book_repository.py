@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
@@ -6,7 +6,10 @@ from sqlalchemy.orm.session import Session
 from dddpy.domain.book.book import Book
 from dddpy.domain.book.book_repository import BookRepository
 from dddpy.infrastructure.sqlite.book.book_dto import BookDTO, from_entity
-from dddpy.usecase.book.book_usecase import BookUseCaseUnitOfWork
+from dddpy.usecase.book.book_command_usecase import (
+    BookCommandUseCase,
+    BookCommandUseCaseUnitOfWork,
+)
 
 
 class BookRepositoryImpl(BookRepository):
@@ -14,13 +17,6 @@ class BookRepositoryImpl(BookRepository):
 
     def __init__(self, session: Session):
         self.session: Session = session
-
-    def create(self, book: Book):
-        book_dto = from_entity(book)
-        try:
-            self.session.add(book_dto)
-        except:
-            raise
 
     def find_by_id(self, id: str) -> Optional[Book]:
         try:
@@ -30,7 +26,7 @@ class BookRepositoryImpl(BookRepository):
         except:
             raise
 
-        return book_dto.to_entity()
+        return book_dto.to_entiry()
 
     def find_by_isbn(self, isbn: str) -> Optional[Book]:
         try:
@@ -40,25 +36,14 @@ class BookRepositoryImpl(BookRepository):
         except:
             raise
 
-        return book_dto.to_entity()
+        return book_dto.to_entiry()
 
-    def find_all(
-        self,
-    ) -> List[Book]:
+    def create(self, book: Book):
+        book_dto = from_entity(book)
         try:
-            book_dtos = (
-                self.session.query(BookDTO)
-                .order_by(BookDTO.updated_at)
-                .limit(100)
-                .all()
-            )
+            self.session.add(book_dto)
         except:
             raise
-
-        if len(book_dtos) == 0:
-            return []
-
-        return list(map(lambda book_dto: book_dto.to_entity(), book_dtos))
 
     def update(self, book: Book):
         book_dto = from_entity(book)
@@ -78,10 +63,14 @@ class BookRepositoryImpl(BookRepository):
             raise
 
 
-class BookRepositoryWithSession(BookUseCaseUnitOfWork):
-    def __init__(self, session: Session):
-        self.session = session
-        self.book_repository: BookRepository = BookRepositoryImpl(session=self.session)
+class BookCommandUseCaseUnitOfWorkImpl(BookCommandUseCaseUnitOfWork):
+    def __init__(
+        self,
+        session: Session,
+        book_repository: BookRepository,
+    ):
+        self.session: Session = session
+        self.book_repository: BookRepository = book_repository
 
     def begin(self):
         self.session.begin()

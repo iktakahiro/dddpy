@@ -1,5 +1,7 @@
 from typing import Optional
 
+from .isbn import Isbn
+
 
 class Book:
     """Book represents your collection of books as an entity."""
@@ -7,7 +9,7 @@ class Book:
     def __init__(
         self,
         id: str,
-        isbn: str,
+        isbn: Isbn,
         title: str,
         page: int,
         read_page: int = 0,
@@ -15,10 +17,14 @@ class Book:
         updated_at: Optional[int] = None,
     ):
         self.id: str = id
-        self.isbn: str = isbn
+        self.isbn: Isbn = isbn
         self.title: str = title
         self.page: int = page
-        self.read_page: int = read_page
+        try:
+            self._validate_read_page(read_page)
+        except:
+            raise
+        self._read_page: int = read_page
         self.created_at: Optional[int] = created_at
         self.updated_at: Optional[int] = updated_at
 

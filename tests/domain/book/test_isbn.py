@@ -34,4 +34,4 @@ class TestIsbn:
     def test_isbn_should_be_frozen(self):
         with pytest.raises(dataclasses.FrozenInstanceError):
             isbn = Isbn("978-0141983479")
-            isbn.value = "978-1141983479"
+            isbn.value = "978-1141983479"  # type: ignore
