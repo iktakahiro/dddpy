@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from dddpy.domain.book.book_exeption import (
+from dddpy.domain.book.book_exception import (
     BookIsbnAlreadyExistsError,
     BookNotFoundError,
     BooksNotFoundError,
