@@ -9,7 +9,7 @@ class TestIsbn:
     @pytest.mark.parametrize(
         "value",
         [
-            ("978-0141983479"),
+            ("978-0321125217"),
             ("978-4-949999-12-0"),
         ],
     )
@@ -33,5 +33,5 @@ class TestIsbn:
 
     def test_isbn_should_be_frozen(self):
         with pytest.raises(dataclasses.FrozenInstanceError):
-            isbn = Isbn("978-0141983479")
+            isbn = Isbn("978-0321125217")
             isbn.value = "978-1141983479"  # type: ignore

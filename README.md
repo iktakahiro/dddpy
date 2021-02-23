@@ -121,8 +121,8 @@ TBD
 curl --location --request POST 'localhost:8000/books' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "isbn": "978-0141983479",
-    "title": "Bullshit Job",
+    "isbn": "978-0321125217",
+    "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
     "page": 320
 }'
 ```
@@ -132,9 +132,9 @@ curl --location --request POST 'localhost:8000/books' \
 ```json
 {
     "id": "HH9uqNdYbjScdiLgaTApcS",
-    "isbn": "978-0141983479",
-    "title": "Bullshit Job",
-    "page": 320,
+    "isbn": "978-0321125217",
+    "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
+    "page": 560,
     "read_page": 0,
     "created_at": 1614007224642,
     "updated_at": 1614007224642
@@ -153,9 +153,9 @@ curl --location --request GET 'localhost:8000/books'
 [
     {
         "id": "e74R3Prx8SfcY8KJFkGVf3",
-        "isbn": "978-0141983479",
-        "title": "Bullshit Job",
-        "page": 320,
+        "isbn": "978-0321125217",
+        "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
+        "page": 560,
         "read_page": 0,
         "created_at": 1614006055213,
         "updated_at": 1614006055213

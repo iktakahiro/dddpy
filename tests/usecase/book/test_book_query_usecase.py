@@ -16,9 +16,9 @@ class TestBookQueryUseCase:
         book_query_service.find_by_id = Mock(
             return_value=BookQueryModel(
                 id="cPqw4yPVUM3fA9sqzpZmkL",
-                isbn="978-0141983479",
-                title="Bullshit Job",
-                page=320,
+                isbn="978-0321125217",
+                title="Domain-Driven Design: Tackling Complexity in the Heart of Software",
+                page=560,
                 read_page=126,
                 created_at=1614051983128,
                 updated_at=1614056689464,
@@ -29,7 +29,10 @@ class TestBookQueryUseCase:
 
         book = book_query_usecase.fetch_book_by_id("cPqw4yPVUM3fA9sqzpZmkL")
 
-        assert book.title == "Bullshit Job"
+        assert (
+            book.title
+            == "Domain-Driven Design: Tackling Complexity in the Heart of Software"
+        )
 
     def test_fetch_book_by_id_should_throw_book_not_found_error(self):
 
@@ -49,9 +52,9 @@ class TestBookQueryUseCase:
             return_value=[
                 BookQueryModel(
                     id="cPqw4yPVUM3fA9sqzpZmkL",
-                    isbn="978-0141983479",
-                    title="Bullshit Job",
-                    page=320,
+                    isbn="978-0321125217",
+                    title="Domain-Driven Design: Tackling Complexity in the Heart of Software",
+                    page=560,
                     read_page=126,
                     created_at=1614051983128,
                     updated_at=1614056689464,
@@ -65,4 +68,4 @@ class TestBookQueryUseCase:
 
         assert len(books) == 1
 
-        assert books[0].page == 320
+        assert books[0].page == 560
