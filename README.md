@@ -123,7 +123,7 @@ curl --location --request POST 'localhost:8000/books' \
 --data-raw '{
     "isbn": "978-0321125217",
     "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
-    "page": 320
+    "page": 560
 }'
 ```
 
