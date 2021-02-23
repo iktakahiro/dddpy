@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, validator
 
 
 class BookCreateModel(BaseModel):
-    """BookCreateSchema represents data structure of a post request to create a book."""
+    """BookCreateModel represents a write model to create a book."""
 
     isbn: str = Field(example="978-0321125217")
     title: str = Field(
@@ -12,7 +12,7 @@ class BookCreateModel(BaseModel):
 
 
 class BookUpdateModel(BaseModel):
-    """BookUpdateSchema represents data structure of a put request to update a book."""
+    """BookUpdateModel represents a write model to update a book."""
 
     title: str = Field(
         example="Domain-Driven Design: Tackling Complexity in the Heart of Softwares"

@@ -7,7 +7,7 @@ from dddpy.domain.book import Book
 
 
 class BookReadModel(BaseModel):
-    """BookReadSchema represents data structure of a get request to fetch books."""
+    """BookReadModel represents data structure as a read model."""
 
     id: str = Field(example="vytxeTZskVKR7C7WgdSP3d")
     isbn: str = Field(example="978-0321125217")
