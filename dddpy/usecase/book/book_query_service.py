@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from dddpy.usecase.book.book import BookQueryModel
+from dddpy.usecase.book.book_query_model import BookQueryModel
 
 
 class BookQueryService(ABC):

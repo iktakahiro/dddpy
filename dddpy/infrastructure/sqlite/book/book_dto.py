@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String
 from dddpy.domain.book.book import Book
 from dddpy.domain.book.isbn import Isbn
 from dddpy.infrastructure.sqlite.database import Base
-from dddpy.usecase.book.book import BookQueryModel
+from dddpy.usecase.book.book_query_model import BookQueryModel
 
 
 def unixtimestamp() -> int:

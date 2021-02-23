@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from dddpy.domain.book.book_exception import BookNotFoundError, BooksNotFoundError
-from dddpy.usecase.book.book import BookQueryModel
+from dddpy.usecase.book.book_query_model import BookQueryModel
 from dddpy.usecase.book.book_query_service import BookQueryService
 
 

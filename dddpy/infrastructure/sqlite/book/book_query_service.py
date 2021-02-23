@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
 from dddpy.infrastructure.sqlite.book.book_dto import BookDTO
-from dddpy.usecase.book.book import BookQueryModel
+from dddpy.usecase.book.book_query_model import BookQueryModel
 from dddpy.usecase.book.book_query_service import BookQueryService
 
 

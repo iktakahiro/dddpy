@@ -10,7 +10,7 @@ from dddpy.domain.book.book_exception import (
 )
 from dddpy.domain.book.book_repository import BookRepository
 from dddpy.domain.book.isbn import Isbn
-from dddpy.usecase.book.book import BookQueryModel, from_entiry_to_query_model
+from dddpy.usecase.book.book_query_model import BookQueryModel, from_entiry_to_query_model
 
 
 class BookCommandUseCaseUnitOfWork(ABC):

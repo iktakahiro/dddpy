@@ -29,14 +29,14 @@ Directory structure:
 │   │           └── book_schema.py  # Schemas for the RESTful API
 │   └── usecase
 │       └── book
-│           ├── book.py  # Query model
 │           ├── book_command_usecase.py
+│           ├── book_query_model.py  # Query model
 │           ├── book_query_service.py  # Query service interface
 │           └── book_query_usecase.py
 └── tests
 ```
 
-### Entiry
+### Entity
 
 To represent an Entity in Python, use `__eq__()` method to ensure the identity of the object.
 
@@ -84,6 +84,10 @@ To solve this problem, we can simply set two rules:
 1. A Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SQLAlchemy Base class.
 2. A Data transfer Objects extend the O/R mapper class.
 
+### CQRS
+
+*TBD*
+
 ### UoW (Unit of Work)
 
 Even if we succeed in isolating the domain layer, some issues remains. One of them is how to manage transactions.
@@ -96,6 +100,7 @@ UoW (Unit of Work) Pattern can be the solution.
 
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [SQLAlchemy](https://www.sqlalchemy.org/)
+    * [SQLite](https://www.sqlite.org/index.html)
 * [Poetry](https://python-poetry.org/)
 * [Docker](https://www.docker.com/)
 
@@ -104,7 +109,10 @@ UoW (Unit of Work) Pattern can be the solution.
 1. Clone and open this repostiroy using VSCode
 2. Run Remote-Container 
 3. Run `make dev` on the Docker container terminal
-4. Access http://127.0.0.1:8000/docs
+4. Access the API document http://127.0.0.1:8000/docs
+
+![OpenAPI Doc](./screenshots/openapi_doc.png)
+
 
 ### Sample requests for the RESTFul API
 
