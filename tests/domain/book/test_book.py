@@ -71,26 +71,6 @@ class TestBook:
         assert book.read_page == read_page
 
     @pytest.mark.parametrize(
-        "read_page",
-        [
-            (561),
-            (-1),
-        ],
-    )
-    def test_read_page_setter_should_throw_value_error_when_params_are_invalid(
-        self, read_page
-    ):
-        book = Book(
-            id="book_0001",
-            isbn=Isbn("978-0321125217"),
-            title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
-            page=560,
-        )
-
-        with pytest.raises(ValueError):
-            book.read_page = read_page
-
-    @pytest.mark.parametrize(
         "read_page, expected",
         [
             (0, False),

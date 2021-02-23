@@ -2,6 +2,14 @@
 
 *NOTE: This repository is an example to explain 'how to implement DDD architecture on Python web applicaiton'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
 
+## Tech Stack
+
+* [FastAPI](https://fastapi.tiangolo.com/)
+* [SQLAlchemy](https://www.sqlalchemy.org/)
+  * [SQLite](https://www.sqlite.org/index.html)
+* [Poetry](https://python-poetry.org/)
+* [Docker](https://www.docker.com/)
+
 ## Code Architecture
 
 For this implementation, I've adopted the [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/).
@@ -9,13 +17,14 @@ For this implementation, I've adopted the [Onion Architecture](https://jeffreypa
 Directory structure:
 
 ```tree
+├── main.py
 ├── dddpy
 │   ├── domain
-│   │   ├── book
-│   │   │   ├── book.py  # Entiry
-│   │   │   ├── book_exception.py  # Exception definitions
-│   │   │   ├── book_repository.py  # Repository interface
-│   │   │   └── isbn.py  # Value Object
+│   │   └── book
+│   │       ├── book.py  # Entiry
+│   │       ├── book_exception.py  # Exception definitions
+│   │       ├── book_repository.py  # Repository interface
+│   │       └── isbn.py
 │   ├── infrastructure
 │   │   └── sqlite
 │   │       ├── book
@@ -26,11 +35,12 @@ Directory structure:
 │   ├── presentation
 │   │   └── schema
 │   │       └── book
-│   │           └── book_schema.py  # Schemas for the RESTful API
+│   │           └── book_error_message.py
 │   └── usecase
 │       └── book
+│           ├── book_command_model.py  # Write models including schemas of the RESTFul API
 │           ├── book_command_usecase.py
-│           ├── book_query_model.py  # Query model
+│           ├── book_query_model.py   # Read models including schemas
 │           ├── book_query_service.py  # Query service interface
 │           └── book_query_usecase.py
 └── tests
@@ -95,14 +105,6 @@ Even if we succeed in isolating the domain layer, some issues remains. One of th
 UoW (Unit of Work) Pattern can be the solution.
 
 TBD
-
-## Tech Stack
-
-* [FastAPI](https://fastapi.tiangolo.com/)
-* [SQLAlchemy](https://www.sqlalchemy.org/)
-  * [SQLite](https://www.sqlite.org/index.html)
-* [Poetry](https://python-poetry.org/)
-* [Docker](https://www.docker.com/)
 
 ## How to work
 

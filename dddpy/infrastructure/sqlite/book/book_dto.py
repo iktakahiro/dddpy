@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String
 from dddpy.domain.book.book import Book
 from dddpy.domain.book.isbn import Isbn
 from dddpy.infrastructure.sqlite.database import Base
-from dddpy.usecase.book.book_query_model import BookQueryModel
+from dddpy.usecase.book.book_query_model import BookReadModel
 
 
 def unixtimestamp() -> int:
@@ -36,8 +36,8 @@ class BookDTO(Base):
             updated_at=self.updated_at,
         )
 
-    def to_query_model(self) -> BookQueryModel:
-        return BookQueryModel(
+    def to_read_model(self) -> BookReadModel:
+        return BookReadModel(
             id=self.id,
             isbn=self.isbn,
             title=self.title,

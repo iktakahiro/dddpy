@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
 from dddpy.infrastructure.sqlite.book.book_dto import BookDTO
-from dddpy.usecase.book.book_query_model import BookQueryModel
+from dddpy.usecase.book.book_query_model import BookReadModel
 from dddpy.usecase.book.book_query_service import BookQueryService
 
 
@@ -14,7 +14,7 @@ class BookQueryServiceImpl(BookQueryService):
     def __init__(self, session: Session):
         self.session: Session = session
 
-    def find_by_id(self, id: str) -> Optional[BookQueryModel]:
+    def find_by_id(self, id: str) -> Optional[BookReadModel]:
         try:
             book_dto = self.session.query(BookDTO).filter_by(id=id).one()
         except NoResultFound:
@@ -22,9 +22,9 @@ class BookQueryServiceImpl(BookQueryService):
         except:
             raise
 
-        return book_dto.to_query_model()
+        return book_dto.to_read_model()
 
-    def find_all(self) -> List[BookQueryModel]:
+    def find_all(self) -> List[BookReadModel]:
         try:
             book_dtos = (
                 self.session.query(BookDTO)
@@ -38,4 +38,4 @@ class BookQueryServiceImpl(BookQueryService):
         if len(book_dtos) == 0:
             return []
 
-        return list(map(lambda book_dto: book_dto.to_query_model(), book_dtos))
+        return list(map(lambda book_dto: book_dto.to_read_model(), book_dtos))

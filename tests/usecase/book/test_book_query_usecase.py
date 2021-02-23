@@ -4,7 +4,7 @@ import pytest
 
 from dddpy.domain.book.book_exception import BookNotFoundError
 from dddpy.infrastructure.sqlite.book.book_query_service import BookQueryServiceImpl
-from dddpy.usecase.book.book_query_model import BookQueryModel
+from dddpy.usecase.book.book_query_model import BookReadModel
 from dddpy.usecase.book.book_query_usecase import BookQueryUseCaseImpl
 
 
@@ -14,7 +14,7 @@ class TestBookQueryUseCase:
         session = MagicMock()
         book_query_service = BookQueryServiceImpl(session)
         book_query_service.find_by_id = Mock(
-            return_value=BookQueryModel(
+            return_value=BookReadModel(
                 id="cPqw4yPVUM3fA9sqzpZmkL",
                 isbn="978-0321125217",
                 title="Domain-Driven Design: Tackling Complexity in the Heart of Software",
@@ -50,7 +50,7 @@ class TestBookQueryUseCase:
         book_query_service = BookQueryServiceImpl(session)
         book_query_service.find_all = Mock(
             return_value=[
-                BookQueryModel(
+                BookReadModel(
                     id="cPqw4yPVUM3fA9sqzpZmkL",
                     isbn="978-0321125217",
                     title="Domain-Driven Design: Tackling Complexity in the Heart of Software",

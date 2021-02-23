@@ -10,10 +10,7 @@ from dddpy.domain.book.book_exception import (
 )
 from dddpy.domain.book.book_repository import BookRepository
 from dddpy.domain.book.isbn import Isbn
-from dddpy.usecase.book.book_query_model import (
-    BookQueryModel,
-    from_entiry_to_query_model,
-)
+from dddpy.usecase.book.book_query_model import BookReadModel, from_entiry_to_read_model
 
 
 class BookCommandUseCaseUnitOfWork(ABC):
@@ -40,13 +37,13 @@ class BookCommandUseCase(ABC):
     @abstractmethod
     def create_book(
         self, isbn_str: str, title: str, page: int
-    ) -> Optional[BookQueryModel]:
+    ) -> Optional[BookReadModel]:
         raise NotImplementedError
 
     @abstractmethod
     def update_book(
         self, id: str, title: str, page: int, read_page: int
-    ) -> Optional[BookQueryModel]:
+    ) -> Optional[BookReadModel]:
         raise NotImplementedError
 
     @abstractmethod
@@ -65,7 +62,7 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
 
     def create_book(
         self, isbn_str: str, title: str, page: int
-    ) -> Optional[BookQueryModel]:
+    ) -> Optional[BookReadModel]:
         try:
             uuid = shortuuid.uuid()
             isbn = Isbn(isbn_str)
@@ -83,11 +80,11 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
             self.uow.rollback()
             raise
 
-        return from_entiry_to_query_model(cast(Book, created_book))
+        return from_entiry_to_read_model(cast(Book, created_book))
 
     def update_book(
         self, id: str, title: str, page: int, read_page: int
-    ) -> Optional[BookQueryModel]:
+    ) -> Optional[BookReadModel]:
         try:
             existing_book = self.uow.book_repository.find_by_id(id)
             if existing_book is None:
@@ -110,7 +107,7 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
             self.uow.rollback()
             raise
 
-        return from_entiry_to_query_model(cast(Book, updated_book))
+        return from_entiry_to_read_model(cast(Book, updated_book))
 
     def delete_book_by_id(self, id: str):
         try:

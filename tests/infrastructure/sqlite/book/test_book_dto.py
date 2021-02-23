@@ -6,16 +6,18 @@ from dddpy.infrastructure.sqlite.book.book_dto import BookDTO, from_entity
 
 
 class TestBookDTO:
-    def test_to_query_model_should_create_entity_instance(self):
+    def test_to_read_model_should_create_entity_instance(self):
         book_dto = BookDTO(
             id="book_01",
             isbn="978-0321125217",
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
             read_page=120,
+            created_at=1614007224642,
+            updated_at=1614007224642,
         )
 
-        book = book_dto.to_query_model()
+        book = book_dto.to_read_model()
 
         assert book.id == "book_01"
         assert book.isbn == "978-0321125217"
@@ -33,6 +35,8 @@ class TestBookDTO:
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
             read_page=120,
+            created_at=1614007224642,
+            updated_at=1614007224642,
         )
 
         book = book_dto.to_entiry()
@@ -53,6 +57,8 @@ class TestBookDTO:
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
             read_page=120,
+            created_at=1614007224642,
+            updated_at=1614007224642,
         )
 
         book_dto = from_entity(book)

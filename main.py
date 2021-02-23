@@ -17,19 +17,18 @@ from dddpy.infrastructure.sqlite.book.book_repository import (
     BookRepositoryImpl,
 )
 from dddpy.infrastructure.sqlite.database import SessionLocal, create_tables
-from dddpy.presentation.schema.book.book_schema import (
-    BookCreateSchema,
-    BookReadSchema,
-    BookUpdateSchema,
+from dddpy.presentation.schema.book.book_error_message import (
     ErrorMessageBookIsbnAlreadyExists,
     ErrorMessageBookNotFound,
     ErrorMessageBooksNotFound,
 )
+from dddpy.usecase.book.book_command_model import BookCreateModel, BookUpdateModel
 from dddpy.usecase.book.book_command_usecase import (
     BookCommandUseCase,
     BookCommandUseCaseImpl,
     BookCommandUseCaseUnitOfWork,
 )
+from dddpy.usecase.book.book_query_model import BookReadModel
 from dddpy.usecase.book.book_query_service import BookQueryService
 from dddpy.usecase.book.book_query_usecase import BookQueryUseCase, BookQueryUseCaseImpl
 
@@ -64,7 +63,7 @@ def book_command_usecase(session: Session = Depends(get_session)) -> BookCommand
 
 @app.post(
     "/books",
-    response_model=BookReadSchema,
+    response_model=BookReadModel,
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_409_CONFLICT: {
@@ -73,7 +72,7 @@ def book_command_usecase(session: Session = Depends(get_session)) -> BookCommand
     },
 )
 async def create_book(
-    data: BookCreateSchema,
+    data: BookCreateModel,
     book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
     try:
@@ -98,7 +97,7 @@ async def create_book(
 
 @app.get(
     "/books",
-    response_model=List[BookReadSchema],
+    response_model=List[BookReadModel],
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
@@ -127,7 +126,7 @@ async def get_books(
 
 @app.get(
     "/books/{book_id}",
-    response_model=BookReadSchema,
+    response_model=BookReadModel,
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
@@ -157,7 +156,7 @@ async def get_book(
 
 @app.put(
     "/books/{book_id}",
-    response_model=BookReadSchema,
+    response_model=BookReadModel,
     status_code=status.HTTP_202_ACCEPTED,
     responses={
         status.HTTP_404_NOT_FOUND: {
@@ -167,7 +166,7 @@ async def get_book(
 )
 async def update_book(
     book_id: str,
-    data: BookUpdateSchema,
+    data: BookUpdateModel,
     book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
     try:
