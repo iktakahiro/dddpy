@@ -11,24 +11,66 @@ Directory structure:
 ```tree
 ├── dddpy
 │   ├── domain
-│   │   └── book
-│   │       ├── book.py # Entity
-│   │       └── book_repository.py  # Repository Interface
+│   │   ├── book
+│   │   │   ├── book.py  # Entiry
+│   │   │   ├── book_exception.py  # Exception definitions
+│   │   │   ├── book_repository.py  # Repository interface
+│   │   │   └── isbn.py  # Value Object
 │   ├── infrastructure
 │   │   └── sqlite
 │   │       ├── book
-│   │       │   ├── book_dto.py  # DTO
+│   │       │   ├── book_dto.py  # DTO using SQLAlchemy
+│   │       │   ├── book_query_service.py  # Query service implementation
 │   │       │   └── book_repository.py  # Repository implementation
-│   │       └── database.py  # Settings for SQLAlchemy
+│   │       └── database.py
 │   ├── presentation
-│   │   └── schema  # Schemas for the RESTful API
+│   │   └── schema
 │   │       └── book
-│   │           └── book_schema.py
+│   │           └── book_schema.py  # Schemas for the RESTful API
 │   └── usecase
 │       └── book
-│           └── book_usecase.py
-├── main.py
+│           ├── book.py  # Query model
+│           ├── book_command_usecase.py
+│           ├── book_query_service.py  # Query service interface
+│           └── book_query_usecase.py
 └── tests
+```
+
+### Entiry
+
+To represent an Entity in Python, use `__eq__()` method to ensure the identity of the object.
+
+```python
+class Book:
+    def __init__(self, id: str, title: str):
+        self.id: str = id
+        self.title: str = title
+
+    def __eq__(self, o: object) -> bool:
+        if isinstance(o, Book):
+            return self.id == o.id
+
+        return False
+```
+
+### Value Object
+
+To represent a Value Object, use `@dataclass` decorator with `eq=True` and `frozen=True`. 
+
+The following code implements the ISBN code of a book as a Value Object.
+
+```python
+@dataclass(init=False, eq=True, frozen=True)
+class Isbn:
+    value: str
+
+    def __init__(self, value: str):
+        if value is None:
+            raise ValueError("value is required.")
+        if !validate_isbn(value):
+            raise ValueError("value should be valid ISBN format.")
+
+        object.__setattr__(self, "value", value)
 ```
 
 ### DTO (Data Transfer Object)

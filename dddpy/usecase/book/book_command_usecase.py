@@ -4,7 +4,7 @@ from typing import Optional, cast
 import shortuuid
 
 from dddpy.domain.book.book import Book
-from dddpy.domain.book.book_exeption import (
+from dddpy.domain.book.book_exception import (
     BookIsbnAlreadyExistsError,
     BookNotFoundError,
 )
