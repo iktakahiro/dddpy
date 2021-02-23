@@ -5,7 +5,7 @@ from typing import Iterator, List
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm.session import Session
 
-from dddpy.domain.book.book_exeption import (
+from dddpy.domain.book.book_exception import (
     BookIsbnAlreadyExistsError,
     BookNotFoundError,
     BooksNotFoundError,
