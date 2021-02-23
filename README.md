@@ -55,7 +55,7 @@ class Book:
 
 ### Value Object
 
-To represent a Value Object, use `@dataclass` decorator with `eq=True` and `frozen=True`. 
+To represent a Value Object, use `@dataclass` decorator with `eq=True` and `frozen=True`.
 
 The following code implements the ISBN code of a book as a Value Object.
 
@@ -86,7 +86,7 @@ To solve this problem, we can simply set two rules:
 
 ### CQRS
 
-*TBD*
+TBD
 
 ### UoW (Unit of Work)
 
@@ -94,25 +94,24 @@ Even if we succeed in isolating the domain layer, some issues remains. One of th
 
 UoW (Unit of Work) Pattern can be the solution.
 
-*TBD*
+TBD
 
 ## Tech Stack
 
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [SQLAlchemy](https://www.sqlalchemy.org/)
-    * [SQLite](https://www.sqlite.org/index.html)
+  * [SQLite](https://www.sqlite.org/index.html)
 * [Poetry](https://python-poetry.org/)
 * [Docker](https://www.docker.com/)
 
 ## How to work
 
 1. Clone and open this repostiroy using VSCode
-2. Run Remote-Container 
+2. Run Remote-Container
 3. Run `make dev` on the Docker container terminal
 4. Access the API document http://127.0.0.1:8000/docs
 
 ![OpenAPI Doc](./screenshots/openapi_doc.png)
-
 
 ### Sample requests for the RESTFul API
 
