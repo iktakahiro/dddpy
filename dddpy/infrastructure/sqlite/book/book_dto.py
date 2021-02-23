@@ -3,10 +3,9 @@ from typing import Union
 
 from sqlalchemy import Column, Integer, String
 
-from dddpy.domain.book.book import Book
-from dddpy.domain.book.isbn import Isbn
+from dddpy.domain.book import Book, Isbn
 from dddpy.infrastructure.sqlite.database import Base
-from dddpy.usecase.book.book_query_model import BookReadModel
+from dddpy.usecase.book import BookReadModel
 
 
 def unixtimestamp() -> int:

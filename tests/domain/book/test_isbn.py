@@ -2,7 +2,7 @@ import dataclasses
 
 import pytest
 
-from dddpy.domain.book.isbn import Isbn
+from dddpy.domain.book import Isbn
 
 
 class TestIsbn:

@@ -3,7 +3,7 @@ from typing import cast
 
 from pydantic import BaseModel, Field
 
-from dddpy.domain.book.book import Book
+from dddpy.domain.book import Book
 
 
 class BookReadModel(BaseModel):

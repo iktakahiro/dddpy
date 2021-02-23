@@ -1,7 +1,6 @@
 import pytest
 
-from dddpy.domain.book.book import Book
-from dddpy.domain.book.isbn import Isbn
+from dddpy.domain.book import Book, Isbn
 
 
 class TestBook:

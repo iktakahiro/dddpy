@@ -2,10 +2,9 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from dddpy.domain.book.book_exception import BookNotFoundError
-from dddpy.infrastructure.sqlite.book.book_query_service import BookQueryServiceImpl
-from dddpy.usecase.book.book_query_model import BookReadModel
-from dddpy.usecase.book.book_query_usecase import BookQueryUseCaseImpl
+from dddpy.domain.book import BookNotFoundError
+from dddpy.infrastructure.sqlite.book import BookQueryServiceImpl
+from dddpy.usecase.book import BookQueryUseCaseImpl, BookReadModel
 
 
 class TestBookQueryUseCase:
@@ -63,9 +62,7 @@ class TestBookQueryUseCase:
         )
 
         book_query_usecase = BookQueryUseCaseImpl(book_query_service)
-
         books = book_query_usecase.fetch_books()
 
         assert len(books) == 1
-
         assert books[0].page == 560

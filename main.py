@@ -5,15 +5,15 @@ from typing import Iterator, List
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm.session import Session
 
-from dddpy.domain.book.book_exception import (
+from dddpy.domain.book import (
     BookIsbnAlreadyExistsError,
     BookNotFoundError,
+    BookRepository,
     BooksNotFoundError,
 )
-from dddpy.domain.book.book_repository import BookRepository
-from dddpy.infrastructure.sqlite.book.book_query_service import BookQueryServiceImpl
-from dddpy.infrastructure.sqlite.book.book_repository import (
+from dddpy.infrastructure.sqlite.book import (
     BookCommandUseCaseUnitOfWorkImpl,
+    BookQueryServiceImpl,
     BookRepositoryImpl,
 )
 from dddpy.infrastructure.sqlite.database import SessionLocal, create_tables
@@ -22,15 +22,17 @@ from dddpy.presentation.schema.book.book_error_message import (
     ErrorMessageBookNotFound,
     ErrorMessageBooksNotFound,
 )
-from dddpy.usecase.book.book_command_model import BookCreateModel, BookUpdateModel
-from dddpy.usecase.book.book_command_usecase import (
+from dddpy.usecase.book import (
     BookCommandUseCase,
     BookCommandUseCaseImpl,
     BookCommandUseCaseUnitOfWork,
+    BookCreateModel,
+    BookQueryService,
+    BookQueryUseCase,
+    BookQueryUseCaseImpl,
+    BookReadModel,
+    BookUpdateModel,
 )
-from dddpy.usecase.book.book_query_model import BookReadModel
-from dddpy.usecase.book.book_query_service import BookQueryService
-from dddpy.usecase.book.book_query_usecase import BookQueryUseCase, BookQueryUseCaseImpl
 
 config.fileConfig("logging.conf", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)

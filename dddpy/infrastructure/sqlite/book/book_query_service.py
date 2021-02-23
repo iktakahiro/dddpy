@@ -3,9 +3,9 @@ from typing import List, Optional
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
-from dddpy.infrastructure.sqlite.book.book_dto import BookDTO
-from dddpy.usecase.book.book_query_model import BookReadModel
-from dddpy.usecase.book.book_query_service import BookQueryService
+from dddpy.usecase.book import BookQueryService, BookReadModel
+
+from .book_dto import BookDTO
 
 
 class BookQueryServiceImpl(BookQueryService):

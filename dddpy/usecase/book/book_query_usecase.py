@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from dddpy.domain.book.book_exception import BookNotFoundError, BooksNotFoundError
-from dddpy.usecase.book.book_query_model import BookReadModel
-from dddpy.usecase.book.book_query_service import BookQueryService
+from dddpy.domain.book import BookNotFoundError, BooksNotFoundError
+
+from .book_query_model import BookReadModel
+from .book_query_service import BookQueryService
 
 
 class BookQueryUseCase(ABC):

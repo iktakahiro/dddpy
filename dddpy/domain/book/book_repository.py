@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from dddpy.domain.book.book import Book
+from dddpy.domain.book import Book
 
 
 class BookRepository(ABC):
