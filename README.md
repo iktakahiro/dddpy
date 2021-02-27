@@ -16,7 +16,7 @@
 
 For this implementation, I've adopted the [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/).
 
-Directory structure:
+Directory structure (based on [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/)):
 
 ```tree
 ├── main.py
@@ -26,7 +26,7 @@ Directory structure:
 │   │       ├── book.py  # Entity
 │   │       ├── book_exception.py  # Exception definitions
 │   │       ├── book_repository.py  # Repository interface
-│   │       └── isbn.py # Value Object
+│   │       └── isbn.py  # Value Object
 │   ├── infrastructure
 │   │   └── sqlite
 │   │       ├── book
@@ -42,7 +42,7 @@ Directory structure:
 │       └── book
 │           ├── book_command_model.py  # Write models including schemas of the RESTFul API
 │           ├── book_command_usecase.py
-│           ├── book_query_model.py   # Read models including schemas
+│           ├── book_query_model.py  # Read models including schemas
 │           ├── book_query_service.py  # Query service interface
 │           └── book_query_usecase.py
 └── tests
@@ -51,6 +51,8 @@ Directory structure:
 ### Entity
 
 To represent an Entity in Python, use `__eq__()` method to ensure the identity of the object.
+
+* [book.py](./dddpy/domain/book/book.py)
 
 ```python
 class Book:
@@ -70,6 +72,8 @@ class Book:
 To represent a Value Object, use `@dataclass` decorator with `eq=True` and `frozen=True`.
 
 The following code implements the ISBN code of a book as a Value Object.
+
+* [isbn.py](./dddpy/domain/book/isbn.py)
 
 ```python
 @dataclass(init=False, eq=True, frozen=True)
@@ -93,12 +97,33 @@ On a minimum MVC architecture, models often inherit a base class provided by a O
 
 To solve this problem, we can simply set two rules:
 
-1. A Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SQLAlchemy Base class.
-2. A Data transfer Objects extend the O/R mapper class.
+1. Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SQLAlchemy Base class.
+2. Data transfer Objects extend the O/R mapper class.
+   * [book_dto.py](./dddpy/infrastructure/sqlite/book/book_dto.py)
 
 ### CQRS
 
-TBD
+CQRS (Command and Query Responsibility Segregation) pattern is useful 
+
+* Read model and Write model
+  1. Define read models and write models in the **usecase layer**
+     * [book_query_model.py](./dddpy/usecase/book/book_query_model.py)
+     * [book_command_model.py](./dddpy/usecase/book/book_command_model.py)
+* Query
+  1. Define query service interfaces in the **usecae layer**
+     * [book_query_service.py (interface)](./dddpy/usecase/book/book_query_service.py)
+  2. Implement query service implimentations in the **infrastructure layer**
+     * [book_query_service.py](./dddpy/infrastructure/sqlite/book/book_query_service.py)
+* Command
+  1. Define repository interfaces in the **domain layer**
+     * [book_repository.py (interface)](./dddpy/domain/book/book_repository.py)
+  2. Implement repository implimentations in the **infrastucrue layer**
+     * [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
+* Usecase
+  1. Usecases depend on repository interfaces or query service interfaces.
+     * [book_query_usecase.py](./dddpy/usecase/book/book_query_usecase.py)
+     * [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
+  2. Usecases return an instance of read|write model to a main routine.
 
 ### UoW (Unit of Work)
 
@@ -106,7 +131,52 @@ Even if we succeed in isolating the domain layer, some issues remains. One of th
 
 UoW (Unit of Work) Pattern can be the solution.
 
-TBD
+First, difine an interface base on Uow pattern in usecase layer. `begin()`, `commit()` and `rollback()` methods are related a transaction.
+
+* [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
+
+```python
+class BookCommandUseCaseUnitOfWork(ABC):
+    book_repository: BookRepository
+
+    @abstractmethod
+    def begin(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def commit(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def rollback(self):
+        raise NotImplementedError
+```
+
+Second, implement a class of infrastructure layer using the above interface.
+
+* [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
+
+```python
+class BookCommandUseCaseUnitOfWorkImpl(BookCommandUseCaseUnitOfWork):
+    def __init__(
+        self,
+        session: Session,
+        book_repository: BookRepository,
+    ):
+        self.session: Session = session
+        self.book_repository: BookRepository = book_repository
+
+    def begin(self):
+        self.session.begin()
+
+    def commit(self):
+        self.session.commit()
+
+    def rollback(self):
+        self.session.rollback()
+```
+
+`session` property is a sessino of SQLAlchemy,
 
 ## How to work
 
