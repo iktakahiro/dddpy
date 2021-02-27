@@ -106,14 +106,14 @@ CQRS (Command and Query Responsibility Segregation) pattern is useful
      * [book_query_model.py](./dddpy/usecase/book/book_query_model.py)
      * [book_command_model.py](./dddpy/usecase/book/book_command_model.py)
 * Query
-  1. Define query service interfaces in the **usecae layer**
+  1. Define query service interfaces in the **usecase layer**
      * [book_query_service.py (interface)](./dddpy/usecase/book/book_query_service.py)
   2. Implement query service implimentations in the **infrastructure layer**
      * [book_query_service.py](./dddpy/infrastructure/sqlite/book/book_query_service.py)
 * Command
   1. Define repository interfaces in the **domain layer**
      * [book_repository.py (interface)](./dddpy/domain/book/book_repository.py)
-  2. Implement repository implimentations in the **infrastucrue layer**
+  2. Implement repository implimentations in the **infrastructure layer**
      * [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
 * Usecase
   1. Usecases depend on repository interfaces or query service interfaces.
