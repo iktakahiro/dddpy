@@ -14,8 +14,6 @@
 
 ## Code Architecture
 
-For this implementation, I've adopted the [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/).
-
 Directory structure (based on [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/)):
 
 ```tree
