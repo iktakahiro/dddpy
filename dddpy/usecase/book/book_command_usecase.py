@@ -12,7 +12,7 @@ from dddpy.domain.book import (
 )
 
 from .book_command_model import BookCreateModel, BookUpdateModel
-from .book_query_model import BookReadModel, from_entiry_to_read_model
+from .book_query_model import BookReadModel, from_entity_to_read_model
 
 
 class BookCommandUseCaseUnitOfWork(ABC):
@@ -76,7 +76,7 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
             self.uow.rollback()
             raise
 
-        return from_entiry_to_read_model(cast(Book, created_book))
+        return from_entity_to_read_model(cast(Book, created_book))
 
     def update_book(self, id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
         try:
@@ -101,7 +101,7 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
             self.uow.rollback()
             raise
 
-        return from_entiry_to_read_model(cast(Book, updated_book))
+        return from_entity_to_read_model(cast(Book, updated_book))
 
     def delete_book_by_id(self, id: str):
         try:

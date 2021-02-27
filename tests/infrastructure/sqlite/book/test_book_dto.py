@@ -27,7 +27,7 @@ class TestBookDTO:
         assert book.page == 560
         assert book.read_page == 120
 
-    def test_to_entiry_should_create_entity_instance(self):
+    def test_to_entity_should_create_entity_instance(self):
         book_dto = BookDTO(
             id="book_01",
             isbn="978-0321125217",
@@ -38,7 +38,7 @@ class TestBookDTO:
             updated_at=1614007224642,
         )
 
-        book = book_dto.to_entiry()
+        book = book_dto.to_entity()
 
         assert book.id == "book_01"
         assert book.isbn == Isbn("978-0321125217")

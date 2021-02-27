@@ -23,7 +23,7 @@ class BookRepositoryImpl(BookRepository):
         except:
             raise
 
-        return book_dto.to_entiry()
+        return book_dto.to_entity()
 
     def find_by_isbn(self, isbn: str) -> Optional[Book]:
         try:
@@ -33,7 +33,7 @@ class BookRepositoryImpl(BookRepository):
         except:
             raise
 
-        return book_dto.to_entiry()
+        return book_dto.to_entity()
 
     def create(self, book: Book):
         book_dto = from_entity(book)

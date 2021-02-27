@@ -24,7 +24,7 @@ class BookDTO(Base):
     created_at: Union[int, Column] = Column(Integer, index=True, nullable=False)
     updated_at: Union[int, Column] = Column(Integer, index=True, nullable=False)
 
-    def to_entiry(self) -> Book:
+    def to_entity(self) -> Book:
         return Book(
             id=self.id,
             isbn=Isbn(self.isbn),

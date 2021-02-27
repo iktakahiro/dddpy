@@ -23,7 +23,7 @@ class BookReadModel(BaseModel):
         orm_mode = True
 
 
-def from_entiry_to_read_model(book: Book) -> BookReadModel:
+def from_entity_to_read_model(book: Book) -> BookReadModel:
     return BookReadModel(
         id=book.id,
         isbn=book.isbn.value,

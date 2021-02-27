@@ -23,10 +23,10 @@ Directory structure:
 ├── dddpy
 │   ├── domain
 │   │   └── book
-│   │       ├── book.py  # Entiry
+│   │       ├── book.py  # Entity
 │   │       ├── book_exception.py  # Exception definitions
 │   │       ├── book_repository.py  # Repository interface
-│   │       └── isbn.py
+│   │       └── isbn.py # Value Object
 │   ├── infrastructure
 │   │   └── sqlite
 │   │       ├── book

@@ -12,9 +12,7 @@ class Isbn:
     value: str
 
     def __init__(self, value: str):
-        if value is None:
-            raise ValueError("value is required.")
         if pattern.match(value) is None:
-            raise ValueError("value should be valid ISBN format.")
+            raise ValueError("isbn should be a valid format.")
 
         object.__setattr__(self, "value", value)
