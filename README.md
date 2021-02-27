@@ -123,11 +123,11 @@ CQRS (Command and Query Responsibility Segregation) pattern is useful
 
 ### UoW (Unit of Work)
 
-Even if we succeed in isolating the domain layer, some issues remains. One of them is how to manage transactions.
+Even if we succeed in isolating the domain layer, some issues remains. One of them is 'how to manage transactions'.
 
 UoW (Unit of Work) Pattern can be the solution.
 
-First, difine an interface base on Uow pattern in usecase layer. `begin()`, `commit()` and `rollback()` methods are related a transaction.
+First, difine an interface base on UoW pattern in the usecase layer. `begin()`, `commit()` and `rollback()` methods are related a transaction management.
 
 * [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
 
@@ -148,7 +148,7 @@ class BookCommandUseCaseUnitOfWork(ABC):
         raise NotImplementedError
 ```
 
-Second, implement a class of infrastructure layer using the above interface.
+Second, implement a class of the infrastructure layer using the above interface.
 
 * [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
 
@@ -172,7 +172,7 @@ class BookCommandUseCaseUnitOfWorkImpl(BookCommandUseCaseUnitOfWork):
         self.session.rollback()
 ```
 
-`session` property is a sessino of SQLAlchemy,
+`session` property is a session of SQLAlchemy,
 
 ## How to work
 
