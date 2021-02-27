@@ -21,7 +21,6 @@ class TestIsbn:
     @pytest.mark.parametrize(
         "value",
         [
-            (None),
             ("invalid-string"),
             ("123456789"),
             ("000-0141983479"),
