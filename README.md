@@ -81,8 +81,6 @@ class Isbn:
     value: str
 
     def __init__(self, value: str):
-        if value is None:
-            raise ValueError("value is required.")
         if !validate_isbn(value):
             raise ValueError("value should be valid ISBN format.")
 
