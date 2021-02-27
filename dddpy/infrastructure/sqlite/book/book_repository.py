@@ -6,7 +6,7 @@ from sqlalchemy.orm.session import Session
 from dddpy.domain.book import Book, BookRepository
 from dddpy.usecase.book import BookCommandUseCaseUnitOfWork
 
-from .book_dto import BookDTO, from_entity
+from .book_dto import BookDTO
 
 
 class BookRepositoryImpl(BookRepository):
@@ -36,14 +36,14 @@ class BookRepositoryImpl(BookRepository):
         return book_dto.to_entity()
 
     def create(self, book: Book):
-        book_dto = from_entity(book)
+        book_dto = BookDTO.from_entity(book)
         try:
             self.session.add(book_dto)
         except:
             raise
 
     def update(self, book: Book):
-        book_dto = from_entity(book)
+        book_dto = BookDTO.from_entity(book)
         try:
             _book = self.session.query(BookDTO).filter_by(id=book_dto.id).one()
             _book.title = book_dto.title

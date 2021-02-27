@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import cast
 
 from pydantic import BaseModel, Field
@@ -22,14 +21,14 @@ class BookReadModel(BaseModel):
     class Config:
         orm_mode = True
 
-
-def from_entity_to_read_model(book: Book) -> BookReadModel:
-    return BookReadModel(
-        id=book.id,
-        isbn=book.isbn.value,
-        title=book.title,
-        page=book.page,
-        read_page=book.read_page,
-        created_at=cast(int, book.created_at),
-        updated_at=cast(int, book.updated_at),
-    )
+    @staticmethod
+    def from_entity(book: Book) -> "BookReadModel":
+        return BookReadModel(
+            id=book.id,
+            isbn=book.isbn.value,
+            title=book.title,
+            page=book.page,
+            read_page=book.read_page,
+            created_at=cast(int, book.created_at),
+            updated_at=cast(int, book.updated_at),
+        )

@@ -1,7 +1,7 @@
 import pytest
 
 from dddpy.domain.book import Book, Isbn
-from dddpy.infrastructure.sqlite.book import BookDTO, from_entity
+from dddpy.infrastructure.sqlite.book import BookDTO
 
 
 class TestBookDTO:
@@ -60,7 +60,7 @@ class TestBookDTO:
             updated_at=1614007224642,
         )
 
-        book_dto = from_entity(book)
+        book_dto = BookDTO.from_entity(book)
 
         assert book_dto.id == "book_01"
         assert book_dto.isbn == "978-0321125217"

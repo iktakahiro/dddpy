@@ -4,6 +4,6 @@ from .book_command_usecase import (
     BookCommandUseCaseImpl,
     BookCommandUseCaseUnitOfWork,
 )
-from .book_query_model import BookReadModel, from_entity_to_read_model
+from .book_query_model import BookReadModel
 from .book_query_service import BookQueryService
 from .book_query_usecase import BookQueryUseCase, BookQueryUseCaseImpl

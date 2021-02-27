@@ -46,15 +46,15 @@ class BookDTO(Base):
             updated_at=self.updated_at,
         )
 
-
-def from_entity(book: Book) -> BookDTO:
-    now = unixtimestamp()
-    return BookDTO(
-        id=book.id,
-        isbn=book.isbn.value,
-        title=book.title,
-        page=book.page,
-        read_page=book.read_page,
-        created_at=now,
-        updated_at=now,
-    )
+    @staticmethod
+    def from_entity(book: Book) -> "BookDTO":
+        now = unixtimestamp()
+        return BookDTO(
+            id=book.id,
+            isbn=book.isbn.value,
+            title=book.title,
+            page=book.page,
+            read_page=book.read_page,
+            created_at=now,
+            updated_at=now,
+        )
