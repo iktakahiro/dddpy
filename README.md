@@ -2,7 +2,7 @@
 
 [![A workflow to run test](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml/badge.svg)](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml)
 
-*NOTE: This repository is an example to explain 'how to implement DDD architecture on Python web applicaiton'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
+*NOTE: This repository is an example to explain 'how to implement DDD architecture on Python web application'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
 
 ## Tech Stack
 
@@ -87,9 +87,9 @@ class Isbn:
 
 ### DTO (Data Transfer Object)
 
-DTO (Data Transfer Object) is a good practice to isolate domain objects from the infrastructuer layer.
+DTO (Data Transfer Object) is a good practice to isolate domain objects from the infrastructure layer.
 
-On a minimum MVC architecture, models often inherit a base class provided by a O/R Mappaer. But in that case, the domain layer would be dependent on the outer layer. The same can be said for Python applications using SQLAlchemy.
+On a minimum MVC architecture, models often inherit a base class provided by a O/R Mapper. But in that case, the domain layer would be dependent on the outer layer. The same can be said for Python applications using SQLAlchemy.
 
 To solve this problem, we can simply set two rules:
 
@@ -123,7 +123,7 @@ CQRS (Command and Query Responsibility Segregation) pattern is useful
 
 ### UoW (Unit of Work)
 
-Even if we succeed in isolating the domain layer, some issues remains. One of them is 'how to manage transactions'.
+Even if we succeed in isolating the domain layer, some issues rremain. One of them is 'how to manage transactions'.
 
 UoW (Unit of Work) Pattern can be the solution.
 
@@ -176,7 +176,7 @@ class BookCommandUseCaseUnitOfWorkImpl(BookCommandUseCaseUnitOfWork):
 
 ## How to work
 
-1. Clone and open this repostiroy using VSCode
+1. Clone and open this repository using VSCode
 2. Run Remote-Container
 3. Run `make dev` on the Docker container terminal
 4. Access the API document http://127.0.0.1:8000/docs
