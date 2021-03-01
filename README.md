@@ -2,7 +2,7 @@
 
 [![A workflow to run test](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml/badge.svg)](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml)
 
-*NOTE: This repository is an example to explain 'how to implement DDD architecture on Python web application'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
+*NOTE: This repository is an example to explain 'how to implement DDD architecture on a Python web application'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
 
 ## Tech Stack
 
@@ -48,7 +48,7 @@ Directory structure (based on [Onion Architecture](https://jeffreypalermo.com/20
 
 ### Entity
 
-To represent an Entity in Python, use `__eq__()` method to ensure the identity of the object.
+To represent an Entity in Python, use `__eq__()` method to ensure the object's itendity.
 
 * [book.py](./dddpy/domain/book/book.py)
 
@@ -69,7 +69,7 @@ class Book:
 
 To represent a Value Object, use `@dataclass` decorator with `eq=True` and `frozen=True`.
 
-The following code implements the ISBN code of a book as a Value Object.
+The following code implements a book's ISBN code as a Value Object.
 
 * [isbn.py](./dddpy/domain/book/isbn.py)
 
@@ -89,9 +89,9 @@ class Isbn:
 
 DTO (Data Transfer Object) is a good practice to isolate domain objects from the infrastructure layer.
 
-On a minimum MVC architecture, models often inherit a base class provided by a O/R Mapper. But in that case, the domain layer would be dependent on the outer layer. The same can be said for Python applications using SQLAlchemy.
+On a minimum MVC architecture, models often inherit a base class provided by an O/R Mapper. But in that case, the domain layer would be dependent on the outer layer.
 
-To solve this problem, we can simply set two rules:
+To solve this problem, we can set two rules:
 
 1. Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SQLAlchemy Base class.
 2. Data transfer Objects extend the O/R mapper class.
@@ -123,7 +123,7 @@ CQRS (Command and Query Responsibility Segregation) pattern is useful
 
 ### UoW (Unit of Work)
 
-Even if we succeed in isolating the domain layer, some issues rremain. One of them is 'how to manage transactions'.
+Even if we succeed in isolating the domain layer, some issues remain. One of them is *how to manage transactions*.
 
 UoW (Unit of Work) Pattern can be the solution.
 
