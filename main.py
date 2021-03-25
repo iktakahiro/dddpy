@@ -108,15 +108,17 @@ async def get_books(
 ):
     try:
         books = book_query_usecase.fetch_books()
-    except BooksNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=e.message,
-        )
+
     except Exception as e:
         logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    if len(books) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=BooksNotFoundError.message,
         )
 
     return books

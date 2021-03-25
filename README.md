@@ -1,4 +1,4 @@
-# Python DDD example using FastAPI
+# Python DDD Example and Techniques
 
 [![A workflow to run test](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml/badge.svg)](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml)
 

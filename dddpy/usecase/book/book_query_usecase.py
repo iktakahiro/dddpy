@@ -38,8 +38,6 @@ class BookQueryUseCaseImpl(BookQueryUseCase):
     def fetch_books(self) -> List[BookReadModel]:
         try:
             books = self.book_query_service.find_all()
-            if books is None or len(books) == 0:
-                raise BooksNotFoundError
         except:
             raise
 
