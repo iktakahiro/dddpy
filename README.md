@@ -4,6 +4,8 @@
 
 *NOTE: This repository is an example to explain 'how to implement DDD architecture on a Python web application'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
 
+* My blog post: https://iktakahiro.dev/python-ddd-onion-architecture
+
 ## Tech Stack
 
 * [FastAPI](https://fastapi.tiangolo.com/)
@@ -21,28 +23,15 @@ Directory structure (based on [Onion Architecture](https://jeffreypalermo.com/20
 ├── dddpy
 │   ├── domain
 │   │   └── book
-│   │       ├── book.py  # Entity
-│   │       ├── book_exception.py  # Exception definitions
-│   │       ├── book_repository.py  # Repository interface
-│   │       └── isbn.py  # Value Object
 │   ├── infrastructure
 │   │   └── sqlite
 │   │       ├── book
-│   │       │   ├── book_dto.py  # DTO using SQLAlchemy
-│   │       │   ├── book_query_service.py  # Query service implementation
-│   │       │   └── book_repository.py  # Repository implementation
 │   │       └── database.py
 │   ├── presentation
 │   │   └── schema
 │   │       └── book
-│   │           └── book_error_message.py
 │   └── usecase
 │       └── book
-│           ├── book_command_model.py  # Write models including schemas of the RESTFul API
-│           ├── book_command_usecase.py
-│           ├── book_query_model.py  # Read models including schemas
-│           ├── book_query_service.py  # Query service interface
-│           └── book_query_usecase.py
 └── tests
 ```
 
