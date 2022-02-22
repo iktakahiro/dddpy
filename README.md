@@ -116,7 +116,7 @@ Even if we succeed in isolating the domain layer, some issues remain. One of the
 
 UoW (Unit of Work) Pattern can be the solution.
 
-First, difine an interface base on UoW pattern in the usecase layer. `begin()`, `commit()` and `rollback()` methods are related a transaction management.
+First, define an interface base on UoW pattern in the usecase layer. `begin()`, `commit()` and `rollback()` methods are related a transaction management.
 
 * [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
 
