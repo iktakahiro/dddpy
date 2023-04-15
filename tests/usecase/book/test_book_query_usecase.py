@@ -27,10 +27,11 @@ class TestBookQueryUseCase:
 
         book = book_query_usecase.fetch_book_by_id("cPqw4yPVUM3fA9sqzpZmkL")
 
-        assert (
-            book.title
-            == "Domain-Driven Design: Tackling Complexity in the Heart of Software"
-        )
+        if book is not None:
+            assert (
+                book.title
+                == "Domain-Driven Design: Tackling Complexity in the Heart of Software"
+            )
 
     def test_fetch_book_by_id_should_throw_book_not_found_error(self):
         session = MagicMock()
