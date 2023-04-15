@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
 from dddpy.domain.book import Book, BookRepository

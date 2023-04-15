@@ -31,4 +31,5 @@ class Book:
         return False
 
     def is_already_read(self) -> bool:
+        """Return True if the message has already been read, False otherwise."""
         return self.page == self.read_page
