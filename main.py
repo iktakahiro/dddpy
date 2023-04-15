@@ -43,6 +43,7 @@ create_tables()
 
 
 def get_session() -> Iterator[Session]:
+    """Get a session from the database."""
     session: Session = SessionLocal()
     try:
         yield session
@@ -51,11 +52,13 @@ def get_session() -> Iterator[Session]:
 
 
 def book_query_usecase(session: Session = Depends(get_session)) -> BookQueryUseCase:
+    """Get a book query use case."""
     book_query_service: BookQueryService = BookQueryServiceImpl(session)
     return BookQueryUseCaseImpl(book_query_service)
 
 
 def book_command_usecase(session: Session = Depends(get_session)) -> BookCommandUseCase:
+    """Get a book command use case."""
     book_repository: BookRepository = BookRepositoryImpl(session)
     uow: BookCommandUseCaseUnitOfWork = BookCommandUseCaseUnitOfWorkImpl(
         session, book_repository=book_repository
@@ -77,6 +80,7 @@ async def create_book(
     data: BookCreateModel,
     book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
+    """Create a book."""
     try:
         book = book_command_usecase.create_book(data)
     except BookIsbnAlreadyExistsError as e:
@@ -106,11 +110,12 @@ async def create_book(
 async def get_books(
     book_query_usecase: BookQueryUseCase = Depends(book_query_usecase),
 ):
+    """Get a list of books."""
     try:
         books = book_query_usecase.fetch_books()
 
-    except Exception as e:
-        logger.error(e)
+    except Exception as err:
+        logger.error(err)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -138,15 +143,16 @@ async def get_book(
     book_id: str,
     book_query_usecase: BookQueryUseCase = Depends(book_query_usecase),
 ):
+    """Get a book."""
     try:
         book = book_query_usecase.fetch_book_by_id(book_id)
-    except BookNotFoundError as e:
+    except BookNotFoundError as err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=e.message,
+            detail=err.message,
         )
-    except Exception as e:
-        logger.error(e)
+    except Exception as err:
+        logger.error(err)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -169,15 +175,16 @@ async def update_book(
     data: BookUpdateModel,
     book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
+    """Update a book."""
     try:
         updated_book = book_command_usecase.update_book(book_id, data)
-    except BookNotFoundError as e:
+    except BookNotFoundError as err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=e.message,
+            detail=err.message,
         )
-    except Exception as e:
-        logger.error(e)
+    except Exception as err:
+        logger.error(err)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -198,15 +205,16 @@ async def delete_book(
     book_id: str,
     book_command_usecase: BookCommandUseCase = Depends(book_command_usecase),
 ):
+    """Delete a bool."""
     try:
         book_command_usecase.delete_book_by_id(book_id)
-    except BookNotFoundError as e:
+    except BookNotFoundError as err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=e.message,
+            detail=err.message,
         )
-    except Exception as e:
-        logger.error(e)
+    except Exception as err:
+        logger.error(err)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
