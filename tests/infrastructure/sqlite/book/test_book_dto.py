@@ -40,7 +40,7 @@ class TestBookDTO:
 
         book = book_dto.to_entity()
 
-        assert book.id == "book_01"
+        assert book.book_id == "book_01"
         assert book.isbn == Isbn("978-0321125217")
         assert (
             book.title
@@ -51,7 +51,7 @@ class TestBookDTO:
 
     def test_from_entity_should_create_dto_instance(self):
         book = Book(
-            id="book_01",
+            book_id="book_01",
             isbn=Isbn("978-0321125217"),
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,

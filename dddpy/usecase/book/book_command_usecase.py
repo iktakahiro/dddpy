@@ -41,11 +41,11 @@ class BookCommandUseCase(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update_book(self, id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
+    def update_book(self, book_id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
         raise NotImplementedError
 
     @abstractmethod
-    def delete_book_by_id(self, id: str):
+    def delete_book_by_id(self, book_id: str):
         raise NotImplementedError
 
 
@@ -62,7 +62,7 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
         try:
             uuid = shortuuid.uuid()
             isbn = Isbn(data.isbn)
-            book = Book(id=uuid, isbn=isbn, title=data.title, page=data.page)
+            book = Book(book_id=uuid, isbn=isbn, title=data.title, page=data.page)
 
             existing_book = self.uow.book_repository.find_by_isbn(isbn.value)
             if existing_book is not None:
@@ -78,14 +78,14 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
 
         return BookReadModel.from_entity(cast(Book, created_book))
 
-    def update_book(self, id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
+    def update_book(self, book_id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
         try:
-            existing_book = self.uow.book_repository.find_by_id(id)
+            existing_book = self.uow.book_repository.find_by_id(book_id)
             if existing_book is None:
                 raise BookNotFoundError
 
             book = Book(
-                id=id,
+                book_id=book_id,
                 isbn=existing_book.isbn,
                 title=data.title,
                 page=data.page,
@@ -94,7 +94,7 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
 
             self.uow.book_repository.update(book)
 
-            updated_book = self.uow.book_repository.find_by_id(book.id)
+            updated_book = self.uow.book_repository.find_by_id(book.book_id)
 
             self.uow.commit()
         except:
@@ -103,13 +103,13 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
 
         return BookReadModel.from_entity(cast(Book, updated_book))
 
-    def delete_book_by_id(self, id: str):
+    def delete_book_by_id(self, book_id: str):
         try:
-            existing_book = self.uow.book_repository.find_by_id(id)
+            existing_book = self.uow.book_repository.find_by_id(book_id)
             if existing_book is None:
                 raise BookNotFoundError
 
-            self.uow.book_repository.delete_by_id(id)
+            self.uow.book_repository.delete_by_id(book_id)
 
             self.uow.commit()
         except:
