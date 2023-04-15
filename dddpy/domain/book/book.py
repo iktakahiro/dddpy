@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Book domain"""
+
 from typing import Optional
 
 from .isbn import Isbn
@@ -8,7 +11,7 @@ class Book:
 
     def __init__(
         self,
-        id: str,
+        book_id: str,
         isbn: Isbn,
         title: str,
         page: int,
@@ -16,7 +19,7 @@ class Book:
         created_at: Optional[int] = None,
         updated_at: Optional[int] = None,
     ):
-        self.id: str = id
+        self.book_id: str = book_id
         self.isbn: Isbn = isbn
         self.title: str = title
         self.page: int = page
@@ -24,9 +27,9 @@ class Book:
         self.created_at: Optional[int] = created_at
         self.updated_at: Optional[int] = updated_at
 
-    def __eq__(self, o: object) -> bool:
-        if isinstance(o, Book):
-            return self.id == o.id
+    def __eq__(self, obj: object) -> bool:
+        if isinstance(obj, Book):
+            return self.book_id == obj.book_id
 
         return False
 

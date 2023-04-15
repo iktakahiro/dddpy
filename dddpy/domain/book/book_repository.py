@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+"""Book repository"""
+
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import  Optional
 
 from dddpy.domain.book import Book
 
@@ -12,7 +15,7 @@ class BookRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def find_by_id(self, id: str) -> Optional[Book]:
+    def find_by_id(self, book_id: str) -> Optional[Book]:
         raise NotImplementedError
 
     @abstractmethod
@@ -24,5 +27,5 @@ class BookRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete_by_id(self, id: str):
+    def delete_by_id(self, book_id: str):
         raise NotImplementedError

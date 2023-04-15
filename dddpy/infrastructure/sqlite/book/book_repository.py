@@ -15,9 +15,9 @@ class BookRepositoryImpl(BookRepository):
     def __init__(self, session: Session):
         self.session: Session = session
 
-    def find_by_id(self, id: str) -> Optional[Book]:
+    def find_by_id(self, book_id: str) -> Optional[Book]:
         try:
-            book_dto = self.session.query(BookDTO).filter_by(id=id).one()
+            book_dto = self.session.query(BookDTO).filter_by(id=book_id).one()
         except NoResultFound:
             return None
         except:
@@ -53,9 +53,9 @@ class BookRepositoryImpl(BookRepository):
         except:
             raise
 
-    def delete_by_id(self, id: str):
+    def delete_by_id(self, book_id: str):
         try:
-            self.session.query(BookDTO).filter_by(id=id).delete()
+            self.session.query(BookDTO).filter_by(id=book_id).delete()
         except:
             raise
 

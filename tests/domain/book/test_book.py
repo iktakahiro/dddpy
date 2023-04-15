@@ -6,13 +6,13 @@ from dddpy.domain.book import Book, Isbn
 class TestBook:
     def test_constructor_should_create_instance(self):
         book = Book(
-            id="book_01",
+            book_id="book_01",
             isbn=Isbn("978-0321125217"),
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
         )
 
-        assert book.id == "book_01"
+        assert book.book_id == "book_01"
         assert book.isbn == Isbn("978-0321125217")
         assert (
             book.title
@@ -23,7 +23,7 @@ class TestBook:
 
     def test_book_entity_should_be_identified_by_id(self):
         book_1 = Book(
-            id="book_01",
+            book_id="book_01",
             isbn=Isbn("978-0321125217"),
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
@@ -31,7 +31,7 @@ class TestBook:
         )
 
         book_2 = Book(
-            id="book_01",
+            book_id="book_01",
             isbn=Isbn("978-0321125217"),
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
@@ -39,7 +39,7 @@ class TestBook:
         )
 
         book_3 = Book(
-            id="book_02",
+            book_id="book_02",
             isbn=Isbn("978-0321125217"),
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
@@ -59,7 +59,7 @@ class TestBook:
     )
     def test_read_page_setter_should_update_value(self, read_page):
         book = Book(
-            id="book_01",
+            book_id="book_01",
             isbn=Isbn("978-0321125217"),
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,
@@ -81,7 +81,7 @@ class TestBook:
         self, read_page, expected
     ):
         book = Book(
-            id="book_01",
+            book_id="book_01",
             isbn=Isbn("978-0321125217"),
             title="Domain-Driven Design: Tackling Complexity in the Heart of Softwares",
             page=560,

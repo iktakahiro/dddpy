@@ -26,7 +26,7 @@ class BookDTO(Base):
 
     def to_entity(self) -> Book:
         return Book(
-            id=self.id,
+            book_id=self.id,
             isbn=Isbn(self.isbn),
             title=self.title,
             page=self.page,
@@ -50,7 +50,7 @@ class BookDTO(Base):
     def from_entity(book: Book) -> "BookDTO":
         now = unixtimestamp()
         return BookDTO(
-            id=book.id,
+            id=book.book_id,
             isbn=book.isbn.value,
             title=book.title,
             page=book.page,

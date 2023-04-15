@@ -24,7 +24,7 @@ class BookReadModel(BaseModel):
     @staticmethod
     def from_entity(book: Book) -> "BookReadModel":
         return BookReadModel(
-            id=book.id,
+            id=book.book_id,
             isbn=book.isbn.value,
             title=book.title,
             page=book.page,
