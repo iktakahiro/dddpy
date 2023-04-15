@@ -23,7 +23,8 @@
 				"GitHub.copilot",
 				"GitHub.copilot-labs",
 				"ms-python.python",
-				"github.vscode-github-actions"
+				"github.vscode-github-actions",
+				"GitHub.vscode-pull-request-github"
 			],
 		},
 		"extensions": [
