@@ -1,4 +1,4 @@
-FROM python:3.9-buster
+FROM python:3.11-buster
 
 RUN pip install poetry
 

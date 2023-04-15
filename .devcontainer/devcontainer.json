@@ -2,39 +2,43 @@
 	"name": "dddpy",
 	"context": "..",
 	"dockerFile": "./Dockerfile",
-	"settings": { 
-		"terminal.integrated.shell.linux": null,
-		"python.pythonPath": "/usr/local/bin/python",
-		// "python.linting.pylintPath": "/usr/local/bin/pylint",
-		// "python.linting.enabled": true,
-		"python.testing.pytestArgs": [
-            "tests", "-vv"
-        ],
-		"python.testing.unittestEnabled": true,
-		"python.testing.pytestEnabled": true,
-        // "python.linting.pylintEnabled": true,
-		"python.analysis.typeCheckingMode": "basic"
-	},
-	"extensions": [
-		"ms-python.python",
-		"ms-python.vscode-pylance",
-		"vscode-icons-team.vscode-icons",
-		"github.vscode-pull-request-github",
-		"mhutchie.git-graph",
-		"mechatroner.rainbow-csv",
-		"redhat.vscode-yaml",
-		"visualstudioexptteam.vscodeintellicode",
-		"vscodevim.vim"
-	],
-	"forwardPorts": [8000, 8000],
-	"postCreateCommand": "make install",
-
-	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
-	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
-
-	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
-	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
-
-	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
-	// "remoteUser": "vscode"
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.pythonPath": "/usr/local/bin/python",
+				// "python.linting.pylintPath": "/usr/local/bin/pylint",
+				// "python.linting.enabled": true,
+				"python.testing.pytestArgs": [
+					"tests",
+					"-vv"
+				],
+				"python.testing.unittestEnabled": true,
+				"python.testing.pytestEnabled": true,
+				"python.linting.pylintEnabled": true,
+				"python.analysis.typeCheckingMode": "basic"
+			},
+		},
+		"extensions": [
+			"ms-python.python",
+			"ms-python.vscode-pylance",
+			"vscode-icons-team.vscode-icons",
+			"github.vscode-pull-request-github",
+			"mhutchie.git-graph",
+			"mechatroner.rainbow-csv",
+			"redhat.vscode-yaml",
+			"visualstudioexptteam.vscodeintellicode",
+			"vscodevim.vim"
+		],
+		"forwardPorts": [
+			8000,
+			8000
+		],
+		"postCreateCommand": "make install"
+		// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+		// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+		// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+		// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+		// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
+		// "remoteUser": "vscode"
+	}
 }

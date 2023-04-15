@@ -9,7 +9,6 @@ from dddpy.usecase.book import BookQueryUseCaseImpl, BookReadModel
 
 class TestBookQueryUseCase:
     def test_fetch_book_by_id_should_return_book(self):
-
         session = MagicMock()
         book_query_service = BookQueryServiceImpl(session)
         book_query_service.find_by_id = Mock(
@@ -34,7 +33,6 @@ class TestBookQueryUseCase:
         )
 
     def test_fetch_book_by_id_should_throw_book_not_found_error(self):
-
         session = MagicMock()
         book_query_service = BookQueryServiceImpl(session)
         book_query_service.find_by_id = Mock(side_effect=BookNotFoundError)
