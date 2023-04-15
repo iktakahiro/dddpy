@@ -17,6 +17,13 @@
 				"python.linting.pylintEnabled": true,
 				"python.analysis.typeCheckingMode": "basic"
 			},
+			"extensions": [
+				"mhutchie.git-graph",
+				"donjayamanne.githistory",
+				"GitHub.copilot",
+				"GitHub.copilot-labs",
+				"ms-python.python"
+			],
 		},
 		"extensions": [
 			"ms-python.python",
