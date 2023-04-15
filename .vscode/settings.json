@@ -1,9 +1,13 @@
 {
-        "python.formatting.provider": "black",
-        "python.testing.pytestArgs": [
-            "tests", "-vv"
-        ],
-        "python.testing.unittestEnabled": false,
-        "python.testing.nosetestsEnabled": false,
-        "python.testing.pytestEnabled": true
+    "python.formatting.provider": "none",
+    "python.testing.pytestArgs": [
+        "tests",
+        "-vv"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    }
 }
