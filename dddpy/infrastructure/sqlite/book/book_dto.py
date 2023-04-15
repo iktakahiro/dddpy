@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Union
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import  String
+from sqlalchemy.orm import Mapped, mapped_column
+
 
 from dddpy.domain.book import Book, Isbn
 from dddpy.infrastructure.sqlite.database import Base
@@ -16,13 +17,13 @@ class BookDTO(Base):
     """BookDTO is a data transfer object associated with Book entity."""
 
     __tablename__ = "book"
-    id: Union[str, Column] = Column(String, primary_key=True, autoincrement=False)
-    isbn: Union[str, Column] = Column(String(17), unique=True, nullable=False)
-    title: Union[str, Column] = Column(String, nullable=False)
-    page: Union[int, Column] = Column(Integer, nullable=False)
-    read_page: Union[int, Column] = Column(Integer, nullable=False, default=0)
-    created_at: Union[int, Column] = Column(Integer, index=True, nullable=False)
-    updated_at: Union[int, Column] = Column(Integer, index=True, nullable=False)
+    id: Mapped[str] = mapped_column(primary_key=True, autoincrement=False)
+    isbn: Mapped[str] = mapped_column(String(17), unique=True, nullable=False)
+    title: Mapped[str] = mapped_column(nullable=False)
+    page: Mapped[int] = mapped_column(nullable=False)
+    read_page: Mapped[int] = mapped_column(nullable=False, default=0)
+    created_at: Mapped[int] = mapped_column(index=True, nullable=False)
+    updated_at: Mapped[int] = mapped_column(index=True, nullable=False)
 
     def to_entity(self) -> Book:
         return Book(
