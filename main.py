@@ -3,7 +3,7 @@ from logging import config
 from typing import Iterator, List
 
 from fastapi import Depends, FastAPI, HTTPException, status
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import Session
 
 from dddpy.domain.book import (
     BookIsbnAlreadyExistsError,
