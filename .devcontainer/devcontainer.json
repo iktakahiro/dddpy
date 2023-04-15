@@ -22,7 +22,8 @@
 				"donjayamanne.githistory",
 				"GitHub.copilot",
 				"GitHub.copilot-labs",
-				"ms-python.python"
+				"ms-python.python",
+				"github.vscode-github-actions"
 			],
 		},
 		"extensions": [
