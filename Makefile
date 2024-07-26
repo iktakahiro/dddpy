@@ -1,19 +1,18 @@
-POETRY=poetry
-PYTEST=$(POETRY) run pytest
-MYPY=$(POETRY) run mypy --ignore-missing-imports
-BLACK=$(POETRY) run black
-ISORT=$(POETRY) run isort
-PYLINT=$(POETRY) run pylint
-UVICORN=$(POETRY) run uvicorn
+RYE=rye
+PYTEST=$(RYE) run pytest
+MYPY=$(RYE) run mypy --ignore-missing-imports
+BLACK=$(RYE) run black
+ISORT=$(RYE) run isort
+PYLINT=$(RYE) run pylint
+UVICORN=$(RYE) run uvicorn
 PACKAGE=dddpy
 
 install:
-	$(POETRY) install
+	$(RYE) sync
 	$(POETRY_EXPORT)
 
 update:
-	$(POETRY) update
-	$(POETRY_EXPORT)
+	$(POETRY) sync
 
 test: install  
 	$(MYPY) main.py ./${PACKAGE}/

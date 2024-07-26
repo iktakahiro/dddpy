@@ -5,7 +5,7 @@ description = "An example of Python FastAPI Domain-Driven Design and Onion Archi
 authors = [{ name = "iktakahiro", email = "takahiro.ikeuchi@gmail.com" }]
 dependencies = [
     "sqlalchemy==2.0.9",
-    "pydantic==1.10.7",
+    "pydantic==2.8.2",
     "fastapi==0.111.1",
     "uvicorn==0.30.3",
     "shortuuid==1.0.13",
