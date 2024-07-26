@@ -1,5 +1,8 @@
 FROM python:3.11-buster
 
-RUN pip install poetry
 
-RUN poetry config virtualenvs.create false
+SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
+RUN curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
+
+ENV RYE_HOME="/opt/rye"
+ENV PATH="$RYE_HOME/shims:$PATH"
