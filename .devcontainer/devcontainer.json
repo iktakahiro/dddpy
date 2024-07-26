@@ -5,17 +5,21 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"python.pythonPath": "/usr/local/bin/python",
-				// "python.linting.pylintPath": "/usr/local/bin/pylint",
-				// "python.linting.enabled": true,
 				"python.testing.pytestArgs": [
 					"tests",
 					"-vv"
 				],
 				"python.testing.unittestEnabled": true,
 				"python.testing.pytestEnabled": true,
-				"python.linting.pylintEnabled": true,
-				"python.analysis.typeCheckingMode": "basic"
+				"python.analysis.typeCheckingMode": "basic",
+				"[python]": {
+					"editor.defaultFormatter": "charliermarsh.ruff",
+					"editor.codeActionsOnSave": {
+					    "source.fixAll.ruff": "explicit",
+					    "source.organizeImports.ruff": "explicit"
+					},
+					"editor.formatOnSave": true
+				    },
 			},
 			"extensions": [
 				"mhutchie.git-graph",
