@@ -8,15 +8,15 @@ from dddpy.domain.book import Book
 class BookReadModel(BaseModel):
     """BookReadModel represents data structure as a read model."""
 
-    id: str = Field(example="vytxeTZskVKR7C7WgdSP3d")
-    isbn: str = Field(example="978-0321125217")
+    id: str = Field(examples=["vytxeTZskVKR7C7WgdSP3d"])
+    isbn: str = Field(examples=["978-0321125217"])
     title: str = Field(
-        example="Domain-Driven Design: Tackling Complexity in the Heart of Softwares"
+        examples=["Domain-Driven Design: Tackling Complexity in the Heart of Softwares"]
     )
-    page: int = Field(ge=0, example=320)
-    read_page: int = Field(ge=0, example=120)
-    created_at: int = Field(example=1136214245000)
-    updated_at: int = Field(example=1136214245000)
+    page: int = Field(ge=0, examples=[320])
+    read_page: int = Field(ge=0, examples=[120])
+    created_at: int = Field(examples=[1136214245000])
+    updated_at: int = Field(examples=[1136214245000])
 
     class Config:
         orm_mode = True

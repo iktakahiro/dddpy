@@ -41,7 +41,9 @@ class BookCommandUseCase(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update_book(self, book_id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
+    def update_book(
+        self, book_id: str, data: BookUpdateModel
+    ) -> Optional[BookReadModel]:
         raise NotImplementedError
 
     @abstractmethod
@@ -78,7 +80,9 @@ class BookCommandUseCaseImpl(BookCommandUseCase):
 
         return BookReadModel.from_entity(cast(Book, created_book))
 
-    def update_book(self, book_id: str, data: BookUpdateModel) -> Optional[BookReadModel]:
+    def update_book(
+        self, book_id: str, data: BookUpdateModel
+    ) -> Optional[BookReadModel]:
         try:
             existing_book = self.uow.book_repository.find_by_id(book_id)
             if existing_book is None:

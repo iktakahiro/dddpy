@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import  String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-
 
 from dddpy.domain.book import Book, Isbn
 from dddpy.infrastructure.sqlite.database import Base

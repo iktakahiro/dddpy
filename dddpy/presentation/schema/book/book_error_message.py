@@ -8,12 +8,12 @@ from dddpy.domain.book import (
 
 
 class ErrorMessageBookNotFound(BaseModel):
-    detail: str = Field(example=BookNotFoundError.message)
+    detail: str = Field(examples=[BookNotFoundError.message])
 
 
 class ErrorMessageBooksNotFound(BaseModel):
-    detail: str = Field(example=BooksNotFoundError.message)
+    detail: str = Field(examples=[BooksNotFoundError.message])
 
 
 class ErrorMessageBookIsbnAlreadyExists(BaseModel):
-    detail: str = Field(example=BookIsbnAlreadyExistsError.message)
+    detail: str = Field(examples=[BookIsbnAlreadyExistsError.message])
