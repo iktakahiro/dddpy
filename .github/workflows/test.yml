@@ -8,21 +8,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11]
-        poetry-version: [1.4.2]
+        python-version: [3.11, 3.12]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
       - name: Use Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
+      - name: Install Rye
         run: |
-          curl -sSL https://install.python-poetry.org | POETRY_HOME=$HOME/.poetry/ python
-          $HOME/.poetry/bin/poetry install
-          $HOME/.poetry/bin/poetry env use python${{ matrix.python-version }}
+          curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
+          echo "$HOME/.rye/shims" >> $GITHUB_PATH
+          source $HOME/.rye/env
+          rye sync
       - name: Pytest
         run: |
-          $HOME/.poetry/bin/poetry run pytest
+          rye run pytest
