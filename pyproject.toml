@@ -20,11 +20,9 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 dev-dependencies = [
-    "black>=24.4.2",
     "mypy>=1.11.0",
     "pytest>=8.3.2",
-    "isort>=5.13.2",
-    "pylint>=3.2.6",
+    "ruff>=0.5.5",
 ]
 
 [tool.hatch.metadata]
@@ -32,3 +30,32 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["dddpy"]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+
+target-version = "py312"
+
+[lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = []
+
+fixable = ["ALL"]
+unfixable = []
+
+[format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+ # Allow unused variables when underscore-prefixed.
+ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"

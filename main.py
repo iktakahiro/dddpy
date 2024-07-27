@@ -51,13 +51,17 @@ def get_session() -> Iterator[Session]:
         session.close()
 
 
-def book_query_usecase(session: Session = Depends(get_session)) -> BookQueryUseCase:
+def book_query_usecase(
+    session: Session = Depends(get_session),
+) -> BookQueryUseCase:
     """Get a book query use case."""
     book_query_service: BookQueryService = BookQueryServiceImpl(session)
     return BookQueryUseCaseImpl(book_query_service)
 
 
-def book_command_usecase(session: Session = Depends(get_session)) -> BookCommandUseCase:
+def book_command_usecase(
+    session: Session = Depends(get_session),
+) -> BookCommandUseCase:
     """Get a book command use case."""
     book_repository: BookRepository = BookRepositoryImpl(session)
     uow: BookCommandUseCaseUnitOfWork = BookCommandUseCaseUnitOfWorkImpl(
