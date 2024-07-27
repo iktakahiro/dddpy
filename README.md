@@ -2,6 +2,8 @@
 
 [![A workflow to run test](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml/badge.svg)](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml)
 
+English | [日本語](README.ja_JP.md)
+
 **NOTE**: This repository is an example to demonstrate "how to implement DDD architecture in a Python web application." If you use this as a reference, ensure to implement authentication and security before deploying it to a real-world environment!
 
 * My blog post: https://iktakahiro.dev/python-ddd-onion-architecture
