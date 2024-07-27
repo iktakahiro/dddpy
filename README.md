@@ -1,8 +1,8 @@
-# Python DDD Example and Techniques
+# Python DDD & Onion-Architecture Example and Techniques
 
 [![A workflow to run test](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml/badge.svg)](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml)
 
-*NOTE: This repository is an example to explain 'how to implement DDD architecture on a Python web application'. If you will to use this as a reference, add your implementation of authentication and security before deploying to the real world!!*
+**NOTE**: This repository is an example to demonstrate "how to implement DDD architecture in a Python web application." If you use this as a reference, ensure to implement authentication and security before deploying it to a real-world environment!
 
 * My blog post: https://iktakahiro.dev/python-ddd-onion-architecture
 
@@ -16,9 +16,9 @@
 
 ## Code Architecture
 
-Directory structure (based on [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/)):
+The directory structure is based on [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/):
 
-```tree
+```
 ├── main.py
 ├── dddpy
 │   ├── domain
@@ -37,7 +37,7 @@ Directory structure (based on [Onion Architecture](https://jeffreypalermo.com/20
 
 ### Entity
 
-To represent an Entity in Python, use `__eq__()` method to ensure the object's itendity.
+To represent an Entity in Python, use the `__eq__()` method to ensure the object's identity.
 
 * [book.py](./dddpy/domain/book/book.py)
 
@@ -56,7 +56,7 @@ class Book:
 
 ### Value Object
 
-To represent a Value Object, use `@dataclass` decorator with `eq=True` and `frozen=True`.
+To represent a Value Object, use the `@dataclass` decorator with `eq=True` and `frozen=True`.
 
 The following code implements a book's ISBN code as a Value Object.
 
@@ -69,7 +69,7 @@ class Isbn:
 
     def __init__(self, value: str):
         if !validate_isbn(value):
-            raise ValueError("value should be valid ISBN format.")
+            raise ValueError("Value should be a valid ISBN format.")
 
         object.__setattr__(self, "value", value)
 ```
@@ -78,45 +78,47 @@ class Isbn:
 
 DTO (Data Transfer Object) is a good practice to isolate domain objects from the infrastructure layer.
 
-On a minimum MVC architecture, models often inherit a base class provided by an O/R Mapper. But in that case, the domain layer would be dependent on the outer layer.
+In a minimal MVC architecture, models often inherit a base class provided by an ORM (Object-Relational Mapper). However, this would make the domain layer dependent on the outer layer.
 
 To solve this problem, we can set two rules:
 
-1. Domain layer classes (such as an Entity or a Value Object) **DO NOT** extend SQLAlchemy Base class.
-2. Data transfer Objects extend the O/R mapper class.
+1. Domain layer classes (such as Entities or Value Objects) **DO NOT** extend the SQLAlchemy Base class.
+2. Data Transfer Objects extend the ORM class.
    * [book_dto.py](./dddpy/infrastructure/sqlite/book/book_dto.py)
 
 ### CQRS
 
-CQRS (Command and Query Responsibility Segregation) pattern is useful 
+CQRS (Command and Query Responsibility Segregation) pattern is useful for separating read and write operations.
 
-* Read model and Write model
-  1. Define read models and write models in the **usecase layer**
-     * [book_query_model.py](./dddpy/usecase/book/book_query_model.py)
-     * [book_command_model.py](./dddpy/usecase/book/book_command_model.py)
-* Query
-  1. Define query service interfaces in the **usecase layer**
+1. Define read models and write models in the **usecase layer**:
+   * [book_query_model.py](./dddpy/usecase/book/book_query_model.py)
+   * [book_command_model.py](./dddpy/usecase/book/book_command_model.py)
+
+2. Query:
+   * Define query service interfaces in the **usecase layer**:
      * [book_query_service.py (interface)](./dddpy/usecase/book/book_query_service.py)
-  2. Implement query service implimentations in the **infrastructure layer**
+   * Implement query service implementations in the **infrastructure layer**:
      * [book_query_service.py](./dddpy/infrastructure/sqlite/book/book_query_service.py)
-* Command
-  1. Define repository interfaces in the **domain layer**
+
+3. Command:
+   * Define repository interfaces in the **domain layer**:
      * [book_repository.py (interface)](./dddpy/domain/book/book_repository.py)
-  2. Implement repository implimentations in the **infrastructure layer**
+   * Implement repository implementations in the **infrastructure layer**:
      * [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
-* Usecase
-  1. Usecases depend on repository interfaces or query service interfaces.
+
+4. Usecases:
+   * Usecases depend on repository interfaces or query service interfaces:
      * [book_query_usecase.py](./dddpy/usecase/book/book_query_usecase.py)
      * [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
-  2. Usecases return an instance of read|write model to a main routine.
+   * Usecases return an instance of the read or write model to the main routine.
 
 ### UoW (Unit of Work)
 
 Even if we succeed in isolating the domain layer, some issues remain. One of them is *how to manage transactions*.
 
-UoW (Unit of Work) Pattern can be the solution.
+The UoW (Unit of Work) Pattern can be a solution.
 
-First, define an interface base on UoW pattern in the usecase layer. `begin()`, `commit()` and `rollback()` methods are related a transaction management.
+First, define an interface based on the UoW pattern in the usecase layer. The `begin()`, `commit()`, and `rollback()` methods manage transactions.
 
 * [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
 
@@ -137,7 +139,7 @@ class BookCommandUseCaseUnitOfWork(ABC):
         raise NotImplementedError
 ```
 
-Second, implement a class of the infrastructure layer using the above interface.
+Second, implement a class in the infrastructure layer using the above interface.
 
 * [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
 
@@ -161,18 +163,18 @@ class BookCommandUseCaseUnitOfWorkImpl(BookCommandUseCaseUnitOfWork):
         self.session.rollback()
 ```
 
-`session` property is a session of SQLAlchemy,
+The `session` property is a SQLAlchemy session.
 
-## How to work
+## How to Work
 
-1. Clone and open this repository using VSCode
-2. Run Remote-Container
-3. Run `make dev` on the Docker container terminal
-4. Access the API document http://127.0.0.1:8000/docs
+1. Clone and open this repository using VSCode.
+2. Run Remote-Container.
+3. Run `make dev` in the Docker container terminal.
+4. Access the API documentation at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
 ![OpenAPI Doc](./screenshots/openapi_doc.png)
 
-### Sample requests for the RESTFul API
+### Sample Requests for the RESTful API
 
 * Create a new book:
 
@@ -221,3 +223,5 @@ curl --location --request GET 'localhost:8000/books'
     }
 ]
 ```
+
+This revised documentation clarifies the steps and code involved in setting up a Domain-Driven Design (DDD) architecture using Python. It also provides sample requests to interact with the RESTful API.
