@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
 
-regex = r"978[-0-9]{10,15}"
+regex = r'978[-0-9]{10,15}'
 pattern = re.compile(regex)
 
 
@@ -13,6 +13,6 @@ class Isbn:
 
     def __init__(self, value: str):
         if pattern.match(value) is None:
-            raise ValueError("isbn should be a valid format.")
+            raise ValueError('isbn should be a valid format.')
 
-        object.__setattr__(self, "value", value)
+        object.__setattr__(self, 'value', value)

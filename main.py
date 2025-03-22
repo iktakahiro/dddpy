@@ -34,7 +34,7 @@ from dddpy.usecase.book import (
     BookUpdateModel,
 )
 
-config.fileConfig("logging.conf", disable_existing_loggers=False)
+config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -71,12 +71,12 @@ def book_command_usecase(
 
 
 @app.post(
-    "/books",
+    '/books',
     response_model=BookReadModel,
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_409_CONFLICT: {
-            "model": ErrorMessageBookIsbnAlreadyExists,
+            'model': ErrorMessageBookIsbnAlreadyExists,
         },
     },
 )
@@ -102,12 +102,12 @@ async def create_book(
 
 
 @app.get(
-    "/books",
+    '/books',
     response_model=List[BookReadModel],
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": ErrorMessageBooksNotFound,
+            'model': ErrorMessageBooksNotFound,
         },
     },
 )
@@ -134,12 +134,12 @@ async def get_books(
 
 
 @app.get(
-    "/books/{book_id}",
+    '/books/{book_id}',
     response_model=BookReadModel,
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": ErrorMessageBookNotFound,
+            'model': ErrorMessageBookNotFound,
         },
     },
 )
@@ -165,12 +165,12 @@ async def get_book(
 
 
 @app.put(
-    "/books/{book_id}",
+    '/books/{book_id}',
     response_model=BookReadModel,
     status_code=status.HTTP_202_ACCEPTED,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": ErrorMessageBookNotFound,
+            'model': ErrorMessageBookNotFound,
         },
     },
 )
@@ -197,11 +197,11 @@ async def update_book(
 
 
 @app.delete(
-    "/books/{book_id}",
+    '/books/{book_id}',
     status_code=status.HTTP_202_ACCEPTED,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "model": ErrorMessageBookNotFound,
+            'model': ErrorMessageBookNotFound,
         },
     },
 )

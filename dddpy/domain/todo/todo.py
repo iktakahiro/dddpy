@@ -10,9 +10,9 @@ from uuid import UUID, uuid4
 class ToDoStatus(Enum):
     """Value object representing the status of a ToDo"""
 
-    NOT_STARTED = "not_started"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
+    NOT_STARTED = 'not_started'
+    IN_PROGRESS = 'in_progress'
+    COMPLETED = 'completed'
 
 
 @dataclass(frozen=True)
@@ -22,7 +22,7 @@ class ToDoId:
     value: UUID
 
     @staticmethod
-    def generate() -> "ToDoId":
+    def generate() -> 'ToDoId':
         """Generate a new ID"""
         return ToDoId(uuid4())
 
@@ -38,9 +38,9 @@ class ToDoTitle:
 
     def __post_init__(self):
         if not self.value:
-            raise ValueError("Title is required")
+            raise ValueError('Title is required')
         if len(self.value) > 100:
-            raise ValueError("Title must be 100 characters or less")
+            raise ValueError('Title must be 100 characters or less')
 
     def __str__(self) -> str:
         return self.value
@@ -54,7 +54,7 @@ class ToDoDescription:
 
     def __post_init__(self):
         if len(self.value) > 1000:
-            raise ValueError("Description must be 1000 characters or less")
+            raise ValueError('Description must be 1000 characters or less')
 
     def __str__(self) -> str:
         return self.value
@@ -138,7 +138,7 @@ class ToDo:
     def start(self) -> None:
         """Change the ToDo's status to in progress"""
         if self._status != ToDoStatus.NOT_STARTED:
-            raise ValueError("Only not started ToDos can be started")
+            raise ValueError('Only not started ToDos can be started')
 
         self._status = ToDoStatus.IN_PROGRESS
         self._updated_at = datetime.now()
@@ -146,7 +146,7 @@ class ToDo:
     def complete(self) -> None:
         """Change the ToDo's status to completed"""
         if self._status == ToDoStatus.COMPLETED:
-            raise ValueError("Already completed")
+            raise ValueError('Already completed')
 
         self._status = ToDoStatus.COMPLETED
         self._completed_at = datetime.now()
@@ -168,6 +168,6 @@ class ToDo:
     @staticmethod
     def create(
         title: ToDoTitle, description: Optional[ToDoDescription] = None
-    ) -> "ToDo":
+    ) -> 'ToDo':
         """Create a new ToDo"""
         return ToDo(ToDoId.generate(), title, description)

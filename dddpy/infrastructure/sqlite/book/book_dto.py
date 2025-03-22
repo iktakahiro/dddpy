@@ -15,7 +15,7 @@ def unixtimestamp() -> int:
 class BookDTO(Base):
     """BookDTO is a data transfer object associated with Book entity."""
 
-    __tablename__ = "book"
+    __tablename__ = 'book'
     id: Mapped[str] = mapped_column(primary_key=True, autoincrement=False)
     isbn: Mapped[str] = mapped_column(String(17), unique=True, nullable=False)
     title: Mapped[str] = mapped_column(nullable=False)
@@ -47,7 +47,7 @@ class BookDTO(Base):
         )
 
     @staticmethod
-    def from_entity(book: Book) -> "BookDTO":
+    def from_entity(book: Book) -> 'BookDTO':
         now = unixtimestamp()
         return BookDTO(
             id=book.book_id,

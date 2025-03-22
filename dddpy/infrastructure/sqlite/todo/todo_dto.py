@@ -6,15 +6,14 @@ from uuid import UUID
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from dddpy.domain.todo import (ToDo, ToDoDescription, ToDoId, ToDoStatus,
-                               ToDoTitle)
+from dddpy.domain.todo import ToDo, ToDoDescription, ToDoId, ToDoStatus, ToDoTitle
 from dddpy.infrastructure.sqlite.database import Base
 
 
 class ToDoDTO(Base):
     """Data Transfer Object for ToDo entity in SQLite database."""
 
-    __tablename__ = "todo"
+    __tablename__ = 'todo'
     id: Mapped[str] = mapped_column(primary_key=True, autoincrement=False)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(1000), nullable=True)
@@ -36,7 +35,7 @@ class ToDoDTO(Base):
         )
 
     @staticmethod
-    def from_entity(todo: ToDo) -> "ToDoDTO":
+    def from_entity(todo: ToDo) -> 'ToDoDTO':
         """Convert domain entity to DTO."""
         return ToDoDTO(
             id=todo.id.value,
