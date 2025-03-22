@@ -18,8 +18,8 @@ test: install
 	$(MYPY) main.py ./${PACKAGE}/
 	$(PYTEST) -vv 
 
-format:
+format: install
 	$(RUFF) format
 
-dev:
-	${UVICORN} main:app --reload
+dev: install
+	uv run fastapi dev

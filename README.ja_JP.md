@@ -19,6 +19,7 @@
 ## プロジェクトのセットアップ
 
 1. 仮想環境を作成して有効化します：
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Unix/macOS
@@ -27,6 +28,7 @@ source .venv/bin/activate  # Unix/macOS
 ```
 
 2. uv を使用して依存関係をインストールします：
+
 ```bash
 uv sync
 ```
