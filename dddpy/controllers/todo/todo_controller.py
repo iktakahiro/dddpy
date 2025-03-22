@@ -11,10 +11,13 @@ from dddpy.controllers.todo.todo_scheme import (
     TodoScheme,
     TodoUpdateScheme,
 )
-from dddpy.domain.todo import TodoDescription, TodoId, TodoNotFoundError, TodoTitle
-from dddpy.domain.todo.todo_exception import (
+from dddpy.domain.todo import (
     TodoAlreadyCompletedError,
     TodoAlreadyStartedError,
+    TodoDescription,
+    TodoId,
+    TodoNotFoundError,
+    TodoTitle,
 )
 from dddpy.infrastructure.di import get_todo_command_usecase, get_todo_query_usecase
 from dddpy.usecase.todo import TodoCommandUseCase, TodoQueryUseCase
@@ -32,7 +35,13 @@ class TodoController:
             status_code=200,
         )
         def get_todos(usecase: TodoQueryUseCase = Depends(get_todo_query_usecase)):
-            return usecase.fetch_todos()
+            try:
+                data = usecase.fetch_todos()
+                return [TodoScheme.from_entity(todo) for todo in data]
+            except Exception as e:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                ) from e
 
         @app.get(
             '/todos/{todo_id}',
@@ -83,7 +92,14 @@ class TodoController:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=e,
                 ) from e
-            todo = usecase.create_todo(title, description)
+
+            try:
+                todo = usecase.create_todo(title, description)
+            except Exception as e:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                ) from e
+
             return TodoScheme.from_entity(todo)
 
         @app.put(
@@ -101,11 +117,19 @@ class TodoController:
             usecase: TodoCommandUseCase = Depends(get_todo_command_usecase),
         ):
             uuid = TodoId(UUID(todo_id))
+
             try:
                 title = TodoTitle(data.title)
                 description = (
                     TodoDescription(data.description) if data.description else None
                 )
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=e,
+                ) from e
+
+            try:
                 usecase.update_todo(uuid, title, description)
             except TodoNotFoundError as e:
                 raise HTTPException(
@@ -116,6 +140,8 @@ class TodoController:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
+
+            return None
 
         @app.patch(
             '/todos/{todo_id}/start',
@@ -147,6 +173,7 @@ class TodoController:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
+
             return None
 
         @app.patch(
@@ -179,4 +206,5 @@ class TodoController:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
+
             return None
