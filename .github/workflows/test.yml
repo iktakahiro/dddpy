@@ -5,10 +5,10 @@ on: [push, pull_request]
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: [3.11, 3.12]
+        python-version: [3.13]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,12 +17,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Rye
+      - name: Install uv
         run: |
-          curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
-          echo "$HOME/.rye/shims" >> $GITHUB_PATH
-          source $HOME/.rye/env
-          rye sync
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: |
+          make install
       - name: Pytest
         run: |
-          rye run pytest
+          make test
