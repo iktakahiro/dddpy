@@ -1,2 +1,2 @@
-from .todo_dto import ToDoDTO
-from .todo_repository import ToDoRepositoryImpl
+from .todo_dto import TodoDTO
+from .todo_repository import TodoRepositoryImpl

@@ -7,5 +7,5 @@
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true
   },
-  "cSpell.words": ["dddpy"]
+  "cSpell.words": ["dddpy", "usecase"]
 }

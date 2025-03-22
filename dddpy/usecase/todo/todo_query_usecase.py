@@ -1,38 +1,38 @@
-"""This module provides use cases for querying ToDo entities."""
+"""This module provides use cases for querying Todo entities."""
 
 from abc import abstractmethod
 from typing import List, Optional
 
-from dddpy.domain.todo import ToDo, ToDoId, ToDoNotFoundError, ToDoRepository
+from dddpy.domain.todo import Todo, TodoId, TodoNotFoundError, TodoRepository
 
 
-class ToDoQueryUseCase:
-    """ToDoQueryUseCase defines a query use cases interface related ToDo entity."""
+class TodoQueryUseCase:
+    """TodoQueryUseCase defines a query use cases interface related Todo entity."""
 
     @abstractmethod
-    def fetch_todo_by_id(self, todo_id: ToDoId) -> Optional[ToDo]:
-        """Fetch a ToDo by its ID."""
+    def fetch_todo_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+        """Fetch a Todo by its ID."""
         raise NotImplementedError
 
     @abstractmethod
-    def fetch_todos(self) -> List[ToDo]:
-        """Fetch all ToDos."""
+    def fetch_todos(self) -> List[Todo]:
+        """Fetch all Todos."""
         raise NotImplementedError
 
 
-class ToDoQueryUseCaseImpl(ToDoQueryUseCase):
-    """ToDoQueryUseCaseImpl implements a query use cases related ToDo entity."""
+class TodoQueryUseCaseImpl(TodoQueryUseCase):
+    """TodoQueryUseCaseImpl implements a query use cases related Todo entity."""
 
-    def __init__(self, todo_repository: ToDoRepository):
+    def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
 
-    def fetch_todo_by_id(self, todo_id: ToDoId) -> Optional[ToDo]:
-        """fetch_todo_by_id fetches a ToDo by ID."""
+    def fetch_todo_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+        """fetch_todo_by_id fetches a Todo by ID."""
         todo = self.todo_repository.find_by_id(todo_id)
         if todo is None:
-            raise ToDoNotFoundError
+            raise TodoNotFoundError
         return todo
 
-    def fetch_todos(self) -> List[ToDo]:
-        """fetch_todos fetches all ToDos."""
+    def fetch_todos(self) -> List[Todo]:
+        """fetch_todos fetches all Todos."""
         return self.todo_repository.find_all()

@@ -1,118 +1,123 @@
-"""This module provides use cases for command operations related to ToDo entities."""
+"""This module provides use cases for command operations related to Todo entities."""
 
 from abc import abstractmethod
 from typing import Optional
 
 from dddpy.domain.todo import (
-    ToDo,
-    ToDoAlreadyCompletedError,
-    ToDoAlreadyStartedError,
-    ToDoDescription,
-    ToDoId,
-    ToDoNotFoundError,
-    ToDoNotStartedError,
-    ToDoRepository,
-    ToDoStatus,
-    ToDoTitle,
+    Todo,
+    TodoAlreadyCompletedError,
+    TodoAlreadyStartedError,
+    TodoDescription,
+    TodoId,
+    TodoNotFoundError,
+    TodoNotStartedError,
+    TodoRepository,
+    TodoStatus,
+    TodoTitle,
 )
 
 
-class ToDoCommandUseCase:
-    """ToDoCommandUseCase defines a command use case interface related ToDo entity."""
+class TodoCommandUseCase:
+    """TodoCommandUseCase defines a command use case interface related Todo entity."""
 
     @abstractmethod
-    def create_todo(self, title: ToDoTitle, description: ToDoDescription) -> None:
-        """Create a new ToDo."""
+    def create_todo(
+        self, title: TodoTitle, description: Optional[TodoDescription] = None
+    ) -> Todo:
+        """Create a new Todo."""
         raise NotImplementedError
 
     @abstractmethod
-    def start_todo(self, todo_id: ToDoId) -> None:
-        """Start a ToDo."""
+    def start_todo(self, todo_id: TodoId) -> None:
+        """Start a Todo."""
         raise NotImplementedError
 
     @abstractmethod
-    def complete_todo(self, todo_id: ToDoId) -> None:
-        """Complete a ToDo."""
+    def complete_todo(self, todo_id: TodoId) -> None:
+        """Complete a Todo."""
         raise NotImplementedError
 
     @abstractmethod
     def update_todo(
-        self, todo_id: ToDoId, title: ToDoTitle, description: ToDoDescription
+        self, todo_id: TodoId, title: TodoTitle, description: Optional[TodoDescription]
     ) -> None:
-        """Update a ToDo."""
+        """Update a Todo."""
         raise NotImplementedError
 
     @abstractmethod
-    def delete_todo(self, todo_id: ToDoId) -> None:
-        """Delete a ToDo by its ID."""
+    def delete_todo(self, todo_id: TodoId) -> None:
+        """Delete a Todo by its ID."""
         raise NotImplementedError
 
 
-class ToDoCommandUseCaseImpl(ToDoCommandUseCase):
-    """ToDoCommandUseCaseImpl implements a command use cases related ToDo entity."""
+class TodoCommandUseCaseImpl(TodoCommandUseCase):
+    """TodoCommandUseCaseImpl implements a command use cases related Todo entity."""
 
-    def __init__(self, todo_repository: ToDoRepository):
+    def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
 
-    def create_todo(self, title: ToDoTitle, description: ToDoDescription) -> None:
-        """create_todo creates a new ToDo."""
-        todo = ToDo.create(title=title, description=description)
+    def create_todo(
+        self, title: TodoTitle, description: Optional[TodoDescription] = None
+    ) -> Todo:
+        """create_todo creates a new Todo."""
+        todo = Todo.create(title=title, description=description)
         self.todo_repository.save(todo)
+        return todo
 
-    def start_todo(self, todo_id: ToDoId) -> None:
-        """start_todo starts a ToDo."""
+    def start_todo(self, todo_id: TodoId) -> None:
+        """start_todo starts a Todo."""
         todo = self.todo_repository.find_by_id(todo_id)
 
         if todo is None:
-            raise ToDoNotFoundError
+            raise TodoNotFoundError
 
         if todo.is_completed:
-            raise ToDoAlreadyCompletedError
+            raise TodoAlreadyCompletedError
 
-        if todo.status == ToDoStatus.IN_PROGRESS:
-            raise ToDoAlreadyStartedError
+        if todo.status == TodoStatus.IN_PROGRESS:
+            raise TodoAlreadyStartedError
 
         todo.start()
 
         self.todo_repository.save(todo)
 
-    def complete_todo(self, todo_id: ToDoId) -> None:
-        """complete_todo completes a ToDo."""
+    def complete_todo(self, todo_id: TodoId) -> None:
+        """complete_todo completes a Todo."""
         todo = self.todo_repository.find_by_id(todo_id)
 
         if todo is None:
-            raise ToDoNotFoundError
+            raise TodoNotFoundError
 
-        if todo.status == ToDoStatus.NOT_STARTED:
-            raise ToDoNotStartedError
+        if todo.status == TodoStatus.NOT_STARTED:
+            raise TodoNotStartedError
 
         if todo.is_completed:
-            raise ToDoAlreadyCompletedError
+            raise TodoAlreadyCompletedError
 
         todo.complete()
 
         self.todo_repository.save(todo)
 
     def update_todo(
-        self, todo_id: ToDoId, title: ToDoTitle, description: Optional[ToDoDescription]
+        self, todo_id: TodoId, title: TodoTitle, description: Optional[TodoDescription]
     ) -> None:
-        """update_todo updates a ToDo."""
+        """update_todo updates a Todo."""
         todo = self.todo_repository.find_by_id(todo_id)
 
         if todo is None:
-            raise ToDoNotFoundError
+            raise TodoNotFoundError
 
         todo.update_title(title)
         todo.update_description(description)
 
         self.todo_repository.save(todo)
 
-    def delete_todo(self, todo_id: ToDoId) -> None:
-        """delete_todo deletes a ToDo by its ID."""
+    def delete_todo(self, todo_id: TodoId) -> None:
+        """delete_todo deletes a Todo by its ID."""
 
         todo = self.todo_repository.find_by_id(todo_id)
 
         if todo is None:
-            raise ToDoNotFoundError
+            raise TodoNotFoundError
 
         self.todo_repository.delete(todo_id)

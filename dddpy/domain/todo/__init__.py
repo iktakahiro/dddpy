@@ -1,14 +1,8 @@
-from .todo import (
-    ToDo,
-    ToDoId,
-    ToDoStatus,
-    ToDoTitle,
-    ToDoDescription,
-)
+from .todo import Todo, TodoDescription, TodoId, TodoStatus, TodoTitle
 from .todo_exception import (
-    ToDoAlreadyCompletedError,
-    ToDoAlreadyStartedError,
-    ToDoNotFoundError,
-    ToDoNotStartedError,
+    TodoAlreadyCompletedError,
+    TodoAlreadyStartedError,
+    TodoNotFoundError,
+    TodoNotStartedError,
 )
-from .todo_repository import ToDoRepository
+from .todo_repository import TodoRepository

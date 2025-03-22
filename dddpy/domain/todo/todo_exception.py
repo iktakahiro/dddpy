@@ -1,37 +1,37 @@
-"""ToDo exception"""
+"""Todo exception"""
 
 
-class ToDoNotFoundError(Exception):
-    """ToDoNotFoundError is an error that occurs when a ToDo is not found."""
+class TodoNotFoundError(Exception):
+    """TodoNotFoundError is an error that occurs when a Todo is not found."""
 
-    message = 'The ToDo you specified does not exist.'
-
-    def __str__(self):
-        return ToDoNotFoundError.message
-
-
-class ToDoNotStartedError(Exception):
-    """ToDoNotStartedError is an error that occurs when a ToDo is not started."""
-
-    message = 'The ToDo is not started.'
+    message = 'The Todo you specified does not exist.'
 
     def __str__(self):
-        return ToDoNotStartedError.message
+        return TodoNotFoundError.message
 
 
-class ToDoAlreadyCompletedError(Exception):
-    """ToDoIsbnAlreadyCompletedError is an error that occurs when a ToDo is already completed."""
+class TodoNotStartedError(Exception):
+    """TodoNotStartedError is an error that occurs when a Todo is not started."""
 
-    message = 'The ToDo is already completed.'
-
-    def __str__(self):
-        return ToDoAlreadyCompletedError.message
-
-
-class ToDoAlreadyStartedError(Exception):
-    """ToDoIsbnAlreadyStartedError is an error that occurs when a ToDo is already started."""
-
-    message = 'The ToDo is already started.'
+    message = 'The Todo is not started.'
 
     def __str__(self):
-        return ToDoAlreadyStartedError.message
+        return TodoNotStartedError.message
+
+
+class TodoAlreadyCompletedError(Exception):
+    """TodoIsbnAlreadyCompletedError is an error that occurs when a Todo is already completed."""
+
+    message = 'The Todo is already completed.'
+
+    def __str__(self):
+        return TodoAlreadyCompletedError.message
+
+
+class TodoAlreadyStartedError(Exception):
+    """TodoIsbnAlreadyStartedError is an error that occurs when a Todo is already started."""
+
+    message = 'The Todo is already started.'
+
+    def __str__(self):
+        return TodoAlreadyStartedError.message

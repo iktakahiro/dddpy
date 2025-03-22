@@ -1,4 +1,4 @@
-"""Domain model for ToDo entities and related value objects."""
+"""Domain model for Todo entities and related value objects."""
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -7,8 +7,8 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 
-class ToDoStatus(Enum):
-    """Value object representing the status of a ToDo"""
+class TodoStatus(Enum):
+    """Value object representing the status of a Todo"""
 
     NOT_STARTED = 'not_started'
     IN_PROGRESS = 'in_progress'
@@ -16,23 +16,23 @@ class ToDoStatus(Enum):
 
 
 @dataclass(frozen=True)
-class ToDoId:
-    """Value object representing the identifier of a ToDo"""
+class TodoId:
+    """Value object representing the identifier of a Todo"""
 
     value: UUID
 
     @staticmethod
-    def generate() -> 'ToDoId':
+    def generate() -> 'TodoId':
         """Generate a new ID"""
-        return ToDoId(uuid4())
+        return TodoId(uuid4())
 
     def __str__(self) -> str:
         return str(self.value)
 
 
 @dataclass(frozen=True)
-class ToDoTitle:
-    """Value object representing the title of a ToDo"""
+class TodoTitle:
+    """Value object representing the title of a Todo"""
 
     value: str
 
@@ -47,8 +47,8 @@ class ToDoTitle:
 
 
 @dataclass(frozen=True)
-class ToDoDescription:
-    """Value object representing the description of a ToDo"""
+class TodoDescription:
+    """Value object representing the description of a Todo"""
 
     value: str
 
@@ -60,21 +60,21 @@ class ToDoDescription:
         return self.value
 
 
-class ToDo:
-    """ToDo entity representing a task or item to be completed"""
+class Todo:
+    """Todo entity representing a task or item to be completed"""
 
     def __init__(
         self,
-        id: ToDoId,
-        title: ToDoTitle,
-        description: Optional[ToDoDescription] = None,
-        status: ToDoStatus = ToDoStatus.NOT_STARTED,
+        id: TodoId,
+        title: TodoTitle,
+        description: Optional[TodoDescription] = None,
+        status: TodoStatus = TodoStatus.NOT_STARTED,
         created_at: datetime = datetime.now(),
         updated_at: datetime = datetime.now(),
         completed_at: Optional[datetime] = None,
     ):
         """
-        Initialize a new ToDo entity.
+        Initialize a new Todo entity.
         """
         self._id = id
         self._title = title
@@ -85,81 +85,81 @@ class ToDo:
         self._completed_at = completed_at
 
     def __eq__(self, obj: object) -> bool:
-        if isinstance(obj, ToDo):
+        if isinstance(obj, Todo):
             return self.id == obj.id
 
         return False
 
     @property
-    def id(self) -> ToDoId:
-        """Get the ToDo's unique identifier"""
+    def id(self) -> TodoId:
+        """Get the Todo's unique identifier"""
         return self._id
 
     @property
-    def title(self) -> ToDoTitle:
-        """Get the ToDo's title"""
+    def title(self) -> TodoTitle:
+        """Get the Todo's title"""
         return self._title
 
     @property
-    def description(self) -> Optional[ToDoDescription]:
-        """Get the ToDo's description"""
+    def description(self) -> Optional[TodoDescription]:
+        """Get the Todo's description"""
         return self._description
 
     @property
-    def status(self) -> ToDoStatus:
-        """Get the ToDo's current status"""
+    def status(self) -> TodoStatus:
+        """Get the Todo's current status"""
         return self._status
 
     @property
     def created_at(self) -> datetime:
-        """Get the ToDo's creation timestamp"""
+        """Get the Todo's creation timestamp"""
         return self._created_at
 
     @property
     def updated_at(self) -> datetime:
-        """Get the ToDo's last update timestamp"""
+        """Get the Todo's last update timestamp"""
         return self._updated_at
 
     @property
     def completed_at(self) -> Optional[datetime]:
-        """Get the ToDo's completion timestamp"""
+        """Get the Todo's completion timestamp"""
         return self._completed_at
 
-    def update_title(self, new_title: ToDoTitle) -> None:
-        """Update the ToDo's title"""
+    def update_title(self, new_title: TodoTitle) -> None:
+        """Update the Todo's title"""
         self._title = new_title
         self._updated_at = datetime.now()
 
-    def update_description(self, new_description: Optional[ToDoDescription]) -> None:
-        """Update the ToDo's description"""
+    def update_description(self, new_description: Optional[TodoDescription]) -> None:
+        """Update the Todo's description"""
         self._description = new_description if new_description else None
         self._updated_at = datetime.now()
 
     def start(self) -> None:
-        """Change the ToDo's status to in progress"""
-        if self._status != ToDoStatus.NOT_STARTED:
-            raise ValueError('Only not started ToDos can be started')
+        """Change the Todo's status to in progress"""
+        if self._status != TodoStatus.NOT_STARTED:
+            raise ValueError('Only not started Todos can be started')
 
-        self._status = ToDoStatus.IN_PROGRESS
+        self._status = TodoStatus.IN_PROGRESS
         self._updated_at = datetime.now()
 
     def complete(self) -> None:
-        """Change the ToDo's status to completed"""
-        if self._status == ToDoStatus.COMPLETED:
+        """Change the Todo's status to completed"""
+        if self._status == TodoStatus.COMPLETED:
             raise ValueError('Already completed')
 
-        self._status = ToDoStatus.COMPLETED
+        self._status = TodoStatus.COMPLETED
         self._completed_at = datetime.now()
         self._updated_at = self._completed_at
 
     @property
     def is_completed(self) -> bool:
-        """Check if the ToDo is completed"""
-        return self._status == ToDoStatus.COMPLETED
+        """Check if the Todo is completed"""
+        return self._status == TodoStatus.COMPLETED
 
     def is_overdue(self, deadline: datetime) -> bool:
         """
-        Check if the ToDo is overdue based on the given deadline
+        Check if the Todo is overdue based on the given deadline
         """
         if self.is_completed:
             return self._completed_at is not None and self._completed_at > deadline
@@ -167,7 +167,7 @@ class ToDo:
 
     @staticmethod
     def create(
-        title: ToDoTitle, description: Optional[ToDoDescription] = None
-    ) -> 'ToDo':
-        """Create a new ToDo"""
-        return ToDo(ToDoId.generate(), title, description)
+        title: TodoTitle, description: Optional[TodoDescription] = None
+    ) -> 'Todo':
+        """Create a new Todo"""
+        return Todo(TodoId.generate(), title, description)
