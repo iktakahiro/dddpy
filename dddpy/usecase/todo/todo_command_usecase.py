@@ -1,15 +1,20 @@
 """This module provides use cases for command operations related to ToDo entities."""
 
 from abc import abstractmethod
+from typing import Optional
 
-from dddpy.domain.todo.todo import ToDo, ToDoDescription, ToDoId, ToDoStatus, ToDoTitle
-from dddpy.domain.todo.todo_exception import (
+from dddpy.domain.todo import (
+    ToDo,
+    ToDoDescription,
+    ToDoId,
+    ToDoStatus,
+    ToDoTitle,
     ToDoAlreadyCompletedError,
     ToDoAlreadyStartedError,
     ToDoNotFoundError,
     ToDoNotStartedError,
+    ToDoRepository,
 )
-from dddpy.domain.todo.todo_repository import ToDoRepository
 
 
 class ToDoCommandUseCase:
@@ -51,7 +56,7 @@ class ToDoCommandUseCaseImpl(ToDoCommandUseCase):
 
     def create_todo(self, title: ToDoTitle, description: ToDoDescription) -> None:
         """create_todo creates a new ToDo."""
-        todo = ToDo(title=title, description=description)
+        todo = ToDo.create(title=title, description=description)
         self.todo_repository.save(todo)
 
     def start_todo(self, todo_id: ToDoId) -> None:
@@ -68,6 +73,7 @@ class ToDoCommandUseCaseImpl(ToDoCommandUseCase):
             raise ToDoAlreadyStartedError
 
         todo.start()
+
         self.todo_repository.save(todo)
 
     def complete_todo(self, todo_id: ToDoId) -> None:
@@ -84,10 +90,11 @@ class ToDoCommandUseCaseImpl(ToDoCommandUseCase):
             raise ToDoAlreadyCompletedError
 
         todo.complete()
+
         self.todo_repository.save(todo)
 
     def update_todo(
-        self, todo_id: ToDoId, title: ToDoTitle, description: ToDoDescription
+        self, todo_id: ToDoId, title: ToDoTitle, description: Optional[ToDoDescription]
     ) -> None:
         """update_todo updates a ToDo."""
         todo = self.todo_repository.find_by_id(todo_id)

@@ -3,9 +3,7 @@
 from abc import abstractmethod
 from typing import List, Optional
 
-from dddpy.domain.todo.todo import ToDo, ToDoId
-from dddpy.domain.todo.todo_exception import ToDoNotFoundError
-from dddpy.domain.todo.todo_repository import ToDoRepository
+from dddpy.domain.todo import ToDo, ToDoId, ToDoNotFoundError, ToDoRepository
 
 
 class ToDoQueryUseCase:

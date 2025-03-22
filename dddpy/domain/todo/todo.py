@@ -65,19 +65,24 @@ class ToDo:
 
     def __init__(
         self,
+        id: ToDoId,
         title: ToDoTitle,
         description: Optional[ToDoDescription] = None,
+        status: ToDoStatus = ToDoStatus.NOT_STARTED,
+        created_at: datetime = datetime.now(),
+        updated_at: datetime = datetime.now(),
+        completed_at: Optional[datetime] = None,
     ):
         """
         Initialize a new ToDo entity.
         """
-        self._id = ToDoId.generate()
+        self._id = id
         self._title = title
-        self._description = description if description else None
-        self._status = ToDoStatus.NOT_STARTED
-        self._created_at = datetime.now()
-        self._updated_at = datetime.now()
-        self._completed_at = None
+        self._description = description
+        self._status = status
+        self._created_at = created_at
+        self._updated_at = updated_at
+        self._completed_at = completed_at
 
     def __eq__(self, obj: object) -> bool:
         if isinstance(obj, ToDo):
@@ -159,3 +164,10 @@ class ToDo:
         if self.is_completed:
             return self._completed_at is not None and self._completed_at > deadline
         return False
+
+    @staticmethod
+    def create(
+        title: ToDoTitle, description: Optional[ToDoDescription] = None
+    ) -> "ToDo":
+        """Create a new ToDo"""
+        return ToDo(ToDoId.generate(), title, description)

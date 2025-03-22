@@ -2,7 +2,7 @@
 
 from typing import List, Optional
 
-from dddpy.domain.todo.todo import ToDo, ToDoId
+from dddpy.domain.todo import ToDo, ToDoId
 
 
 class ToDoRepository:
