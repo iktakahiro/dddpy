@@ -19,7 +19,7 @@ class BookReadModel(BaseModel):
     updated_at: int = Field(examples=[1136214245000])
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
     @staticmethod
     def from_entity(book: Book) -> "BookReadModel":

@@ -6,21 +6,35 @@ English | [日本語](README.ja_JP.md)
 
 **NOTE**: This repository is an example to demonstrate "how to implement DDD architecture in a Python web application." If you use this as a reference, ensure to implement authentication and security before deploying it to a real-world environment!
 
-* My blog post: https://iktakahiro.dev/python-ddd-onion-architecture
+* My blog post: <https://iktakahiro.dev/python-ddd-onion-architecture>
 
 ## Tech Stack
 
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [SQLAlchemy](https://www.sqlalchemy.org/)
   * [SQLite](https://www.sqlite.org/index.html)
-* [Poetry](https://python-poetry.org/)
+* [uv](https://github.com/astral-sh/uv)
 * [Docker](https://www.docker.com/)
+
+## Project Setup
+
+1. Install dependencies using uv:
+
+```bash
+make install
+```
+
+2. Run the web app
+
+```bash
+make dev
+```
 
 ## Code Architecture
 
 The directory structure is based on [Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/):
 
-```
+```tree
 ├── main.py
 ├── dddpy
 │   ├── domain

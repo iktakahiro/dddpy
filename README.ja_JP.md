@@ -13,8 +13,23 @@
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [SQLAlchemy](https://www.sqlalchemy.org/)
   * [SQLite](https://www.sqlite.org/index.html)
-* [Poetry](https://python-poetry.org/)
+* [uv](https://github.com/astral-sh/uv)
 * [Docker](https://www.docker.com/)
+
+## プロジェクトのセットアップ
+
+1. 仮想環境を作成して有効化します：
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Unix/macOS
+# または
+.venv\Scripts\activate  # Windows
+```
+
+2. uv を使用して依存関係をインストールします：
+```bash
+uv sync
+```
 
 ## コードアーキテクチャ
 
