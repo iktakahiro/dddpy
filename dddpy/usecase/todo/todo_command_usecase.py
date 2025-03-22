@@ -3,10 +3,18 @@
 from abc import abstractmethod
 from typing import Optional
 
-from dddpy.domain.todo import (ToDo, ToDoAlreadyCompletedError,
-                               ToDoAlreadyStartedError, ToDoDescription,
-                               ToDoId, ToDoNotFoundError, ToDoNotStartedError,
-                               ToDoRepository, ToDoStatus, ToDoTitle)
+from dddpy.domain.todo import (
+    ToDo,
+    ToDoAlreadyCompletedError,
+    ToDoAlreadyStartedError,
+    ToDoDescription,
+    ToDoId,
+    ToDoNotFoundError,
+    ToDoNotStartedError,
+    ToDoRepository,
+    ToDoStatus,
+    ToDoTitle,
+)
 
 
 class ToDoCommandUseCase:
