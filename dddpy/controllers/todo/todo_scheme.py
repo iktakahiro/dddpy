@@ -16,6 +16,7 @@ class TodoScheme(BaseModel):
     status: str = Field(examples=['not_started'])
     created_at: int = Field(examples=[1136214245000])
     updated_at: int = Field(examples=[1136214245000])
+    completed_at: int | None = Field(examples=[1136214245000])
 
     class Config:
         """Configuration for Pydantic model."""
@@ -30,8 +31,11 @@ class TodoScheme(BaseModel):
             title=todo.title.value if todo.title else '',
             description=todo.description.value if todo.description else '',
             status=todo.status.value,
-            created_at=cast(int, todo.created_at),
-            updated_at=cast(int, todo.updated_at),
+            created_at=int(todo.created_at.timestamp() * 1000),
+            updated_at=int(todo.updated_at.timestamp() * 1000),
+            completed_at=int(todo.completed_at.timestamp() * 1000)
+            if todo.completed_at
+            else None,
         )
 
 

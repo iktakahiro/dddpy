@@ -10,7 +10,7 @@ class TodoQueryUseCase:
     """TodoQueryUseCase defines a query use cases interface related Todo entity."""
 
     @abstractmethod
-    def fetch_todo_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    def fetch_todo_by_id(self, todo_id: TodoId) -> Todo:
         """Fetch a Todo by its ID."""
         raise NotImplementedError
 

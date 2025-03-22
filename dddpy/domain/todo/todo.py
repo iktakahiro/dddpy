@@ -137,9 +137,6 @@ class Todo:
 
     def start(self) -> None:
         """Change the Todo's status to in progress"""
-        if self._status != TodoStatus.NOT_STARTED:
-            raise ValueError('Only not started Todos can be started')
-
         self._status = TodoStatus.IN_PROGRESS
         self._updated_at = datetime.now()
 

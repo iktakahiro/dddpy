@@ -54,9 +54,9 @@ class TodoController:
             },
         )
         def get_todo(
-            todo_id: str, usecase: TodoQueryUseCase = Depends(get_todo_query_usecase)
+            todo_id: UUID, usecase: TodoQueryUseCase = Depends(get_todo_query_usecase)
         ):
-            uuid = TodoId(UUID(todo_id))
+            uuid = TodoId(todo_id)
             try:
                 todo = usecase.fetch_todo_by_id(uuid)
             except TodoNotFoundError as e:
@@ -68,7 +68,7 @@ class TodoController:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from exc
-            return todo
+            return TodoScheme.from_entity(todo)
 
         @app.post(
             '/todos',
@@ -112,11 +112,11 @@ class TodoController:
             },
         )
         def update_todo(
-            todo_id: str,
+            todo_id: UUID,
             data: TodoUpdateScheme,
             usecase: TodoCommandUseCase = Depends(get_todo_command_usecase),
         ):
-            uuid = TodoId(UUID(todo_id))
+            _id = TodoId(todo_id)
 
             try:
                 title = TodoTitle(data.title)
@@ -130,7 +130,7 @@ class TodoController:
                 ) from e
 
             try:
-                usecase.update_todo(uuid, title, description)
+                usecase.update_todo(_id, title, description)
             except TodoNotFoundError as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -153,12 +153,12 @@ class TodoController:
             },
         )
         def start_todo(
-            todo_id: str,
+            todo_id: UUID,
             usecase: TodoCommandUseCase = Depends(get_todo_command_usecase),
         ):
-            uuid = TodoId(UUID(todo_id))
+            _id = TodoId(todo_id)
             try:
-                usecase.start_todo(uuid)
+                usecase.start_todo(_id)
             except TodoNotFoundError as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -186,15 +186,20 @@ class TodoController:
             },
         )
         def complete_todo(
-            todo_id: str,
+            todo_id: UUID,
             usecase: TodoCommandUseCase = Depends(get_todo_command_usecase),
         ):
-            uuid = TodoId(UUID(todo_id))
+            _id = TodoId(todo_id)
             try:
-                usecase.complete_todo(uuid)
+                usecase.complete_todo(_id)
             except TodoNotFoundError as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
+                    detail=e.message,
+                ) from e
+            except TodoAlreadyStartedError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
                     detail=e.message,
                 ) from e
             except TodoAlreadyCompletedError as e:
