@@ -3,25 +3,17 @@
 from abc import abstractmethod
 from typing import Optional
 
-from dddpy.domain.todo import (
-    ToDo,
-    ToDoDescription,
-    ToDoId,
-    ToDoStatus,
-    ToDoTitle,
-    ToDoAlreadyCompletedError,
-    ToDoAlreadyStartedError,
-    ToDoNotFoundError,
-    ToDoNotStartedError,
-    ToDoRepository,
-)
+from dddpy.domain.todo import (ToDo, ToDoAlreadyCompletedError,
+                               ToDoAlreadyStartedError, ToDoDescription,
+                               ToDoId, ToDoNotFoundError, ToDoNotStartedError,
+                               ToDoRepository, ToDoStatus, ToDoTitle)
 
 
 class ToDoCommandUseCase:
     """ToDoCommandUseCase defines a command use case interface related ToDo entity."""
 
     @abstractmethod
-    def create_todo(self, title: str, description: str) -> None:
+    def create_todo(self, title: ToDoTitle, description: ToDoDescription) -> None:
         """Create a new ToDo."""
         raise NotImplementedError
 
