@@ -1,8 +1,9 @@
-FROM python:3.11-buster
+FROM debian:bookworm
 
 
-SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
-RUN curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
+RUN apt-get update && apt-get install -y curl make
 
-ENV RYE_HOME="/opt/rye"
-ENV PATH="$RYE_HOME/shims:$PATH"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+	echo '. $HOME/.cargo/env' >> $HOME/.bashrc

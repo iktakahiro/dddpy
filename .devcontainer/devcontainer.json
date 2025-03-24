@@ -13,7 +13,6 @@
 				"python.testing.pytestEnabled": true,
 				"python.analysis.typeCheckingMode": "basic",
 				"[python]": {
-					"editor.defaultFormatter": "charliermarsh.ruff",
 					"editor.codeActionsOnSave": {
 					    "source.fixAll.ruff": "explicit",
 					    "source.organizeImports.ruff": "explicit"
@@ -22,36 +21,14 @@
 				    },
 			},
 			"extensions": [
-				"mhutchie.git-graph",
-				"donjayamanne.githistory",
-				"GitHub.copilot",
-				"GitHub.copilot-labs",
 				"ms-python.python",
-				"github.vscode-github-actions",
-				"GitHub.vscode-pull-request-github"
+				"vscodevim.vim"
 			],
 		},
-		"extensions": [
-			"ms-python.python",
-			"ms-python.vscode-pylance",
-			"vscode-icons-team.vscode-icons",
-			"github.vscode-pull-request-github",
-			"mhutchie.git-graph",
-			"mechatroner.rainbow-csv",
-			"redhat.vscode-yaml",
-			"visualstudioexptteam.vscodeintellicode",
-			"vscodevim.vim"
-		],
 		"forwardPorts": [
 			8000,
 			8000
 		],
 		"postCreateCommand": "make install"
-		// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
-		// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
-		// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
-		// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
-		// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
-		// "remoteUser": "vscode"
 	}
 }
