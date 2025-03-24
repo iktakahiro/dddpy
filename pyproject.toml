@@ -30,13 +30,37 @@ indent-width = 4
 target-version = "py313"
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F"]
-ignore = []
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "TID",
+    "C4",
+    "UP",
+    "N",
+    "B",
+    "C90",
+    "TC",
+    "TID",
+    "ERA",
+    "PD",
+    "PGH",
+    "PL",
+    "TRY",
+    "PIE",
+    "PERF",
+]
+ignore = ["E501", "B008", "TC003"]
 fixable = ["ALL"]
-unfixable = []
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
 
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
