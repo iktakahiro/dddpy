@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Optional
 
 from dddpy.domain.todo.entities import Todo
-from dddpy.domain.todo.repositories.todo_repository import TodoRepository
+from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoDescription, TodoTitle
 
 

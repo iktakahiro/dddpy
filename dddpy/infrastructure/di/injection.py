@@ -5,7 +5,7 @@ from typing import Iterator
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from dddpy.domain.todo.repositories.todo_repository import TodoRepository
+from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.infrastructure.sqlite.database import SessionLocal
 from dddpy.infrastructure.sqlite.todo.todo_repository import new_todo_repository
 from dddpy.usecase.todo import (

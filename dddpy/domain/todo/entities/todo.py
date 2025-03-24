@@ -1,12 +1,10 @@
+"""This module provides the Todo entity representing a task or item to be completed."""
+
 from datetime import datetime
 from typing import Optional
 
-from dddpy.domain.todo.value_objects import (
-    TodoDescription,
-    TodoId,
-    TodoStatus,
-    TodoTitle,
-)
+from dddpy.domain.todo.value_objects import (TodoDescription, TodoId,
+                                             TodoStatus, TodoTitle)
 
 
 class Todo:

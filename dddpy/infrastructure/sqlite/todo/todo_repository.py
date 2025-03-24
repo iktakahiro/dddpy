@@ -7,7 +7,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
 from dddpy.domain.todo.entities import Todo
-from dddpy.domain.todo.repositories.todo_repository import TodoRepository
+from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoId
 from dddpy.infrastructure.sqlite.todo import TodoDTO
 
