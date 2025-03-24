@@ -303,7 +303,7 @@ curl --location --request GET 'localhost:8000/todos'
         "id": "e74R3Prx8SfcY8KJFkGVf3",
         "title": "Implement DDD architecture",
         "description": "Create a sample application using DDD principles",
-        "status": "TODO",
+        "status": "not_started",
         "created_at": 1614006055213,
         "updated_at": 1614006055213
     }
