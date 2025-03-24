@@ -280,7 +280,7 @@ curl --location --request POST 'localhost:8000/todos' \
 
 ```json
 {
-    "id": "HH9uqNdYbjScdiLgaTApcS",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Implement DDD architecture",
     "description": "Create a sample application using DDD principles",
     "status": "TODO",
@@ -300,7 +300,7 @@ curl --location --request GET 'localhost:8000/todos'
 ```json
 [
     {
-        "id": "e74R3Prx8SfcY8KJFkGVf3",
+        "id": "550e8400-e29b-41d4-a716-446655440000",
         "title": "Implement DDD architecture",
         "description": "Create a sample application using DDD principles",
         "status": "not_started",

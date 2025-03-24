@@ -39,9 +39,16 @@ The directory structure is based on [Onion Architecture](https://jeffreypalermo.
 ├── dddpy
 │   ├── domain
 │   │   └── todo
-│   │       ├── todo.py
-│   │       ├── todo_repository.py
-│   │       └── todo_exception.py
+│   │       ├── entities
+│   │       │   └── todo.py
+│   │       ├── value_objects
+│   │       │   ├── todo_title.py
+│   │       │   ├── todo_description.py
+│   │       │   ├── todo_id.py
+│   │       │   └── todo_status.py
+│   │       ├── repositories
+│   │       │   └── todo_repository.py
+│   │       └── exceptions
 │   ├── infrastructure
 │   │   ├── di
 │   │   │   └── injection.py
@@ -177,7 +184,7 @@ The usecase layer contains the application-specific business rules. It includes:
 2. DTOs (Data Transfer Objects)
 3. Service interfaces
 
-This project follows the "One Class One Method" pattern for use cases, where each use case is implemented as a separate class with a single `execute` method. Here's how it's implemented:
+In this project, each use case is implemented as a separate class with a single public `execute` method. This design ensures clear separation of concerns and makes the code more maintainable. Here's how it's implemented:
 
 #### 1. Use Case Interface and Implementation
 
@@ -280,7 +287,7 @@ curl --location --request POST 'localhost:8000/todos' \
 
 ```json
 {
-    "id": "HH9uqNdYbjScdiLgaTApcS",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Implement DDD architecture",
     "description": "Create a sample application using DDD principles",
     "status": "TODO",
@@ -300,7 +307,7 @@ curl --location --request GET 'localhost:8000/todos'
 ```json
 [
     {
-        "id": "e74R3Prx8SfcY8KJFkGVf3",
+        "id": "550e8400-e29b-41d4-a716-446655440000",
         "title": "Implement DDD architecture",
         "description": "Create a sample application using DDD principles",
         "status": "not_started",
