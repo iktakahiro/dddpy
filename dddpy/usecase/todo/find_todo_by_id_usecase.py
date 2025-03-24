@@ -11,7 +11,6 @@ class FindTodoByIdUseCase(ABC):
     @abstractmethod
     def execute(self, todo_id: TodoId) -> Todo:
         """execute finds a Todo by its ID."""
-        pass
 
 
 class FindTodoByIdUseCaseImpl(FindTodoByIdUseCase):
@@ -29,4 +28,5 @@ class FindTodoByIdUseCaseImpl(FindTodoByIdUseCase):
 
 
 def new_find_todo_by_id_usecase(todo_repository: TodoRepository) -> FindTodoByIdUseCase:
+    """Create a new instance of FindTodoByIdUseCase."""
     return FindTodoByIdUseCaseImpl(todo_repository)

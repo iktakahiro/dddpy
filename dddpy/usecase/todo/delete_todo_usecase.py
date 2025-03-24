@@ -1,6 +1,7 @@
 """This module provides use case for deleting a Todo entity."""
 
 from abc import ABC, abstractmethod
+
 from dddpy.domain.todo import TodoId, TodoNotFoundError, TodoRepository
 
 
@@ -10,7 +11,6 @@ class DeleteTodoUseCase(ABC):
     @abstractmethod
     def execute(self, todo_id: TodoId) -> None:
         """execute deletes a Todo by its ID."""
-        pass
 
 
 class DeleteTodoUseCaseImpl(DeleteTodoUseCase):
@@ -30,4 +30,5 @@ class DeleteTodoUseCaseImpl(DeleteTodoUseCase):
 
 
 def new_delete_todo_usecase(todo_repository: TodoRepository) -> DeleteTodoUseCase:
+    """Create a new instance of DeleteTodoUseCase."""
     return DeleteTodoUseCaseImpl(todo_repository)

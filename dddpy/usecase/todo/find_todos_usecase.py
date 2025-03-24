@@ -12,7 +12,6 @@ class FindTodosUseCase(ABC):
     @abstractmethod
     def execute(self) -> List[Todo]:
         """execute finds all Todos."""
-        pass
 
 
 class FindTodosUseCaseImpl(FindTodosUseCase):
@@ -27,4 +26,5 @@ class FindTodosUseCaseImpl(FindTodosUseCase):
 
 
 def new_find_todos_usecase(todo_repository: TodoRepository) -> FindTodosUseCase:
+    """Create a new instance of FindTodosUseCase."""
     return FindTodosUseCaseImpl(todo_repository)

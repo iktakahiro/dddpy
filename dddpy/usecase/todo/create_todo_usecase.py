@@ -3,13 +3,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-from dddpy.domain.todo import (
-    Todo,
-    TodoDescription,
-    TodoId,
-    TodoRepository,
-    TodoTitle,
-)
+from dddpy.domain.todo import Todo, TodoDescription, TodoRepository, TodoTitle
 
 
 class CreateTodoUseCase:
@@ -20,7 +14,6 @@ class CreateTodoUseCase:
         self, title: TodoTitle, description: Optional[TodoDescription] = None
     ) -> Todo:
         """execute creates a new Todo."""
-        raise NotImplementedError
 
 
 class CreateTodoUseCaseImpl(CreateTodoUseCase):
@@ -39,4 +32,5 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
 
 
 def new_create_todo_usecase(todo_repository: TodoRepository) -> CreateTodoUseCase:
+    """Create a new instance of CreateTodoUseCase."""
     return CreateTodoUseCaseImpl(todo_repository)

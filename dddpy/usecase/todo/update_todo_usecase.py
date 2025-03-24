@@ -20,7 +20,6 @@ class UpdateTodoUseCase(ABC):
         self, todo_id: TodoId, title: TodoTitle, description: Optional[TodoDescription]
     ) -> None:
         """execute updates a Todo."""
-        pass
 
 
 class UpdateTodoUseCaseImpl(UpdateTodoUseCase):
@@ -44,4 +43,5 @@ class UpdateTodoUseCaseImpl(UpdateTodoUseCase):
 
 
 def new_update_todo_usecase(todo_repository: TodoRepository) -> UpdateTodoUseCase:
+    """Create a new instance of UpdateTodoUseCase."""
     return UpdateTodoUseCaseImpl(todo_repository)

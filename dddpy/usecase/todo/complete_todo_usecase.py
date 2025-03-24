@@ -1,6 +1,7 @@
 """This module provides use case for completing a Todo entity."""
 
 from abc import ABC, abstractmethod
+
 from dddpy.domain.todo import (
     TodoAlreadyCompletedError,
     TodoId,
@@ -17,7 +18,6 @@ class CompleteTodoUseCase(ABC):
     @abstractmethod
     def execute(self, todo_id: TodoId) -> None:
         """execute completes a Todo."""
-        pass
 
 
 class CompleteTodoUseCaseImpl(CompleteTodoUseCase):

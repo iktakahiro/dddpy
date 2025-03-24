@@ -1,6 +1,7 @@
 """This module provides use case for starting a Todo entity."""
 
 from abc import ABC, abstractmethod
+
 from dddpy.domain.todo import (
     TodoAlreadyCompletedError,
     TodoAlreadyStartedError,
@@ -17,7 +18,6 @@ class StartTodoUseCase(ABC):
     @abstractmethod
     def execute(self, todo_id: TodoId) -> None:
         """execute starts a Todo."""
-        pass
 
 
 class StartTodoUseCaseImpl(StartTodoUseCase):
@@ -44,4 +44,5 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
 
 
 def new_start_todo_usecase(todo_repository: TodoRepository) -> StartTodoUseCase:
+    """Create a new instance of StartTodoUseCase."""
     return StartTodoUseCaseImpl(todo_repository)

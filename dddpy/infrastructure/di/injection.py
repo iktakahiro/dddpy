@@ -7,17 +7,23 @@ from sqlalchemy.orm import Session
 
 from dddpy.domain.todo.todo_repository import TodoRepository
 from dddpy.infrastructure.sqlite.database import SessionLocal
-from dddpy.infrastructure.sqlite.todo.todo_repository import \
-    new_todo_repository
-from dddpy.usecase.todo import (CompleteTodoUseCase, CreateTodoUseCase,
-                                DeleteTodoUseCase, FindTodoByIdUseCase,
-                                FindTodosUseCase, StartTodoUseCase,
-                                UpdateTodoUseCase, new_complete_todo_usecase,
-                                new_create_todo_usecase,
-                                new_delete_todo_usecase,
-                                new_find_todo_by_id_usecase,
-                                new_find_todos_usecase, new_start_todo_usecase,
-                                new_update_todo_usecase)
+from dddpy.infrastructure.sqlite.todo.todo_repository import new_todo_repository
+from dddpy.usecase.todo import (
+    CompleteTodoUseCase,
+    CreateTodoUseCase,
+    DeleteTodoUseCase,
+    FindTodoByIdUseCase,
+    FindTodosUseCase,
+    StartTodoUseCase,
+    UpdateTodoUseCase,
+    new_complete_todo_usecase,
+    new_create_todo_usecase,
+    new_delete_todo_usecase,
+    new_find_todo_by_id_usecase,
+    new_find_todos_usecase,
+    new_start_todo_usecase,
+    new_update_todo_usecase,
+)
 
 
 def get_session() -> Iterator[Session]:

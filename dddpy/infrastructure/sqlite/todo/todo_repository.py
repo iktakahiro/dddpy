@@ -59,5 +59,5 @@ class TodoRepositoryImpl(TodoRepository):
 
 
 def new_todo_repository(session: Session) -> TodoRepository:
-    """Get a TodoRepository instance with dependencies injected."""
+    """Create a new TodoRepository instance."""
     return TodoRepositoryImpl(session)
