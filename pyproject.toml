@@ -42,7 +42,6 @@ select = [
     "B",
     "C90",
     "TC",
-    "TID",
     "ERA",
     "PD",
     "PGH",
@@ -52,10 +51,6 @@ select = [
     "PERF",
 ]
 ignore = ["E501", "B008", "TC003"]
-fixable = ["ALL"]
-
-[tool.ruff.lint.mccabe]
-max-complexity = 10
 
 [tool.ruff.format]
 quote-style = "single"

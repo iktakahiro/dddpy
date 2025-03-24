@@ -7,7 +7,7 @@ from logging import config
 from fastapi import FastAPI
 
 from dddpy.controllers.todo.todo_controller import TodoController
-from dddpy.infrastructure.sqlite.database import Base, create_tables, engine
+from dddpy.infrastructure.sqlite.database import create_tables, engine
 
 config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
@@ -21,7 +21,12 @@ async def lifespan(app: FastAPI):
     engine.dispose()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title='DDD Todo API',
+    description='A RESTful API for managing todos using Domain-Driven Design principles.',
+    version='2.0.0',
+    lifespan=lifespan,
+)
 
 todo_controller = TodoController()
 todo_controller.register_routes(app)
