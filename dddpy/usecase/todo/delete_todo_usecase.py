@@ -2,7 +2,9 @@
 
 from abc import ABC, abstractmethod
 
-from dddpy.domain.todo import TodoId, TodoNotFoundError, TodoRepository
+from dddpy.domain.todo.exceptions import TodoNotFoundError
+from dddpy.domain.todo.repositories.todo_repository import TodoRepository
+from dddpy.domain.todo.value_objects import TodoId
 
 
 class DeleteTodoUseCase(ABC):

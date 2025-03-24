@@ -11,14 +11,12 @@ from dddpy.controllers.todo.todo_scheme import (
     TodoScheme,
     TodoUpdateScheme,
 )
-from dddpy.domain.todo import (
+from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
     TodoAlreadyStartedError,
-    TodoDescription,
-    TodoId,
     TodoNotFoundError,
-    TodoTitle,
 )
+from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
 from dddpy.infrastructure.di.injection import (
     get_complete_todo_usecase,
     get_create_todo_usecase,

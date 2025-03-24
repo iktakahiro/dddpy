@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field
 
-from dddpy.domain.todo.todo_exception import (
+from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
     TodoAlreadyStartedError,
     TodoNotFoundError,

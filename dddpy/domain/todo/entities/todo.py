@@ -1,63 +1,12 @@
-"""Domain model for Todo entities and related value objects."""
-
-from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 from typing import Optional
-from uuid import UUID, uuid4
 
-
-class TodoStatus(Enum):
-    """Value object representing the status of a Todo"""
-
-    NOT_STARTED = 'not_started'
-    IN_PROGRESS = 'in_progress'
-    COMPLETED = 'completed'
-
-
-@dataclass(frozen=True)
-class TodoId:
-    """Value object representing the identifier of a Todo"""
-
-    value: UUID
-
-    @staticmethod
-    def generate() -> 'TodoId':
-        """Generate a new ID"""
-        return TodoId(uuid4())
-
-    def __str__(self) -> str:
-        return str(self.value)
-
-
-@dataclass(frozen=True)
-class TodoTitle:
-    """Value object representing the title of a Todo"""
-
-    value: str
-
-    def __post_init__(self):
-        if not self.value:
-            raise ValueError('Title is required')
-        if len(self.value) > 100:
-            raise ValueError('Title must be 100 characters or less')
-
-    def __str__(self) -> str:
-        return self.value
-
-
-@dataclass(frozen=True)
-class TodoDescription:
-    """Value object representing the description of a Todo"""
-
-    value: str
-
-    def __post_init__(self):
-        if len(self.value) > 1000:
-            raise ValueError('Description must be 1000 characters or less')
-
-    def __str__(self) -> str:
-        return self.value
+from dddpy.domain.todo.value_objects import (
+    TodoDescription,
+    TodoId,
+    TodoStatus,
+    TodoTitle,
+)
 
 
 class Todo:

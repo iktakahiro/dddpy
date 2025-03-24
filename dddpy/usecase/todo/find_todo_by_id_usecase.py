@@ -2,7 +2,10 @@
 
 from abc import ABC, abstractmethod
 
-from dddpy.domain.todo import Todo, TodoId, TodoNotFoundError, TodoRepository
+from dddpy.domain.todo.entities import Todo
+from dddpy.domain.todo.exceptions import TodoNotFoundError
+from dddpy.domain.todo.repositories import TodoRepository
+from dddpy.domain.todo.value_objects import TodoId
 
 
 class FindTodoByIdUseCase(ABC):

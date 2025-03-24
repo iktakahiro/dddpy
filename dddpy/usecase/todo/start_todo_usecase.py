@@ -2,14 +2,13 @@
 
 from abc import ABC, abstractmethod
 
-from dddpy.domain.todo import (
+from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
     TodoAlreadyStartedError,
-    TodoId,
     TodoNotFoundError,
-    TodoRepository,
-    TodoStatus,
 )
+from dddpy.domain.todo.repositories import TodoRepository
+from dddpy.domain.todo.value_objects import TodoId, TodoStatus
 
 
 class StartTodoUseCase(ABC):

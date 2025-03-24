@@ -3,7 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from dddpy.domain.todo import Todo, TodoRepository
+from dddpy.domain.todo.entities import Todo
+from dddpy.domain.todo.repositories import TodoRepository
 
 
 class FindTodosUseCase(ABC):

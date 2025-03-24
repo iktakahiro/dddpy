@@ -3,13 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from dddpy.domain.todo import (
-    TodoDescription,
-    TodoId,
-    TodoNotFoundError,
-    TodoRepository,
-    TodoTitle,
-)
+from dddpy.domain.todo.exceptions import TodoNotFoundError
+from dddpy.domain.todo.repositories import TodoRepository
+from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
 
 
 class UpdateTodoUseCase(ABC):

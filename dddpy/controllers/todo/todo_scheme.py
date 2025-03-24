@@ -1,10 +1,8 @@
 """Query model for Todo entities in the application."""
 
-from typing import cast
-
 from pydantic import BaseModel, Field
 
-from dddpy.domain.todo import Todo
+from dddpy.domain.todo.entities import Todo
 
 
 class TodoScheme(BaseModel):

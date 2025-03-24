@@ -6,7 +6,13 @@ from uuid import UUID
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from dddpy.domain.todo import Todo, TodoDescription, TodoId, TodoStatus, TodoTitle
+from dddpy.domain.todo.entities import Todo
+from dddpy.domain.todo.value_objects import (
+    TodoDescription,
+    TodoId,
+    TodoStatus,
+    TodoTitle,
+)
 from dddpy.infrastructure.sqlite.database import Base
 
 

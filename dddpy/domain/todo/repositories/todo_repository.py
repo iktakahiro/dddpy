@@ -3,7 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from dddpy.domain.todo import Todo, TodoId
+from dddpy.domain.todo.entities import Todo
+from dddpy.domain.todo.value_objects import TodoId
 
 
 class TodoRepository(ABC):

@@ -2,14 +2,13 @@
 
 from abc import ABC, abstractmethod
 
-from dddpy.domain.todo import (
+from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
-    TodoId,
     TodoNotFoundError,
     TodoNotStartedError,
-    TodoRepository,
-    TodoStatus,
 )
+from dddpy.domain.todo.repositories.todo_repository import TodoRepository
+from dddpy.domain.todo.value_objects import TodoId, TodoStatus
 
 
 class CompleteTodoUseCase(ABC):
@@ -44,4 +43,5 @@ class CompleteTodoUseCaseImpl(CompleteTodoUseCase):
 
 
 def new_complete_todo_usecase(todo_repository: TodoRepository) -> CompleteTodoUseCase:
+    """Create a new instance of CompleteTodoUseCase."""
     return CompleteTodoUseCaseImpl(todo_repository)
