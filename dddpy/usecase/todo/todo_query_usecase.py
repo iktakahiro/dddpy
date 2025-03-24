@@ -26,7 +26,7 @@ class TodoQueryUseCaseImpl(TodoQueryUseCase):
     def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
 
-    def fetch_todo_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    def fetch_todo_by_id(self, todo_id: TodoId) -> Todo:
         """fetch_todo_by_id fetches a Todo by ID."""
         todo = self.todo_repository.find_by_id(todo_id)
         if todo is None:
