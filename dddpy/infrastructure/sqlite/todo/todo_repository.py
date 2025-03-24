@@ -56,3 +56,8 @@ class TodoRepositoryImpl(TodoRepository):
     def delete(self, todo_id: TodoId) -> None:
         """Delete a Todo item by its ID."""
         self.session.query(TodoDTO).filter_by(id=todo_id.value).delete()
+
+
+def new_todo_repository(session: Session) -> TodoRepository:
+    """Get a TodoRepository instance with dependencies injected."""
+    return TodoRepositoryImpl(session)
