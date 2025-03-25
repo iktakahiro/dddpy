@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from dddpy.domain.todo.entities import Todo
 
 
-class TodoScheme(BaseModel):
+class TodoSchema(BaseModel):
     """TodoQueryModel represents data structure as a read model."""
 
     id: str = Field(examples=['123e4567-e89b-12d3-a456-426614174000'])
@@ -22,9 +22,9 @@ class TodoScheme(BaseModel):
         from_attributes = True
 
     @staticmethod
-    def from_entity(todo: Todo) -> 'TodoScheme':
+    def from_entity(todo: Todo) -> 'TodoSchema':
         """Convert a Todo entity to a TodoQueryModel."""
-        return TodoScheme(
+        return TodoSchema(
             id=str(todo.id.value),
             title=todo.title.value if todo.title else '',
             description=todo.description.value if todo.description else '',
@@ -35,25 +35,3 @@ class TodoScheme(BaseModel):
             if todo.completed_at
             else None,
         )
-
-
-class TodoCreateScheme(BaseModel):
-    """TodoCreateScheme represents data structure as a create model."""
-
-    title: str = Field(min_length=1, max_length=100, examples=['Complete the project'])
-    description: str | None = Field(
-        default=None,
-        max_length=1000,
-        examples=['Finish implementing the DDD architecture'],
-    )
-
-
-class TodoUpdateScheme(BaseModel):
-    """TodoUpdateScheme represents data structure as an update model."""
-
-    title: str = Field(min_length=1, max_length=100, examples=['Complete the project'])
-    description: str | None = Field(
-        default=None,
-        max_length=1000,
-        examples=['Finish implementing the DDD architecture'],
-    )

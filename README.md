@@ -57,11 +57,14 @@ The directory structure is based on [Onion Architecture](https://jeffreypalermo.
 │   │       └── todo
 │   │           ├── todo_repository.py
 │   │           └── todo_dto.py
-│   ├── controllers
+│   ├── presentation
 │   │   └── todo
-│   │       ├── todo_controller.py
-│   │       ├── todo_scheme.py
-│   │       └── todo_error_message.py
+│   │       ├── controllers
+│   │       │   └── todo_controller.py
+│   │       ├── schemes
+│   │       │   └── todo_scheme.py
+│   │       └── error_messages
+│   │           └── todo_error_message.py
 │   └── usecase
 │       └── todo
 │           ├── create_todo_usecase.py

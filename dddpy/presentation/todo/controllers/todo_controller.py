@@ -5,22 +5,34 @@ from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, status
 
-from dddpy.controllers.todo.todo_error_message import ErrorMessageTodoNotFound
-from dddpy.controllers.todo.todo_scheme import (TodoCreateScheme, TodoScheme,
-                                                TodoUpdateScheme)
-from dddpy.domain.todo.exceptions import (TodoAlreadyCompletedError,
-                                          TodoAlreadyStartedError,
-                                          TodoNotFoundError)
+from dddpy.domain.todo.exceptions import (
+    TodoAlreadyCompletedError,
+    TodoAlreadyStartedError,
+    TodoNotFoundError,
+)
 from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
-from dddpy.infrastructure.di.injection import (get_complete_todo_usecase,
-                                               get_create_todo_usecase,
-                                               get_find_todo_by_id_usecase,
-                                               get_find_todos_usecase,
-                                               get_start_todo_usecase,
-                                               get_update_todo_usecase)
-from dddpy.usecase.todo import (CompleteTodoUseCase, CreateTodoUseCase,
-                                FindTodoByIdUseCase, FindTodosUseCase,
-                                StartTodoUseCase, UpdateTodoUseCase)
+from dddpy.infrastructure.di.injection import (
+    get_complete_todo_usecase,
+    get_create_todo_usecase,
+    get_find_todo_by_id_usecase,
+    get_find_todos_usecase,
+    get_start_todo_usecase,
+    get_update_todo_usecase,
+)
+from dddpy.presentation.todo.error_messages import ErrorMessageTodoNotFound
+from dddpy.presentation.todo.schemas import (
+    TodoCreateSchema,
+    TodoSchema,
+    TodoUpdateSchema,
+)
+from dddpy.usecase.todo import (
+    CompleteTodoUseCase,
+    CreateTodoUseCase,
+    FindTodoByIdUseCase,
+    FindTodosUseCase,
+    StartTodoUseCase,
+    UpdateTodoUseCase,
+)
 
 
 class TodoController:
@@ -31,7 +43,7 @@ class TodoController:
 
         @app.get(
             '/todos',
-            response_model=List[TodoScheme],
+            response_model=List[TodoSchema],
             status_code=200,
         )
         def get_todos(
@@ -39,7 +51,7 @@ class TodoController:
         ):
             try:
                 data = usecase.execute()
-                return [TodoScheme.from_entity(todo) for todo in data]
+                return [TodoSchema.from_entity(todo) for todo in data]
             except Exception as e:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -47,7 +59,7 @@ class TodoController:
 
         @app.get(
             '/todos/{todo_id}',
-            response_model=TodoScheme,
+            response_model=TodoSchema,
             status_code=200,
             responses={
                 status.HTTP_404_NOT_FOUND: {
@@ -71,18 +83,18 @@ class TodoController:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from exc
-            return TodoScheme.from_entity(todo)
+            return TodoSchema.from_entity(todo)
 
         @app.post(
             '/todos',
-            response_model=TodoScheme,
+            response_model=TodoSchema,
             status_code=201,
             responses={
                 status.HTTP_400_BAD_REQUEST: {},
             },
         )
         def create_todo(
-            data: TodoCreateScheme,
+            data: TodoCreateSchema,
             usecase: CreateTodoUseCase = Depends(get_create_todo_usecase),
         ):
             try:
@@ -103,11 +115,11 @@ class TodoController:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
-            return TodoScheme.from_entity(todo)
+            return TodoSchema.from_entity(todo)
 
         @app.put(
             '/todos/{todo_id}',
-            response_model=TodoScheme,
+            response_model=TodoSchema,
             status_code=200,
             responses={
                 status.HTTP_404_NOT_FOUND: {
@@ -117,7 +129,7 @@ class TodoController:
         )
         def update_todo(
             todo_id: UUID,
-            data: TodoUpdateScheme,
+            data: TodoUpdateSchema,
             usecase: UpdateTodoUseCase = Depends(get_update_todo_usecase),
         ):
             _id = TodoId(todo_id)
@@ -145,11 +157,11 @@ class TodoController:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
-            return TodoScheme.from_entity(todo)
+            return TodoSchema.from_entity(todo)
 
         @app.patch(
             '/todos/{todo_id}/start',
-            response_model=TodoScheme,
+            response_model=TodoSchema,
             status_code=200,
             responses={
                 status.HTTP_404_NOT_FOUND: {
@@ -179,11 +191,11 @@ class TodoController:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
-            return TodoScheme.from_entity(todo)
+            return TodoSchema.from_entity(todo)
 
         @app.patch(
             '/todos/{todo_id}/complete',
-            response_model=TodoScheme,
+            response_model=TodoSchema,
             status_code=200,
             responses={
                 status.HTTP_404_NOT_FOUND: {
@@ -218,4 +230,4 @@ class TodoController:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
-            return TodoScheme.from_entity(todo)
+            return TodoSchema.from_entity(todo)

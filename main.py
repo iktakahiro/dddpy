@@ -6,8 +6,8 @@ from logging import config
 
 from fastapi import FastAPI
 
-from dddpy.controllers.todo.todo_controller import TodoController
 from dddpy.infrastructure.sqlite.database import create_tables, engine
+from dddpy.presentation.todo.controllers.todo_controller import TodoController
 
 config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
