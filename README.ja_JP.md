@@ -39,9 +39,16 @@ make dev
 ├── dddpy
 │   ├── domain
 │   │   └── todo
-│   │       ├── todo.py
-│   │       ├── todo_repository.py
-│   │       └── todo_exception.py
+│   │       ├── entities
+│   │       │   └── todo.py
+│   │       ├── value_objects
+│   │       │   ├── todo_title.py
+│   │       │   ├── todo_description.py
+│   │       │   ├── todo_id.py
+│   │       │   └── todo_status.py
+│   │       ├── repositories
+│   │       │   └── todo_repository.py
+│   │       └── exceptions
 │   ├── infrastructure
 │   │   ├── di
 │   │   │   └── injection.py
@@ -50,11 +57,14 @@ make dev
 │   │       └── todo
 │   │           ├── todo_repository.py
 │   │           └── todo_dto.py
-│   ├── controllers
+│   ├── presentation
 │   │   └── todo
-│   │       ├── todo_controller.py
-│   │       ├── todo_scheme.py
-│   │       └── todo_error_message.py
+│   │       ├── controllers
+│   │       │   └── todo_controller.py
+│   │       ├── schemas
+│   │       │   └── todo_schema.py
+│   │       └── error_messages
+│   │           └── todo_error_message.py
 │   └── usecase
 │       └── todo
 │           ├── create_todo_usecase.py
