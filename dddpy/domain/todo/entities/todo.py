@@ -105,13 +105,22 @@ class Todo:
         """Check if the Todo is completed"""
         return self._status == TodoStatus.COMPLETED
 
-    def is_overdue(self, deadline: datetime) -> bool:
+    def is_overdue(
+        self, deadline: datetime, current_time: Optional[datetime] = None
+    ) -> bool:
         """
-        Check if the Todo is overdue based on the given deadline
+        Check if the Todo is overdue based on the given deadline.
+        A Todo is considered overdue if:
+        1. It is not completed and the current time is past the deadline
+        Note: Completed todos are never considered overdue
+
+        Args:
+            deadline: The deadline to check against
+            current_time: The current time to use for comparison (defaults to now)
         """
         if self.is_completed:
-            return self._completed_at is not None and self._completed_at > deadline
-        return False
+            return False
+        return (current_time or datetime.now()) > deadline
 
     @staticmethod
     def create(
