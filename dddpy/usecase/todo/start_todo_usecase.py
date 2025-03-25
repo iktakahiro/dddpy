@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
     TodoAlreadyStartedError,
@@ -15,7 +16,7 @@ class StartTodoUseCase(ABC):
     """StartTodoUseCase defines an interface for starting a Todo."""
 
     @abstractmethod
-    def execute(self, todo_id: TodoId) -> None:
+    def execute(self, todo_id: TodoId) -> Todo:
         """execute starts a Todo."""
 
 
@@ -25,7 +26,7 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
     def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
 
-    def execute(self, todo_id: TodoId) -> None:
+    def execute(self, todo_id: TodoId) -> Todo:
         """execute starts a Todo."""
         todo = self.todo_repository.find_by_id(todo_id)
 
@@ -40,6 +41,7 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
 
         todo.start()
         self.todo_repository.save(todo)
+        return todo
 
 
 def new_start_todo_usecase(todo_repository: TodoRepository) -> StartTodoUseCase:

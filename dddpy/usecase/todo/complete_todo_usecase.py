@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
     TodoNotFoundError,
@@ -15,7 +16,7 @@ class CompleteTodoUseCase(ABC):
     """CompleteTodoUseCase defines an interface for completing a Todo."""
 
     @abstractmethod
-    def execute(self, todo_id: TodoId) -> None:
+    def execute(self, todo_id: TodoId) -> Todo:
         """execute completes a Todo."""
 
 
@@ -25,7 +26,7 @@ class CompleteTodoUseCaseImpl(CompleteTodoUseCase):
     def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
 
-    def execute(self, todo_id: TodoId) -> None:
+    def execute(self, todo_id: TodoId) -> Todo:
         """execute completes a Todo."""
         todo = self.todo_repository.find_by_id(todo_id)
 
@@ -40,6 +41,7 @@ class CompleteTodoUseCaseImpl(CompleteTodoUseCase):
 
         todo.complete()
         self.todo_repository.save(todo)
+        return todo
 
 
 def new_complete_todo_usecase(todo_repository: TodoRepository) -> CompleteTodoUseCase:
