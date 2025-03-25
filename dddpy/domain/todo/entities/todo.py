@@ -3,8 +3,12 @@
 from datetime import datetime
 from typing import Optional
 
-from dddpy.domain.todo.value_objects import (TodoDescription, TodoId,
-                                             TodoStatus, TodoTitle)
+from dddpy.domain.todo.value_objects import (
+    TodoDescription,
+    TodoId,
+    TodoStatus,
+    TodoTitle,
+)
 
 
 class Todo:

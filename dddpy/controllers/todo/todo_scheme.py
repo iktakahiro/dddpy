@@ -8,7 +8,7 @@ from dddpy.domain.todo.entities import Todo
 class TodoScheme(BaseModel):
     """TodoQueryModel represents data structure as a read model."""
 
-    id: str = Field(examples=['vytxeTZskVKR7C7WgdSP3d'])
+    id: str = Field(examples=['123e4567-e89b-12d3-a456-426614174000'])
     title: str = Field(examples=['Complete the project'])
     description: str = Field(examples=['Finish implementing the DDD architecture'])
     status: str = Field(examples=['not_started'])
