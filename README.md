@@ -111,6 +111,11 @@ class Todo:
         self._created_at = created_at
         self._updated_at = updated_at
         self._completed_at = completed_at
+
+    def __eq__(self, obj: object) -> bool:
+        if isinstance(obj, Todo):
+            return self._id == obj._id
+        return False
 ```
 
 Key characteristics of entities:
@@ -118,6 +123,21 @@ Key characteristics of entities:
 * Have a unique identifier (`id`)
 * Can change state (methods like `update_title`, `start`, `complete`)
 * Identity is determined by the identifier (`__eq__` method implementation)
+
+The `__eq__` method implementation in this project follows DDD principles:
+
+```python
+def __eq__(self, obj: object) -> bool:
+    if isinstance(obj, Todo):
+        return self._id == obj._id
+    return False
+```
+
+Key points of this implementation:
+
+* Identity is determined solely by the identifier (`id`)
+* Type safety is ensured with `isinstance` check
+* Clean implementation focusing on the essential characteristic of entities
 
 #### 2. Value Objects
 
