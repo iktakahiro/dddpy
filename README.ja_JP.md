@@ -150,19 +150,19 @@ class TodoTitle:
 class TodoRepository(ABC):
     @abstractmethod
     def save(self, todo: Todo) -> None:
-        """Todoを保存する"""
+        """Save a Todo"""
 
     @abstractmethod
     def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
-        """IDでTodoを検索する"""
+        """Find a Todo by ID"""
 
     @abstractmethod
     def find_all(self) -> List[Todo]:
-        """すべてのTodoを取得する"""
+        """Get all Todos"""
 
     @abstractmethod
     def delete(self, todo_id: TodoId) -> None:
-        """IDでTodoを削除する"""
+        """Delete a Todo by ID"""
 ```
 
 リポジトリの主な特徴：
@@ -196,17 +196,17 @@ class TodoRepository(ABC):
 
 ```python
 class CreateTodoUseCase:
-    """CreateTodoUseCaseは新しいTodoを作成するためのユースケースインターフェースを定義します。"""
+    """CreateTodoUseCase defines a use case interface for creating a new Todo."""
 
     @abstractmethod
     def execute(
         self, title: TodoTitle, description: Optional[TodoDescription] = None
     ) -> Todo:
-        """executeは新しいTodoを作成します。"""
+        """execute creates a new Todo."""
 
 
 class CreateTodoUseCaseImpl(CreateTodoUseCase):
-    """CreateTodoUseCaseImplは新しいTodoを作成するためのユースケースを実装します。"""
+    """CreateTodoUseCaseImpl implements the use case for creating a new Todo."""
 
     def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
@@ -214,7 +214,7 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
     def execute(
         self, title: TodoTitle, description: Optional[TodoDescription] = None
     ) -> Todo:
-        """executeは新しいTodoを作成します。"""
+        """execute creates a new Todo."""
         todo = Todo.create(title=title, description=description)
         self.todo_repository.save(todo)
         return todo
