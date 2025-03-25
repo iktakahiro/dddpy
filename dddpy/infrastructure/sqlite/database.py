@@ -1,3 +1,5 @@
+"""Database configuration and session management for SQLite."""
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -21,4 +23,5 @@ Base = declarative_base()
 
 
 def create_tables():
+    """Create all database tables defined in SQLAlchemy models."""
     Base.metadata.create_all(bind=engine)
