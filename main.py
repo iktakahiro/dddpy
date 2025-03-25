@@ -7,7 +7,7 @@ from logging import config
 from fastapi import FastAPI
 
 from dddpy.infrastructure.sqlite.database import create_tables, engine
-from dddpy.presentation.todo.controllers.todo_controller import TodoController
+from dddpy.presentation.api.todo.handlers.todo_route_handler import TodoRouteHandler
 
 config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
@@ -28,5 +28,5 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-todo_controller = TodoController()
-todo_controller.register_routes(app)
+todo_route_handler = TodoRouteHandler()
+todo_route_handler.register_routes(app)

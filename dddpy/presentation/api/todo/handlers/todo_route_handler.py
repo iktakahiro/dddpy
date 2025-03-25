@@ -19,8 +19,8 @@ from dddpy.infrastructure.di.injection import (
     get_start_todo_usecase,
     get_update_todo_usecase,
 )
-from dddpy.presentation.todo.error_messages import ErrorMessageTodoNotFound
-from dddpy.presentation.todo.schemas import (
+from dddpy.presentation.api.todo.error_messages import ErrorMessageTodoNotFound
+from dddpy.presentation.api.todo.schemas import (
     TodoCreateSchema,
     TodoSchema,
     TodoUpdateSchema,
@@ -35,7 +35,7 @@ from dddpy.usecase.todo import (
 )
 
 
-class TodoController:
+class TodoRouteHandler:
     """Controller class for handling Todo-related HTTP endpoints."""
 
     def register_routes(self, app: FastAPI):
