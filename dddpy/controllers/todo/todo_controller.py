@@ -6,33 +6,21 @@ from uuid import UUID
 from fastapi import Depends, FastAPI, HTTPException, status
 
 from dddpy.controllers.todo.todo_error_message import ErrorMessageTodoNotFound
-from dddpy.controllers.todo.todo_scheme import (
-    TodoCreateScheme,
-    TodoScheme,
-    TodoUpdateScheme,
-)
-from dddpy.domain.todo.exceptions import (
-    TodoAlreadyCompletedError,
-    TodoAlreadyStartedError,
-    TodoNotFoundError,
-)
+from dddpy.controllers.todo.todo_scheme import (TodoCreateScheme, TodoScheme,
+                                                TodoUpdateScheme)
+from dddpy.domain.todo.exceptions import (TodoAlreadyCompletedError,
+                                          TodoAlreadyStartedError,
+                                          TodoNotFoundError)
 from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
-from dddpy.infrastructure.di.injection import (
-    get_complete_todo_usecase,
-    get_create_todo_usecase,
-    get_find_todo_by_id_usecase,
-    get_find_todos_usecase,
-    get_start_todo_usecase,
-    get_update_todo_usecase,
-)
-from dddpy.usecase.todo import (
-    CompleteTodoUseCase,
-    CreateTodoUseCase,
-    FindTodoByIdUseCase,
-    FindTodosUseCase,
-    StartTodoUseCase,
-    UpdateTodoUseCase,
-)
+from dddpy.infrastructure.di.injection import (get_complete_todo_usecase,
+                                               get_create_todo_usecase,
+                                               get_find_todo_by_id_usecase,
+                                               get_find_todos_usecase,
+                                               get_start_todo_usecase,
+                                               get_update_todo_usecase)
+from dddpy.usecase.todo import (CompleteTodoUseCase, CreateTodoUseCase,
+                                FindTodoByIdUseCase, FindTodosUseCase,
+                                StartTodoUseCase, UpdateTodoUseCase)
 
 
 class TodoController:
@@ -119,7 +107,8 @@ class TodoController:
 
         @app.put(
             '/todos/{todo_id}',
-            status_code=204,
+            response_model=TodoScheme,
+            status_code=200,
             responses={
                 status.HTTP_404_NOT_FOUND: {
                     'model': ErrorMessageTodoNotFound,
@@ -145,7 +134,7 @@ class TodoController:
                 ) from e
 
             try:
-                usecase.execute(_id, title, description)
+                todo = usecase.execute(_id, title, description)
             except TodoNotFoundError as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -156,11 +145,12 @@ class TodoController:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
-            return None
+            return TodoScheme.from_entity(todo)
 
         @app.patch(
             '/todos/{todo_id}/start',
-            status_code=204,
+            response_model=TodoScheme,
+            status_code=200,
             responses={
                 status.HTTP_404_NOT_FOUND: {
                     'model': ErrorMessageTodoNotFound,
@@ -173,7 +163,7 @@ class TodoController:
         ):
             _id = TodoId(todo_id)
             try:
-                usecase.execute(_id)
+                todo = usecase.execute(_id)
             except TodoNotFoundError as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -189,11 +179,12 @@ class TodoController:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
-            return None
+            return TodoScheme.from_entity(todo)
 
         @app.patch(
             '/todos/{todo_id}/complete',
-            status_code=204,
+            response_model=TodoScheme,
+            status_code=200,
             responses={
                 status.HTTP_404_NOT_FOUND: {
                     'model': ErrorMessageTodoNotFound,
@@ -206,7 +197,7 @@ class TodoController:
         ):
             _id = TodoId(todo_id)
             try:
-                usecase.execute(_id)
+                todo = usecase.execute(_id)
             except TodoNotFoundError as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -227,4 +218,4 @@ class TodoController:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
-            return None
+            return TodoScheme.from_entity(todo)
