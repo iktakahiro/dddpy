@@ -58,13 +58,14 @@ make dev
 │   │           ├── todo_repository.py
 │   │           └── todo_dto.py
 │   ├── presentation
-│   │   └── todo
-│   │       ├── controllers
-│   │       │   └── todo_controller.py
-│   │       ├── schemas
-│   │       │   └── todo_schema.py
-│   │       └── error_messages
-│   │           └── todo_error_message.py
+│   │   └── api
+│   │       └── todo
+│   │           ├── handlers
+│   │           │   └── todo_api_route_handler.py
+│   │           ├── schemas
+│   │           │   └── todo_schema.py
+│   │           └── error_messages
+│   │               └── todo_error_message.py
 │   └── usecase
 │       └── todo
 │           ├── create_todo_usecase.py
@@ -256,13 +257,15 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
 * 状態変更前の検証
 * アトミックな操作
 
-### コントローラ層
+### プレゼンテーション層
 
-コントローラ層はHTTPリクエストとレスポンスを処理します。以下が含まれます：
+プレゼンテーション層はHTTPリクエストとレスポンスを処理します。以下が含まれます：
 
 1. FastAPIルートハンドラ
 2. リクエスト/レスポンスモデル
 3. 入力検証
+
+ハンドラは`presentation/api`ディレクトリの下に配置され、アプリケーションのAPI層を表します。各ドメイン（例：`todo`）は独自のハンドラ、スキーマ、エラーメッセージ定義を持っています。
 
 ## 動作方法
 

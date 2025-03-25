@@ -35,8 +35,8 @@ from dddpy.usecase.todo import (
 )
 
 
-class TodoRouteHandler:
-    """Controller class for handling Todo-related HTTP endpoints."""
+class TodoApiRouteHandler:
+    """Handler class for handling Todo-related HTTP endpoints."""
 
     def register_routes(self, app: FastAPI):
         """Register Todo-related routes to the FastAPI application."""

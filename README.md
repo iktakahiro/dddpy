@@ -58,13 +58,14 @@ The directory structure is based on [Onion Architecture](https://jeffreypalermo.
 │   │           ├── todo_repository.py
 │   │           └── todo_dto.py
 │   ├── presentation
-│   │   └── todo
-│   │       ├── controllers
-│   │       │   └── todo_controller.py
-│   │       ├── schemas
-│   │       │   └── todo_schema.py
-│   │       └── error_messages
-│   │           └── todo_error_message.py
+│   │   └── api
+│   │       └── todo
+│   │           ├── handlers
+│   │           │   └── todo_api_route_handler.py
+│   │           ├── schemas
+│   │           │   └── todo_schema.py
+│   │           └── error_messages
+│   │               └── todo_error_message.py
 │   └── usecase
 │       └── todo
 │           ├── create_todo_usecase.py
@@ -256,13 +257,15 @@ Key characteristics of error handling:
 * Validation before state changes
 * Atomic operations
 
-### Controllers Layer
+### Presentation Layer
 
-The controllers layer handles HTTP requests and responses. It includes:
+The presentation layer handles HTTP requests and responses. It includes:
 
 1. FastAPI route handlers
 2. Request/Response models
 3. Input validation
+
+The handlers are organized under the `presentation/api` directory, which represents the API layer of the application. Each domain (like `todo`) has its own controller, schema, and error message definitions.
 
 ## How to Work
 
