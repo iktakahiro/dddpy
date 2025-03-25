@@ -18,190 +18,261 @@
 
 ## プロジェクトのセットアップ
 
-1. 仮想環境を作成して有効化します：
+1. uvを使用して依存関係をインストールします：
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # Unix/macOS
-# または
-.venv\Scripts\activate  # Windows
+make install
 ```
 
-2. uv を使用して依存関係をインストールします：
+2. Webアプリケーションを実行します：
 
 ```bash
-uv sync
+make dev
 ```
 
 ## コードアーキテクチャ
 
 ディレクトリ構造は[オニオンアーキテクチャ](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/)に基づいています：
 
-```
+```tree
 ├── main.py
 ├── dddpy
-│   ├── domain
-│   │   └── book
-│   ├── infrastructure
-│   │   └── sqlite
-│   │       ├── book
-│   │       └── database.py
-│   ├── presentation
-│   │   └── schema
-│   │       └── book
-│   └── usecase
-│       └── book
+│   ├── domain
+│   │   └── todo
+│   │       ├── todo.py
+│   │       ├── todo_repository.py
+│   │       └── todo_exception.py
+│   ├── infrastructure
+│   │   ├── di
+│   │   │   └── injection.py
+│   │   └── sqlite
+│   │       ├── database.py
+│   │       └── todo
+│   │           ├── todo_repository.py
+│   │           └── todo_dto.py
+│   ├── controllers
+│   │   └── todo
+│   │       ├── todo_controller.py
+│   │       ├── todo_scheme.py
+│   │       └── todo_error_message.py
+│   └── usecase
+│       └── todo
+│           ├── create_todo_usecase.py
+│           ├── update_todo_usecase.py
+│           ├── start_todo_usecase.py
+│           ├── find_todos_usecase.py
+│           ├── find_todo_by_id_usecase.py
+│           ├── complete_todo_usecase.py
+│           └── delete_todo_usecase.py
 └── tests
 ```
 
-### エンティティ
+### ドメイン層
 
-Pythonでエンティティを表現するには、オブジェクトの同一性を確保するために `__eq__()` メソッドを使用します。
+ドメイン層には、コアとなるビジネスロジックとルールが含まれています。以下が含まれます：
 
-* [book.py](./dddpy/domain/book/book.py)
+1. エンティティ
+2. 値オブジェクト
+3. リポジトリインターフェース
 
-```python
-class Book:
-    def __init__(self, id: str, title: str):
-        self.id: str = id
-        self.title: str = title
+このプロジェクトでの各コンポーネントの実装方法は以下の通りです：
 
-    def __eq__(self, o: object) -> bool:
-        if isinstance(o, Book):
-            return self.id == o.id
-        return False
-```
+#### 1. エンティティ
 
-### 値オブジェクト
-
-値オブジェクトを表現するには、`@dataclass` デコレーターを `eq=True` および `frozen=True` と共に使用します。
-
-以下のコードは、値オブジェクトとしての本のISBNコードを実装しています。
-
-* [isbn.py](./dddpy/domain/book/isbn.py)
+エンティティは一意の識別子を持つドメインモデルです。このプロジェクトでは、`Todo`クラスがエンティティとして実装されています：
 
 ```python
-@dataclass(init=False, eq=True, frozen=True)
-class Isbn:
-    value: str
-
-    def __init__(self, value: str):
-        if not validate_isbn(value):
-            raise ValueError("Value should be a valid ISBN format.")
-        object.__setattr__(self, "value", value)
-```
-
-### DTO (データ転送オブジェクト)
-
-DTO (データ転送オブジェクト)は、ドメインオブジェクトをインフラ層から分離するための良い実践です。
-
-最小のMVCアーキテクチャでは、モデルはORM（オブジェクト関係マッピング）によって提供されるベースクラスを継承することがよくあります。しかし、その場合、ドメイン層が外部層に依存することになります。
-
-この問題を解決するために、2つのルールを設定できます：
-
-1. ドメイン層のクラス（エンティティや値オブジェクトなど）は、SQLAlchemyのBaseクラスを継承しない。
-2. データ転送オブジェクトは、ORMクラスを継承する。
-   * [book_dto.py](./dddpy/infrastructure/sqlite/book/book_dto.py)
-
-### CQRS
-
-CQRS（コマンドとクエリの責任分離）パターンは、読み取り操作と書き込み操作を分離するために有用です。
-
-1. **ユースケース層**にリードモデルとライトモデルを定義します：
-   * [book_query_model.py](./dddpy/usecase/book/book_query_model.py)
-   * [book_command_model.py](./dddpy/usecase/book/book_command_model.py)
-
-2. クエリ：
-   * **ユースケース層**にクエリサービスインターフェースを定義します：
-     * [book_query_service.py (interface)](./dddpy/usecase/book/book_query_service.py)
-   * **インフラ層**にクエリサービスの実装を定義します：
-     * [book_query_service.py](./dddpy/infrastructure/sqlite/book/book_query_service.py)
-
-3. コマンド：
-   * **ドメイン層**にリポジトリインターフェースを定義します：
-     * [book_repository.py (interface)](./dddpy/domain/book/book_repository.py)
-   * **インフラ層**にリポジトリの実装を定義します：
-     * [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
-
-4. ユースケース：
-   * ユースケースはリポジトリインターフェースまたはクエリサービスインターフェースに依存します：
-     * [book_query_usecase.py](./dddpy/usecase/book/book_query_usecase.py)
-     * [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
-   * ユースケースは、リードモデルまたはライトモデルのインスタンスをメインルーチンに返します。
-
-### UoW (ユニット・オブ・ワーク)
-
-ドメイン層の分離に成功しても、トランザクション管理の方法などの問題が残ります。
-
-UoW（ユニット・オブ・ワーク）パターンが解決策となりえます。
-
-まず、ユースケース層に基づいたUoWパターンのインターフェースを定義します。`begin()`, `commit()`, `rollback()`メソッドはトランザクション管理に関連します。
-
-* [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
-
-```python
-class BookCommandUseCaseUnitOfWork(ABC):
-    book_repository: BookRepository
-
-    @abstractmethod
-    def begin(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def commit(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def rollback(self):
-        raise NotImplementedError
-```
-
-次に、上記のインターフェースを使用してインフラ層にクラスを実装します。
-
-* [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
-
-```python
-class BookCommandUseCaseUnitOfWorkImpl(BookCommandUseCaseUnitOfWork):
+class Todo:
     def __init__(
         self,
-        session: Session,
-        book_repository: BookRepository,
+        id: TodoId,
+        title: TodoTitle,
+        description: Optional[TodoDescription] = None,
+        status: TodoStatus = TodoStatus.NOT_STARTED,
+        created_at: datetime = datetime.now(),
+        updated_at: datetime = datetime.now(),
+        completed_at: Optional[datetime] = None,
     ):
-        self.session: Session = session
-        self.book_repository: BookRepository = book_repository
-
-    def begin(self):
-        self.session.begin()
-
-    def commit(self):
-        self.session.commit()
-
-    def rollback(self):
-        self.session.rollback()
+        self._id = id
+        self._title = title
+        self._description = description
+        self._status = status
+        self._created_at = created_at
+        self._updated_at = updated_at
+        self._completed_at = completed_at
 ```
 
-`session`プロパティはSQLAlchemyのセッションです。
+エンティティの主な特徴：
+
+* 一意の識別子（`id`）を持つ
+* 状態を変更できる（`update_title`、`start`、`complete`などのメソッド）
+* 識別子によって同一性が決定される（`__eq__`メソッドの実装）
+
+#### 2. 値オブジェクト
+
+値オブジェクトは識別子を持たない不変のドメインモデルです。このプロジェクトでは、いくつかの値オブジェクトを実装しています：
+
+```python
+@dataclass(frozen=True)
+class TodoTitle:
+    value: str
+
+    def __post_init__(self):
+        if not self.value:
+            raise ValueError('Title is required')
+        if len(self.value) > 100:
+            raise ValueError('Title must be 100 characters or less')
+```
+
+値オブジェクトの主な特徴：
+
+* `@dataclass(frozen=True)`による不変性の保証
+* 値の検証ロジックを含む（`__post_init__`）
+* 識別子を持たない
+* 値の内容によって同一性が決定される
+
+#### 3. リポジトリインターフェース
+
+リポジトリはエンティティの永続化を担当する抽象化レイヤーです。このプロジェクトでは`TodoRepository`インターフェースを実装しています：
+
+```python
+class TodoRepository(ABC):
+    @abstractmethod
+    def save(self, todo: Todo) -> None:
+        """Todoを保存する"""
+
+    @abstractmethod
+    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+        """IDでTodoを検索する"""
+
+    @abstractmethod
+    def find_all(self) -> List[Todo]:
+        """すべてのTodoを取得する"""
+
+    @abstractmethod
+    def delete(self, todo_id: TodoId) -> None:
+        """IDでTodoを削除する"""
+```
+
+リポジトリの主な特徴：
+
+* エンティティの永続化を抽象化
+* ドメイン層とインフラ層の境界を定義
+* インフラ層で具象実装を提供
+
+### インフラ層
+
+インフラ層はドメイン層で定義されたインターフェースを実装します。以下が含まれます：
+
+1. データベース設定
+2. リポジトリの実装
+3. 外部サービスとの統合
+4. 依存性注入（DI）の設定
+
+### ユースケース層
+
+ユースケース層には、アプリケーション固有のビジネスルールが含まれています。以下が含まれます：
+
+1. ユースケースの実装
+2. DTO（データ転送オブジェクト）
+3. サービスインターフェース
+
+このプロジェクトでは、1つのユースケースが1つのパブリックメソッドを持つというルールを採用し、各ユースケースを単一の`execute`メソッドを持つ別々のクラスとして実装しています。実装例は以下の通りです：
+
+#### 1. ユースケースインターフェースと実装
+
+各ユースケースは以下の構造に従います：
+
+```python
+class CreateTodoUseCase:
+    """CreateTodoUseCaseは新しいTodoを作成するためのユースケースインターフェースを定義します。"""
+
+    @abstractmethod
+    def execute(
+        self, title: TodoTitle, description: Optional[TodoDescription] = None
+    ) -> Todo:
+        """executeは新しいTodoを作成します。"""
+
+
+class CreateTodoUseCaseImpl(CreateTodoUseCase):
+    """CreateTodoUseCaseImplは新しいTodoを作成するためのユースケースを実装します。"""
+
+    def __init__(self, todo_repository: TodoRepository):
+        self.todo_repository = todo_repository
+
+    def execute(
+        self, title: TodoTitle, description: Optional[TodoDescription] = None
+    ) -> Todo:
+        """executeは新しいTodoを作成します。"""
+        todo = Todo.create(title=title, description=description)
+        self.todo_repository.save(todo)
+        return todo
+```
+
+ユースケースの主な特徴：
+
+* ユースケースごとに1つのクラス
+* 単一責任の原則
+* 明確なインターフェース定義
+* コンストラクタによる依存性注入
+* インスタンス化のためのファクトリ関数
+
+#### 2. エラーハンドリング
+
+ユースケースはドメイン固有のエラーを処理します：
+
+```python
+class StartTodoUseCaseImpl(StartTodoUseCase):
+    def execute(self, todo_id: TodoId) -> None:
+        todo = self.todo_repository.find_by_id(todo_id)
+
+        if todo is None:
+            raise TodoNotFoundError
+
+        if todo.is_completed:
+            raise TodoAlreadyCompletedError
+
+        if todo.status == TodoStatus.IN_PROGRESS:
+            raise TodoAlreadyStartedError
+
+        todo.start()
+        self.todo_repository.save(todo)
+```
+
+エラーハンドリングの主な特徴：
+
+* ドメイン固有の例外
+* 明確なエラー条件
+* 状態変更前の検証
+* アトミックな操作
+
+### コントローラ層
+
+コントローラ層はHTTPリクエストとレスポンスを処理します。以下が含まれます：
+
+1. FastAPIルートハンドラ
+2. リクエスト/レスポンスモデル
+3. 入力検証
 
 ## 動作方法
 
-1. このリポジトリをクローンしてVSCodeで開きます。
+1. VSCodeでこのリポジトリをクローンして開きます。
 2. リモートコンテナを実行します。
-3. Dockerコンテナのターミナルで `make dev` を実行します。
-4. APIドキュメントにアクセスします： [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+3. Dockerコンテナのターミナルで`make dev`を実行します。
+4. APIドキュメントにアクセスします：[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ![OpenAPI Doc](./screenshots/openapi_doc.png)
 
 ### RESTful APIのサンプルリクエスト
 
-* 新しい本を作成する：
+* 新しいTodoを作成する：
 
 ```bash
-curl --location --request POST 'localhost:8000/books' \
+curl --location --request POST 'localhost:8000/todos' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "isbn": "978-0321125217",
-    "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
-    "page": 560
+    "title": "Implement DDD architecture",
+    "description": "Create a sample application using DDD principles"
 }'
 ```
 
@@ -209,20 +280,19 @@ curl --location --request POST 'localhost:8000/books' \
 
 ```json
 {
-    "id": "HH9uqNdYbjScdiLgaTApcS",
-    "isbn": "978-0321125217",
-    "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
-    "page": 560,
-    "read_page": 0,
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "Implement DDD architecture",
+    "description": "Create a sample application using DDD principles",
+    "status": "TODO",
     "created_at": 1614007224642,
     "updated_at": 1614007224642
 }
 ```
 
-* 本を取得する：
+* Todoを取得する：
 
 ```bash
-curl --location --request GET 'localhost:8000/books'
+curl --location --request GET 'localhost:8000/todos'
 ```
 
 * GETリクエストのレスポンス：
@@ -230,5 +300,36 @@ curl --location --request GET 'localhost:8000/books'
 ```json
 [
     {
-        "id": "e74R3Prx8SfcY8KJFkGVf3",
-        "
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "title": "Implement DDD architecture",
+        "description": "Create a sample application using DDD principles",
+        "status": "not_started",
+        "created_at": 1614006055213,
+        "updated_at": 1614006055213
+    }
+]
+```
+
+## 開発
+
+### テストの実行
+
+```bash
+make test
+```
+
+### コード品質
+
+このプロジェクトでは、コード品質を維持するために以下のツールを使用しています：
+
+* [mypy](http://mypy-lang.org/) - 静的型チェック
+* [ruff](https://github.com/astral-sh/ruff) - リンティング
+* [pytest](https://docs.pytest.org/) - テスト
+
+### Docker開発
+
+このプロジェクトには、Dockerベースの開発用の`.devcontainer`設定が含まれています。これにより、異なるマシン間で一貫した開発環境を確保できます。
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。詳細は[LICENSE](LICENSE)ファイルを参照してください。

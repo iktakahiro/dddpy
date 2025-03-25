@@ -20,10 +20,9 @@ jobs:
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       - name: Install dependencies
         run: |
           make install
-      - name: Pytest
+      - name: Run tests
         run: |
           make test

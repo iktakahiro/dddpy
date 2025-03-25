@@ -1,6 +1,6 @@
 [project]
 name = "dddpy"
-version = "0.10.0"
+version = "2.0.0"
 description = "An example of Python FastAPI Domain-Driven Design and Onion Architecture."
 authors = [{ name = "iktakahiro", email = "takahiro.ikeuchi@gmail.com" }]
 dependencies = [
@@ -27,10 +27,35 @@ packages = ["dddpy"]
 [tool.ruff]
 line-length = 88
 indent-width = 4
-target-version = "py312"
+target-version = "py313"
 
-# Lint configuration
-select = ["E4", "E7", "E9", "F"]
-ignore = []
-fixable = ["ALL"]
-unfixable = []
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "TID",
+    "C4",
+    "UP",
+    "N",
+    "B",
+    "C90",
+    "TC",
+    "ERA",
+    "PD",
+    "PGH",
+    "PL",
+    "TRY",
+    "PIE",
+    "PERF",
+]
+ignore = ["E501", "B008", "TC003"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"

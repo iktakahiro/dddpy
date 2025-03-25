@@ -37,149 +37,229 @@ The directory structure is based on [Onion Architecture](https://jeffreypalermo.
 ```tree
 ├── main.py
 ├── dddpy
-│   ├── domain
-│   │   └── book
-│   ├── infrastructure
-│   │   └── sqlite
-│   │       ├── book
-│   │       └── database.py
-│   ├── presentation
-│   │   └── schema
-│   │       └── book
-│   └── usecase
-│       └── book
+│   ├── domain
+│   │   └── todo
+│   │       ├── entities
+│   │       │   └── todo.py
+│   │       ├── value_objects
+│   │       │   ├── todo_title.py
+│   │       │   ├── todo_description.py
+│   │       │   ├── todo_id.py
+│   │       │   └── todo_status.py
+│   │       ├── repositories
+│   │       │   └── todo_repository.py
+│   │       └── exceptions
+│   ├── infrastructure
+│   │   ├── di
+│   │   │   └── injection.py
+│   │   └── sqlite
+│   │       ├── database.py
+│   │       └── todo
+│   │           ├── todo_repository.py
+│   │           └── todo_dto.py
+│   ├── controllers
+│   │   └── todo
+│   │       ├── todo_controller.py
+│   │       ├── todo_scheme.py
+│   │       └── todo_error_message.py
+│   └── usecase
+│       └── todo
+│           ├── create_todo_usecase.py
+│           ├── update_todo_usecase.py
+│           ├── start_todo_usecase.py
+│           ├── find_todos_usecase.py
+│           ├── find_todo_by_id_usecase.py
+│           ├── complete_todo_usecase.py
+│           └── delete_todo_usecase.py
 └── tests
 ```
 
-### Entity
+### Domain Layer
 
-To represent an Entity in Python, use the `__eq__()` method to ensure the object's identity.
+The domain layer contains the core business logic and rules. It includes:
 
-* [book.py](./dddpy/domain/book/book.py)
+1. Entities
+2. Value Objects
+3. Repository Interfaces
 
-```python
-class Book:
-    def __init__(self, id: str, title: str):
-        self.id: str = id
-        self.title: str = title
+Here's how each component is implemented in this project:
 
-    def __eq__(self, o: object) -> bool:
-        if isinstance(o, Book):
-            return self.id == o.id
+#### 1. Entities
 
-        return False
-```
-
-### Value Object
-
-To represent a Value Object, use the `@dataclass` decorator with `eq=True` and `frozen=True`.
-
-The following code implements a book's ISBN code as a Value Object.
-
-* [isbn.py](./dddpy/domain/book/isbn.py)
+Entities are domain models with unique identifiers. In this project, the `Todo` class is implemented as an entity:
 
 ```python
-@dataclass(init=False, eq=True, frozen=True)
-class Isbn:
-    value: str
-
-    def __init__(self, value: str):
-        if !validate_isbn(value):
-            raise ValueError("Value should be a valid ISBN format.")
-
-        object.__setattr__(self, "value", value)
-```
-
-### DTO (Data Transfer Object)
-
-DTO (Data Transfer Object) is a good practice to isolate domain objects from the infrastructure layer.
-
-In a minimal MVC architecture, models often inherit a base class provided by an ORM (Object-Relational Mapper). However, this would make the domain layer dependent on the outer layer.
-
-To solve this problem, we can set two rules:
-
-1. Domain layer classes (such as Entities or Value Objects) **DO NOT** extend the SQLAlchemy Base class.
-2. Data Transfer Objects extend the ORM class.
-   * [book_dto.py](./dddpy/infrastructure/sqlite/book/book_dto.py)
-
-### CQRS
-
-CQRS (Command and Query Responsibility Segregation) pattern is useful for separating read and write operations.
-
-1. Define read models and write models in the **usecase layer**:
-   * [book_query_model.py](./dddpy/usecase/book/book_query_model.py)
-   * [book_command_model.py](./dddpy/usecase/book/book_command_model.py)
-
-2. Query:
-   * Define query service interfaces in the **usecase layer**:
-     * [book_query_service.py (interface)](./dddpy/usecase/book/book_query_service.py)
-   * Implement query service implementations in the **infrastructure layer**:
-     * [book_query_service.py](./dddpy/infrastructure/sqlite/book/book_query_service.py)
-
-3. Command:
-   * Define repository interfaces in the **domain layer**:
-     * [book_repository.py (interface)](./dddpy/domain/book/book_repository.py)
-   * Implement repository implementations in the **infrastructure layer**:
-     * [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
-
-4. Usecases:
-   * Usecases depend on repository interfaces or query service interfaces:
-     * [book_query_usecase.py](./dddpy/usecase/book/book_query_usecase.py)
-     * [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
-   * Usecases return an instance of the read or write model to the main routine.
-
-### UoW (Unit of Work)
-
-Even if we succeed in isolating the domain layer, some issues remain. One of them is *how to manage transactions*.
-
-The UoW (Unit of Work) Pattern can be a solution.
-
-First, define an interface based on the UoW pattern in the usecase layer. The `begin()`, `commit()`, and `rollback()` methods manage transactions.
-
-* [book_command_usecase.py](./dddpy/usecase/book/book_command_usecase.py)
-
-```python
-class BookCommandUseCaseUnitOfWork(ABC):
-    book_repository: BookRepository
-
-    @abstractmethod
-    def begin(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def commit(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def rollback(self):
-        raise NotImplementedError
-```
-
-Second, implement a class in the infrastructure layer using the above interface.
-
-* [book_repository.py](./dddpy/infrastructure/sqlite/book/book_repository.py)
-
-```python
-class BookCommandUseCaseUnitOfWorkImpl(BookCommandUseCaseUnitOfWork):
+class Todo:
     def __init__(
         self,
-        session: Session,
-        book_repository: BookRepository,
+        id: TodoId,
+        title: TodoTitle,
+        description: Optional[TodoDescription] = None,
+        status: TodoStatus = TodoStatus.NOT_STARTED,
+        created_at: datetime = datetime.now(),
+        updated_at: datetime = datetime.now(),
+        completed_at: Optional[datetime] = None,
     ):
-        self.session: Session = session
-        self.book_repository: BookRepository = book_repository
-
-    def begin(self):
-        self.session.begin()
-
-    def commit(self):
-        self.session.commit()
-
-    def rollback(self):
-        self.session.rollback()
+        self._id = id
+        self._title = title
+        self._description = description
+        self._status = status
+        self._created_at = created_at
+        self._updated_at = updated_at
+        self._completed_at = completed_at
 ```
 
-The `session` property is a SQLAlchemy session.
+Key characteristics of entities:
+
+* Have a unique identifier (`id`)
+* Can change state (methods like `update_title`, `start`, `complete`)
+* Identity is determined by the identifier (`__eq__` method implementation)
+
+#### 2. Value Objects
+
+Value objects are immutable domain models without identifiers. This project implements several value objects:
+
+```python
+@dataclass(frozen=True)
+class TodoTitle:
+    value: str
+
+    def __post_init__(self):
+        if not self.value:
+            raise ValueError('Title is required')
+        if len(self.value) > 100:
+            raise ValueError('Title must be 100 characters or less')
+```
+
+Key characteristics of value objects:
+
+* Immutability guaranteed by `@dataclass(frozen=True)`
+* Include value validation logic (`__post_init__`)
+* No identifier
+* Identity is determined by value content
+
+#### 3. Repository Interfaces
+
+Repositories are abstraction layers responsible for entity persistence. This project implements the `TodoRepository` interface:
+
+```python
+class TodoRepository(ABC):
+    @abstractmethod
+    def save(self, todo: Todo) -> None:
+        """Save a Todo"""
+
+    @abstractmethod
+    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+        """Find a Todo by ID"""
+
+    @abstractmethod
+    def find_all(self) -> List[Todo]:
+        """Get all Todos"""
+
+    @abstractmethod
+    def delete(self, todo_id: TodoId) -> None:
+        """Delete a Todo by ID"""
+```
+
+Key characteristics of repositories:
+
+* Abstract entity persistence
+* Define boundaries between domain and infrastructure layers
+* Concrete implementations provided in the infrastructure layer
+
+### Infrastructure Layer
+
+The infrastructure layer implements the interfaces defined in the domain layer. It includes:
+
+1. Database configurations
+2. Repository implementations
+3. External service integrations
+4. Dependency Injection (DI) setup
+
+### Usecase Layer
+
+The usecase layer contains the application-specific business rules. It includes:
+
+1. Usecase implementations
+2. DTOs (Data Transfer Objects)
+3. Service interfaces
+
+In this project, each use case is implemented as a separate class with a single public `execute` method. This design ensures clear separation of concerns and makes the code more maintainable. Here's how it's implemented:
+
+#### 1. Use Case Interface and Implementation
+
+Each use case follows this structure:
+
+```python
+class CreateTodoUseCase:
+    """CreateTodoUseCase defines a use case interface for creating a new Todo."""
+
+    @abstractmethod
+    def execute(
+        self, title: TodoTitle, description: Optional[TodoDescription] = None
+    ) -> Todo:
+        """execute creates a new Todo."""
+
+
+class CreateTodoUseCaseImpl(CreateTodoUseCase):
+    """CreateTodoUseCaseImpl implements the use case for creating a new Todo."""
+
+    def __init__(self, todo_repository: TodoRepository):
+        self.todo_repository = todo_repository
+
+    def execute(
+        self, title: TodoTitle, description: Optional[TodoDescription] = None
+    ) -> Todo:
+        """execute creates a new Todo."""
+        todo = Todo.create(title=title, description=description)
+        self.todo_repository.save(todo)
+        return todo
+```
+
+Key characteristics of use cases:
+
+* One class per use case
+* Single responsibility principle
+* Clear interface definition
+* Dependency injection through constructor
+* Factory function for instantiation
+
+#### 2. Error Handling
+
+Use cases handle domain-specific errors:
+
+```python
+class StartTodoUseCaseImpl(StartTodoUseCase):
+    def execute(self, todo_id: TodoId) -> None:
+        todo = self.todo_repository.find_by_id(todo_id)
+
+        if todo is None:
+            raise TodoNotFoundError
+
+        if todo.is_completed:
+            raise TodoAlreadyCompletedError
+
+        if todo.status == TodoStatus.IN_PROGRESS:
+            raise TodoAlreadyStartedError
+
+        todo.start()
+        self.todo_repository.save(todo)
+```
+
+Key characteristics of error handling:
+
+* Domain-specific exceptions
+* Clear error conditions
+* Validation before state changes
+* Atomic operations
+
+### Controllers Layer
+
+The controllers layer handles HTTP requests and responses. It includes:
+
+1. FastAPI route handlers
+2. Request/Response models
+3. Input validation
 
 ## How to Work
 
@@ -192,15 +272,14 @@ The `session` property is a SQLAlchemy session.
 
 ### Sample Requests for the RESTful API
 
-* Create a new book:
+* Create a new todo:
 
 ```bash
-curl --location --request POST 'localhost:8000/books' \
+curl --location --request POST 'localhost:8000/todos' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "isbn": "978-0321125217",
-    "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
-    "page": 560
+    "title": "Implement DDD architecture",
+    "description": "Create a sample application using DDD principles"
 }'
 ```
 
@@ -208,20 +287,19 @@ curl --location --request POST 'localhost:8000/books' \
 
 ```json
 {
-    "id": "HH9uqNdYbjScdiLgaTApcS",
-    "isbn": "978-0321125217",
-    "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
-    "page": 560,
-    "read_page": 0,
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "Implement DDD architecture",
+    "description": "Create a sample application using DDD principles",
+    "status": "TODO",
     "created_at": 1614007224642,
     "updated_at": 1614007224642
 }
 ```
 
-* Get books:
+* Get todos:
 
 ```bash
-curl --location --request GET 'localhost:8000/books'
+curl --location --request GET 'localhost:8000/todos'
 ```
 
 * Response of the GET request:
@@ -229,15 +307,36 @@ curl --location --request GET 'localhost:8000/books'
 ```json
 [
     {
-        "id": "e74R3Prx8SfcY8KJFkGVf3",
-        "isbn": "978-0321125217",
-        "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
-        "page": 560,
-        "read_page": 0,
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "title": "Implement DDD architecture",
+        "description": "Create a sample application using DDD principles",
+        "status": "not_started",
         "created_at": 1614006055213,
         "updated_at": 1614006055213
     }
 ]
 ```
 
-This revised documentation clarifies the steps and code involved in setting up a Domain-Driven Design (DDD) architecture using Python. It also provides sample requests to interact with the RESTful API.
+## Development
+
+### Running Tests
+
+```bash
+make test
+```
+
+### Code Quality
+
+This project uses several tools to maintain code quality:
+
+* [mypy](http://mypy-lang.org/) for static type checking
+* [ruff](https://github.com/astral-sh/ruff) for linting
+* [pytest](https://docs.pytest.org/) for testing
+
+### Docker Development
+
+The project includes a `.devcontainer` configuration for Docker-based development. This ensures a consistent development environment across different machines.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

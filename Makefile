@@ -18,7 +18,7 @@ test: install
 	$(MYPY) main.py ./${PACKAGE}/
 	$(PYTEST) -vv 
 
-format: install
+format: 
 	$(RUFF) format
 
 dev: install
