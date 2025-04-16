@@ -200,15 +200,106 @@ The infrastructure layer implements the interfaces defined in the domain layer. 
 3. External service integrations
 4. Dependency Injection (DI) setup
 
+#### 1. Repository Implementations
+
+The repository implementation is done as follows:
+
+```python
+class TodoRepositoryImpl(TodoRepository):
+    """SQLite implementation of Todo repository interface."""
+
+    def __init__(self, session: Session):
+        """Initialize repository with SQLAlchemy session."""
+        self.session = session
+
+    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+        """Find a Todo by its ID."""
+        try:
+            row = self.session.query(TodoDTO).filter_by(id=todo_id.value).one()
+        except NoResultFound:
+            return None
+
+        return row.to_entity()
+
+    def save(self, todo: Todo) -> None:
+        """Save a new Todo item."""
+        todo_dto = TodoDTO.from_entity(todo)
+        try:
+            existing_todo = (
+                self.session.query(TodoDTO).filter_by(id=todo.id.value).one()
+            )
+        except NoResultFound:
+            self.session.add(todo_dto)
+
+        else:
+            existing_todo.title = todo_dto.title
+            existing_todo.description = todo_dto.description
+            existing_todo.status = todo_dto.status
+            existing_todo.updated_at = todo_dto.updated_at
+            existing_todo.completed_at = todo_dto.completed_at
+```
+
+Unlike the repository interface, the implementation code in the infrastructure layer can contain details specific to a particular technology (SQLite in this example). It's often beneficial to clearly indicate the underlying technology in directory names (e.g., `sqlite`) or class names, rather than strictly adhering to abstract interface definitions.
+
+#### 2. Data Transfer Object
+
+In Onion Architecture, inner layers (like the domain layer) do not depend on outer layers (infrastructure, presentation). Therefore, when exchanging data between layers, object conversion might be necessary to prevent details of one layer (e.g., infrastructure's database model) from leaking into others. Data Transfer Objects (DTOs) fulfill this conversion role.
+
+The following `TodoDTO` class inherits from SQLAlchemy's base class as an O/R Mapper and implements methods for converting to and from domain layer objects:
+
+```python
+class TodoDTO(Base):
+    """Data Transfer Object for Todo entity in SQLite database."""
+
+    __tablename__ = 'todo'
+    id: Mapped[UUID] = mapped_column(primary_key=True, autoincrement=False)
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), nullable=True)
+    status: Mapped[str] = mapped_column(index=True, nullable=False)
+    created_at: Mapped[int] = mapped_column(index=True, nullable=False)
+    updated_at: Mapped[int] = mapped_column(index=True, nullable=False)
+    completed_at: Mapped[int] = mapped_column(index=True, nullable=True)
+
+    def to_entity(self) -> Todo:
+        """Convert DTO to domain entity."""
+        return Todo(
+            TodoId(self.id),
+            TodoTitle(self.title),
+            TodoDescription(self.description),
+            TodoStatus(self.status),
+            datetime.fromtimestamp(self.created_at / 1000, tz=timezone.utc),
+            datetime.fromtimestamp(self.updated_at / 1000, tz=timezone.utc),
+            datetime.fromtimestamp(self.completed_at / 1000, tz=timezone.utc)
+            if self.completed_at
+            else None,
+        )
+
+    @staticmethod
+    def from_entity(todo: Todo) -> 'TodoDTO':
+        """Convert domain entity to DTO."""
+        return TodoDTO(
+            id=todo.id.value,
+            title=todo.title.value,
+            description=todo.description.value if todo.description else None,
+            status=todo.status.value,
+            created_at=int(todo.created_at.timestamp() * 1000),
+            updated_at=int(todo.updated_at.timestamp() * 1000),
+            completed_at=int(todo.completed_at.timestamp() * 1000)
+            if todo.completed_at
+            else None,
+        )
+```
+
+By converting `TodoDTO` objects (dependent on SQLAlchemy) retrieved from the database into the domain layer's `Todo` entity before returning them to the use case layer, we prevent the use case layer from depending on infrastructure layer details. This also maintains consistency with the return type (`Todo` entity) defined in the repository interface.
+
 ### Usecase Layer
 
 The usecase layer contains the application-specific business rules. It includes:
 
 1. Usecase implementations
-2. DTOs (Data Transfer Objects)
-3. Service interfaces
+2. Error handling related to use cases
 
-In this project, each use case is implemented as a separate class with a single public `execute` method. This design ensures clear separation of concerns and makes the code more maintainable. Here's how it's implemented:
+In this project, each use case is implemented as a separate class with a single public `execute` method, following the rule of "one public method per use case". This design ensures clear separation of concerns and makes the code more maintainable. Here's how it's implemented:
 
 #### 1. Use Case Interface and Implementation
 
@@ -337,8 +428,8 @@ curl --location --request GET 'localhost:8000/todos'
         "title": "Implement DDD architecture",
         "description": "Create a sample application using DDD principles",
         "status": "not_started",
-        "created_at": 1614006055213,
-        "updated_at": 1614006055213
+        "created_at": 1614007224642,
+        "updated_at": 1614007224642
     }
 ]
 ```
