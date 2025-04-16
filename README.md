@@ -121,15 +121,16 @@ class Todo:
 Key characteristics of entities:
 
 * Have a unique identifier (`id`)
-* Can change state (methods like `update_title`, `start`, `complete`)
+* Can change state (e.g., `update_title`, `update_description`, `start`, `complete` methods)
 * Identity is determined by the identifier (`__eq__` method implementation)
+* May be created through factory methods (e.g., `create`)
 
-The `__eq__` method implementation in this project follows DDD principles:
+In this project, the `__eq__` method is implemented to determine instance identity solely based on the `id`:
 
 ```python
 def __eq__(self, obj: object) -> bool:
     if isinstance(obj, Todo):
-        return self._id == obj._id
+        return self.id == obj.id # Note: Accessing via property
     return False
 ```
 
@@ -137,7 +138,6 @@ Key points of this implementation:
 
 * Identity is determined solely by the identifier (`id`)
 * Type safety is ensured with `isinstance` check
-* Clean implementation focusing on the essential characteristic of entities
 
 #### 2. Value Objects
 
@@ -243,9 +243,9 @@ Unlike the repository interface, the implementation code in the infrastructure l
 
 #### 2. Data Transfer Object
 
-In Onion Architecture, inner layers (like the domain layer) do not depend on outer layers (infrastructure, presentation). Therefore, when exchanging data between layers, object conversion might be necessary to prevent details of one layer (e.g., infrastructure's database model) from leaking into others. Data Transfer Objects (DTOs) fulfill this conversion role.
+In Onion Architecture, inner layers (like the domain layer) do not depend on outer layers (infrastructure, presentation). Therefore, when exchanging data between layers, object conversion might be necessary to prevent details of one layer (e.g., infrastructure's database model) from leaking into others. Data Transfer Objects (DTOs) fulfill this conversion role. DTOs are simple objects used to transfer data across layers.
 
-The following `TodoDTO` class inherits from SQLAlchemy's base class as an O/R Mapper and implements methods for converting to and from domain layer objects:
+The `TodoDTO` class example below is an SQLAlchemy model (inheriting from `Base`) and includes methods (`to_entity`, `from_entity`) for converting between itself and the domain entity (`Todo`):
 
 ```python
 class TodoDTO(Base):
@@ -345,7 +345,9 @@ Use cases handle domain-specific errors:
 
 ```python
 class StartTodoUseCaseImpl(StartTodoUseCase):
-    def execute(self, todo_id: TodoId) -> None:
+    # ... __init__ ...
+
+    def execute(self, todo_id: TodoId) -> Todo: # Corrected return type
         todo = self.todo_repository.find_by_id(todo_id)
 
         if todo is None:
@@ -359,14 +361,8 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
 
         todo.start()
         self.todo_repository.save(todo)
+        return todo # Return the updated Todo
 ```
-
-Key characteristics of error handling:
-
-* Domain-specific exceptions
-* Clear error conditions
-* Validation before state changes
-* Atomic operations
 
 ### Presentation Layer
 
@@ -407,7 +403,7 @@ curl --location --request POST 'localhost:8000/todos' \
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Implement DDD architecture",
     "description": "Create a sample application using DDD principles",
-    "status": "TODO",
+    "status": "not_started", # Corrected status
     "created_at": 1614007224642,
     "updated_at": 1614007224642
 }

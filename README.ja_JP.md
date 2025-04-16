@@ -13,7 +13,7 @@
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [SQLAlchemy](https://www.sqlalchemy.org/)
   * [SQLite](https://www.sqlite.org/index.html)
-* [uv](https://github.com/astral-sh/uv) - 高速なPythonパッケージインストーラー兼リゾルバー
+* [uv](https://github.com/astral-sh/uv)
 * [Docker](https://www.docker.com/)
 
 ## プロジェクトのセットアップ
