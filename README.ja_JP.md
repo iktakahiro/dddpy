@@ -13,7 +13,7 @@
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [SQLAlchemy](https://www.sqlalchemy.org/)
   * [SQLite](https://www.sqlite.org/index.html)
-* [uv](https://github.com/astral-sh/uv)
+* [uv](https://github.com/astral-sh/uv) - 高速なPythonパッケージインストーラー兼リゾルバー
 * [Docker](https://www.docker.com/)
 
 ## プロジェクトのセットアップ
@@ -118,10 +118,11 @@ class Todo:
 エンティティの主な特徴：
 
 * 一意の識別子（`id`）を持つ
-* 状態を変更できる（`update_title`、`start`、`complete`などのメソッド）
+* 状態を変更できる（例: `update_title`, `update_description`, `start`, `complete` メソッド）
 * 識別子によって同一性が決定される（`__eq__`メソッドの実装）
+* ファクトリメソッド（例: `create`）を通じて生成されることがある
 
-このプロジェクトでは、`id` によってのみインスタンスの同一性を判断するために `__eq__` メソッドを実装しています。
+このプロジェクトでは、インスタンスの同一性を `id` のみによって判断するため、`__eq__` メソッドを以下のように実装しています。
 
 ```python
 def __eq__(self, obj: object) -> bool:
@@ -230,16 +231,16 @@ class TodoRepositoryImpl(TodoRepository):
             existing_todo.description = todo_dto.description
             existing_todo.status = todo_dto.status
             existing_todo.updated_at = todo_dto.updated_at
-            existing_todo.completed_at = todo_dto.completed_at    
+            existing_todo.completed_at = todo_dto.completed_at
 ```
 
 リポジトリインターフェースとは異なり、インフラ層の実装コードには、特定の技術（この例ではSQLite）に依存する詳細が含まれていても問題ありません。むしろ、抽象的なインターフェース定義にとらわれすぎず、具体的な技術名をディレクトリ名（例: `sqlite`）やクラス名に含めることで、その実装がどの技術に基づいているかを明確にすることが推奨されます。
 
-#### 2. Data Transfer Object
+#### 2. Data Transfer Object (DTO)
 
-オニオンアーキテクチャでは、内側のレイヤー（ドメイン層）は外側のレイヤー（インフラ層、プレゼンテーション層）に依存しません。そのため、レイヤー間でデータをやり取りする際に、特定のレイヤーの詳細（例えば、インフラ層のデータベースモデル）が他のレイヤーに漏れ出ないように、オブジェクトの変換が必要になることがあります。この変換の役割を担うのがData Transfer Object（DTO）です。
+オニオンアーキテクチャでは、内側のレイヤー（ドメイン層）は外側のレイヤー（インフラ層、プレゼンテーション層）に依存しません。そのため、レイヤー間でデータをやり取りする際に、特定のレイヤーの詳細（例えば、インフラ層のデータベースモデル）が他のレイヤーに漏れ出ないように、オブジェクトの変換が必要になることがあります。この変換の役割を担うのがData Transfer Object（DTO）です。DTOは、レイヤー間でデータを転送するために使用されるシンプルなオブジェクトです。
 
-次の `TodoDTO` クラスは、O/R Mapperとして SQL Alchemy の基底クラスを継承しながら、ドメイン層のオブジェクトとの相互変換のためのメソッドを実装したクラスです。
+`TodoDTO` クラスの例を以下に示します。これは SQLAlchemy のモデル（`Base` を継承）であり、ドメインエンティティ (`Todo`) との間で相互変換を行うメソッド (`to_entity`, `from_entity`) を持ちます。
 
 ```python
 class TodoDTO(Base):
@@ -282,7 +283,6 @@ class TodoDTO(Base):
             if todo.completed_at
             else None,
         )
-
 ```
 
 データベースから取得した `TodoDTO` オブジェクト（SQLAlchemyに依存）を、ドメイン層の `Todo` エンティティに変換してからユースケース層に返すことで、ユースケース層がインフラストラクチャ層の詳細に依存することを防ぎます。これにより、リポジトリインターフェースで定義された戻り値の型（`Todo` エンティティ）との整合性も保たれます。
@@ -337,7 +337,9 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
 
 ```python
 class StartTodoUseCaseImpl(StartTodoUseCase):
-    def execute(self, todo_id: TodoId) -> None:
+    # ... __init__ ...
+
+    def execute(self, todo_id: TodoId) -> Todo:
         todo = self.todo_repository.find_by_id(todo_id)
 
         if todo is None:
@@ -351,6 +353,7 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
 
         todo.start()
         self.todo_repository.save(todo)
+        return todo
 ```
 
 ### プレゼンテーション層
@@ -413,8 +416,8 @@ curl --location --request GET 'localhost:8000/todos'
         "title": "Implement DDD architecture",
         "description": "Create a sample application using DDD principles",
         "status": "not_started",
-        "created_at": 1614006055213,
-        "updated_at": 1614006055213
+    "created_at": 1614006055213,
+    "updated_at": 1614006055213
     }
 ]
 ```
