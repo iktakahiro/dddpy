@@ -30,9 +30,11 @@ make install
 make dev
 ```
 
-## コードアーキテクチャ
+## ソフトウェアアーキテクチャ
 
-ディレクトリ構造は[オニオンアーキテクチャ](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/)に基づいています：
+このリポジトリのソフトウェアアーキテクチャは、[オニオン・アーキテクチャ](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/)に基づいています。
+
+オニオン・アーキテクチャを実践するためのディレクトリ構造に正解はありませんが、このリポジトリでは次のようなディレクトリ構造を採用しています：
 
 ```tree
 ├── main.py
@@ -119,7 +121,7 @@ class Todo:
 * 状態を変更できる（`update_title`、`start`、`complete`などのメソッド）
 * 識別子によって同一性が決定される（`__eq__`メソッドの実装）
 
-このプロジェクトでの`__eq__`メソッドの実装は、DDDの原則に従っています：
+このプロジェクトでは、`id` によってのみインスタンスの同一性を判断するために `__eq__` メソッドを実装しています。
 
 ```python
 def __eq__(self, obj: object) -> bool:
@@ -131,8 +133,7 @@ def __eq__(self, obj: object) -> bool:
 この実装のポイント：
 
 * 同一性は識別子（`id`）のみによって判断される
-* `isinstance`チェックによる型安全性の確保
-* エンティティの本質的な特徴に焦点を当てたクリーンな実装
+* `isinstance`チェックによる型安全性が確保されている
 
 #### 2. 値オブジェクト
 
@@ -155,11 +156,11 @@ class TodoTitle:
 * `@dataclass(frozen=True)`による不変性の保証
 * 値の検証ロジックを含む（`__post_init__`）
 * 識別子を持たない
-* 値の内容によって同一性が決定される
+* すべての値の内容によって同一性が決定される
 
 #### 3. リポジトリインターフェース
 
-リポジトリはエンティティの永続化を担当する抽象化レイヤーです。このプロジェクトでは`TodoRepository`インターフェースを次のように実装しています：
+リポジトリはエンティティの永続化を担当する抽象化レイヤーです。このプロジェクトでは`TodoRepository`インターフェースを次のように定義しています：
 
 ```python
 class TodoRepository(ABC):
@@ -183,8 +184,6 @@ class TodoRepository(ABC):
 リポジトリの主な特徴：
 
 * エンティティの永続化を抽象化する
-* ドメイン層とインフラ層の境界を定義する
-* インフラ層で具体的な実装を提供する
 
 ### インフラ層
 
@@ -195,13 +194,105 @@ class TodoRepository(ABC):
 3. 外部サービスとの統合
 4. 依存性注入（DI）の設定
 
+#### 1. リポジトリの実装
+
+リポジトリの実装は、次のように行います：
+
+```python
+class TodoRepositoryImpl(TodoRepository):
+    """SQLite implementation of Todo repository interface."""
+
+    def __init__(self, session: Session):
+        """Initialize repository with SQLAlchemy session."""
+        self.session = session
+
+    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+        """Find a Todo by its ID."""
+        try:
+            row = self.session.query(TodoDTO).filter_by(id=todo_id.value).one()
+        except NoResultFound:
+            return None
+
+        return row.to_entity()
+
+    def save(self, todo: Todo) -> None:
+        """Save a new Todo item."""
+        todo_dto = TodoDTO.from_entity(todo)
+        try:
+            existing_todo = (
+                self.session.query(TodoDTO).filter_by(id=todo.id.value).one()
+            )
+        except NoResultFound:
+            self.session.add(todo_dto)
+
+        else:
+            existing_todo.title = todo_dto.title
+            existing_todo.description = todo_dto.description
+            existing_todo.status = todo_dto.status
+            existing_todo.updated_at = todo_dto.updated_at
+            existing_todo.completed_at = todo_dto.completed_at    
+```
+
+リポジトリインターフェースとは異なり、インフラ層の実装コードには、特定の技術（この例ではSQLite）に依存する詳細が含まれていても問題ありません。むしろ、抽象的なインターフェース定義にとらわれすぎず、具体的な技術名をディレクトリ名（例: `sqlite`）やクラス名に含めることで、その実装がどの技術に基づいているかを明確にすることが推奨されます。
+
+#### 2. Data Transfer Object
+
+オニオンアーキテクチャでは、内側のレイヤー（ドメイン層）は外側のレイヤー（インフラ層、プレゼンテーション層）に依存しません。そのため、レイヤー間でデータをやり取りする際に、特定のレイヤーの詳細（例えば、インフラ層のデータベースモデル）が他のレイヤーに漏れ出ないように、オブジェクトの変換が必要になることがあります。この変換の役割を担うのがData Transfer Object（DTO）です。
+
+次の `TodoDTO` クラスは、O/R Mapperとして SQL Alchemy の基底クラスを継承しながら、ドメイン層のオブジェクトとの相互変換のためのメソッドを実装したクラスです。
+
+```python
+class TodoDTO(Base):
+    """Data Transfer Object for Todo entity in SQLite database."""
+
+    __tablename__ = 'todo'
+    id: Mapped[UUID] = mapped_column(primary_key=True, autoincrement=False)
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), nullable=True)
+    status: Mapped[str] = mapped_column(index=True, nullable=False)
+    created_at: Mapped[int] = mapped_column(index=True, nullable=False)
+    updated_at: Mapped[int] = mapped_column(index=True, nullable=False)
+    completed_at: Mapped[int] = mapped_column(index=True, nullable=True)
+
+    def to_entity(self) -> Todo:
+        """Convert DTO to domain entity."""
+        return Todo(
+            TodoId(self.id),
+            TodoTitle(self.title),
+            TodoDescription(self.description),
+            TodoStatus(self.status),
+            datetime.fromtimestamp(self.created_at / 1000, tz=timezone.utc),
+            datetime.fromtimestamp(self.updated_at / 1000, tz=timezone.utc),
+            datetime.fromtimestamp(self.completed_at / 1000, tz=timezone.utc)
+            if self.completed_at
+            else None,
+        )
+
+    @staticmethod
+    def from_entity(todo: Todo) -> 'TodoDTO':
+        """Convert domain entity to DTO."""
+        return TodoDTO(
+            id=todo.id.value,
+            title=todo.title.value,
+            description=todo.description.value if todo.description else None,
+            status=todo.status.value,
+            created_at=int(todo.created_at.timestamp() * 1000),
+            updated_at=int(todo.updated_at.timestamp() * 1000),
+            completed_at=int(todo.completed_at.timestamp() * 1000)
+            if todo.completed_at
+            else None,
+        )
+
+```
+
+データベースから取得した `TodoDTO` オブジェクト（SQLAlchemyに依存）を、ドメイン層の `Todo` エンティティに変換してからユースケース層に返すことで、ユースケース層がインフラストラクチャ層の詳細に依存することを防ぎます。これにより、リポジトリインターフェースで定義された戻り値の型（`Todo` エンティティ）との整合性も保たれます。
+
 ### ユースケース層
 
 ユースケース層には、アプリケーション固有のビジネスルールが含まれています。主に以下の要素で構成されています：
 
 1. ユースケースの実装
-2. DTO（データ転送オブジェクト）
-3. サービスインターフェース
+2. ユースケースに関係するエラーハンドリング
 
 このプロジェクトでは、「1つのユースケースに1つのパブリックメソッド」というルールを採用し、各ユースケースを単一の`execute`メソッドを持つ独立したクラスとして実装しています。実装例は以下の通りです：
 
@@ -239,9 +330,6 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
 
 * ユースケースごとに1つのクラスを用意
 * 単一責任の原則に従う設計
-* 明確なインターフェース定義
-* コンストラクタによる依存性注入
-* インスタンス化のためのファクトリ関数
 
 #### 2. エラーハンドリング
 
@@ -265,13 +353,6 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
         self.todo_repository.save(todo)
 ```
 
-エラーハンドリングの主な特徴：
-
-* ドメイン固有の例外を定義
-* 明確なエラー条件の設定
-* 状態変更前の入念な検証
-* アトミックな操作の保証
-
 ### プレゼンテーション層
 
 プレゼンテーション層はHTTPリクエストとレスポンスを処理します。主に以下の要素で構成されています：
@@ -282,7 +363,7 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
 
 ハンドラは`presentation/api`ディレクトリに配置され、アプリケーションのAPI層を形成します。各ドメイン（例：`todo`）は独自のハンドラ、スキーマ、エラーメッセージ定義を持っています。
 
-## 動作方法
+## 起動方法
 
 1. VSCodeでこのリポジトリをクローンして開きます
 2. リモートコンテナを起動します
@@ -311,7 +392,7 @@ curl --location --request POST 'localhost:8000/todos' \
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Implement DDD architecture",
     "description": "Create a sample application using DDD principles",
-    "status": "TODO",
+    "status": "not_started",
     "created_at": 1614007224642,
     "updated_at": 1614007224642
 }
@@ -346,7 +427,7 @@ curl --location --request GET 'localhost:8000/todos'
 make test
 ```
 
-### コード品質
+### コードの品質について
 
 このプロジェクトでは、コード品質を維持するために以下のツールを使用しています：
 
