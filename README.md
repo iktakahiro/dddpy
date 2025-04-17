@@ -443,7 +443,7 @@ make test
 This project uses several tools to maintain code quality:
 
 * [mypy](http://mypy-lang.org/) for static type checking
-* [ruff](https://github.com/astral-sh/ruff) for linting
+* [ruff](https://github.com/astral-sh/ruff) for linter & formatter
 * [pytest](https://docs.pytest.org/) for testing
 
 ### Docker Development

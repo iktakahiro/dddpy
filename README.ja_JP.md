@@ -435,7 +435,7 @@ make test
 このプロジェクトでは、コード品質を維持するために以下のツールを使用しています：
 
 * [mypy](http://mypy-lang.org/) - 静的型チェック
-* [ruff](https://github.com/astral-sh/ruff) - リンティング
+* [ruff](https://github.com/astral-sh/ruff) - Linter と Formatter
 * [pytest](https://docs.pytest.org/) - テスト
 
 ### Docker開発環境
