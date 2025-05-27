@@ -1,6 +1,7 @@
 # Python DDD & Onion-Architecture Example and Techniques
 
 [![A workflow to run test](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml/badge.svg)](https://github.com/iktakahiro/dddpy/actions/workflows/test.yml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/iktakahiro/dddpy)
 
 [English](README.md) | 日本語
 
