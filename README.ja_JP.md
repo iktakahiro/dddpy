@@ -5,6 +5,8 @@
 
 [English](README.md) | 日本語
 
+* Go実装版: [oniongo](https://github.com/iktakahiro/oniongo)
+
 **注意**: このリポジトリは「PythonのWebアプリケーションでDDDアーキテクチャを実装する方法」を説明するためのサンプルです。参考として使用する場合は、本番環境にデプロイする前に認証とセキュリティの実装を追加してください。
 
 * DeepWiki powered by Devin: <https://deepwiki.com/iktakahiro/dddpy>

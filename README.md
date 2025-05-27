@@ -5,6 +5,8 @@
 
 English | [日本語](README.ja_JP.md)
 
+* Go implementation: [oniongo](https://github.com/iktakahiro/oniongo)
+
 **NOTE**: This repository is an example to demonstrate "how to implement DDD architecture in a Python web application." If you use this as a reference, ensure to implement authentication and security before deploying it to a real-world environment!
 
 * DeepWiki powered by Devin: <https://deepwiki.com/iktakahiro/dddpy>
