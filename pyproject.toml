@@ -3,12 +3,12 @@ name = "dddpy"
 version = "2.0.1"
 description = "An example of Python FastAPI Domain-Driven Design and Onion Architecture."
 authors = [{ name = "iktakahiro", email = "takahiro.ikeuchi@gmail.com" }]
-dependencies = ["sqlalchemy==2.0.43", "fastapi[standard]==0.118.2"]
+dependencies = ["sqlalchemy==2.0.46", "fastapi[standard]==0.128.0"]
 readme = "README.md"
 requires-python = ">=3.13"
 
 [project.optional-dependencies]
-dev = ["mypy>=1.18.1", "pytest>=8.4.2", "ruff>=0.14.0"]
+dev = ["mypy>=1.19.1", "pytest>=9.0.2", "ruff>=0.14.14"]
 
 [build-system]
 requires = ["hatchling"]
