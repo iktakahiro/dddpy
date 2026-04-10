@@ -510,13 +510,13 @@ curl --location --request PUT 'localhost:8000/todos/550e8400-e29b-41d4-a716-4466
 make test
 ```
 
-このコマンドは、mypyによる型チェックとpytestによるユニットテストの両方を実行します。
+このコマンドは、Pyreflyによる型チェックとpytestによるユニットテストの両方を実行します。
 
 ### コードの品質について
 
 このプロジェクトでは、コード品質を維持するために以下のツールを使用しています：
 
-* [mypy](http://mypy-lang.org/) - 静的型チェック
+* [Pyrefly](https://pyrefly.org/) - 静的型チェック
 * [ruff](https://github.com/astral-sh/ruff) - Linter と Formatter
 * [pytest](https://docs.pytest.org/) - テスト
 

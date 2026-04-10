@@ -25,4 +25,4 @@ jobs:
           make install
       - name: Run tests
         run: |
-          make test
+          make test PYREFLY_FLAGS=--output-format=github

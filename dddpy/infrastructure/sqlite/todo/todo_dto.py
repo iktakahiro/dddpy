@@ -1,6 +1,6 @@
 """Map todo entities to and from SQLite persistence models."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import String
@@ -22,11 +22,11 @@ class TodoDTO(Base):
     __tablename__ = 'todo'
     id: Mapped[UUID] = mapped_column(primary_key=True, autoincrement=False)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(String(1000), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     status: Mapped[str] = mapped_column(index=True, nullable=False)
     created_at: Mapped[int] = mapped_column(index=True, nullable=False)
     updated_at: Mapped[int] = mapped_column(index=True, nullable=False)
-    completed_at: Mapped[int] = mapped_column(index=True, nullable=True)
+    completed_at: Mapped[int | None] = mapped_column(index=True, nullable=True)
 
     def to_entity(self) -> Todo:
         """Convert the DTO into a domain entity.
@@ -39,9 +39,9 @@ class TodoDTO(Base):
             TodoTitle(self.title),
             TodoDescription(self.description) if self.description else None,
             TodoStatus(self.status),
-            datetime.fromtimestamp(self.created_at / 1000, tz=timezone.utc),
-            datetime.fromtimestamp(self.updated_at / 1000, tz=timezone.utc),
-            datetime.fromtimestamp(self.completed_at / 1000, tz=timezone.utc)
+            datetime.fromtimestamp(self.created_at / 1000, tz=UTC),
+            datetime.fromtimestamp(self.updated_at / 1000, tz=UTC),
+            datetime.fromtimestamp(self.completed_at / 1000, tz=UTC)
             if self.completed_at
             else None,
         )

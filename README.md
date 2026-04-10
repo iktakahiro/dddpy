@@ -518,13 +518,13 @@ curl --location --request PUT 'localhost:8000/todos/550e8400-e29b-41d4-a716-4466
 make test
 ```
 
-This command runs both type checking with mypy and unit tests with pytest.
+This command runs both type checking with Pyrefly and unit tests with pytest.
 
 ### Code Quality
 
 This project uses several tools to maintain code quality:
 
-* [mypy](http://mypy-lang.org/) for static type checking
+* [Pyrefly](https://pyrefly.org/) for static type checking
 * [ruff](https://github.com/astral-sh/ruff) for linting & formatting
 * [pytest](https://docs.pytest.org/) for testing
 
