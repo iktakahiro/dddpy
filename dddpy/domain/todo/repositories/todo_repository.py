@@ -1,7 +1,6 @@
 """Define the repository abstraction for todo entities."""
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.value_objects import TodoId
@@ -19,7 +18,7 @@ class TodoRepository(ABC):
         """
 
     @abstractmethod
-    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Retrieve a todo by its identifier.
 
         Args:
@@ -30,7 +29,7 @@ class TodoRepository(ABC):
         """
 
     @abstractmethod
-    def find_all(self) -> List[Todo]:
+    def find_all(self) -> list[Todo]:
         """Return the collection of todos stored in the repository.
 
         Returns:

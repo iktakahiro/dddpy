@@ -13,6 +13,10 @@ run = "uv venv .venv --allow-existing --seed"
 depends = ["venv"]
 run = "uv pip install -e '.[dev]' --python .venv/bin/python"
 
+[tasks.lint]
+depends = ["install"]
+run = ".venv/bin/ruff check ."
+
 [tasks.test]
 depends = ["install"]
 run = ".venv/bin/pyrefly check --summarize-errors && .venv/bin/pytest -vv"

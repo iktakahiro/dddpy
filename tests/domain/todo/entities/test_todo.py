@@ -1,6 +1,6 @@
 """Test cases for the Todo entity."""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytest
 

@@ -1,10 +1,9 @@
 """Test cases for CreateTodoUseCaseImpl."""
 
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
-from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoDescription, TodoTitle
 from dddpy.usecase.todo.create_todo_usecase import CreateTodoUseCaseImpl

@@ -1,6 +1,6 @@
 """Test cases for UpdateTodoUseCaseImpl."""
 
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 

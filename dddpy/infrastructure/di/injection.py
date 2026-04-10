@@ -1,6 +1,6 @@
 """Dependency injection configuration for the application."""
 
-from typing import Iterator
+from collections.abc import Iterator
 
 from fastapi import Depends
 from sqlalchemy.orm import Session

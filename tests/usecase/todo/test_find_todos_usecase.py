@@ -1,6 +1,6 @@
 """Test cases for FindTodosUseCaseImpl."""
 
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -56,7 +56,7 @@ def test_find_todos_with_items(find_todos_usecase, todo_repository_mock):
     result = find_todos_usecase.execute()
 
     # Assert
-    assert len(result) == 2
+    assert len(result) == len(todos)
     assert result[0].title == todos[0].title
     assert result[1].title == todos[1].title
     todo_repository_mock.find_all.assert_called_once()

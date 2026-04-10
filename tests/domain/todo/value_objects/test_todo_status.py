@@ -2,6 +2,8 @@
 
 from dddpy.domain.todo.value_objects.todo_status import TodoStatus
 
+EXPECTED_TODO_STATUS_COUNT = 3
+
 
 def test_todo_status_values():
     """Test that TodoStatus has the correct values."""
@@ -12,7 +14,7 @@ def test_todo_status_values():
 
 def test_todo_status_enum_members():
     """Test that TodoStatus has the correct enum members."""
-    assert len(TodoStatus) == 3
+    assert len(TodoStatus) == EXPECTED_TODO_STATUS_COUNT
     assert TodoStatus.NOT_STARTED in TodoStatus
     assert TodoStatus.IN_PROGRESS in TodoStatus
     assert TodoStatus.COMPLETED in TodoStatus

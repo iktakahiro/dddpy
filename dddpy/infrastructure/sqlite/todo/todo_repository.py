@@ -1,7 +1,5 @@
 """SQLite implementation of Todo repository."""
 
-from typing import List, Optional
-
 from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.session import Session
@@ -23,7 +21,7 @@ class TodoRepositoryImpl(TodoRepository):
         """
         self.session = session
 
-    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Return a todo matching the provided identifier.
 
         Args:
@@ -39,7 +37,7 @@ class TodoRepositoryImpl(TodoRepository):
 
         return row.to_entity()
 
-    def find_all(self) -> List[Todo]:
+    def find_all(self) -> list[Todo]:
         """Return todos ordered by creation date with an upper limit.
 
         Returns:

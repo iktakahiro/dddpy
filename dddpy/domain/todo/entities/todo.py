@@ -1,7 +1,7 @@
 """Define the Todo entity used throughout the domain layer."""
 
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
 
 from dddpy.domain.todo.value_objects import (
     TodoDescription,
@@ -10,89 +10,41 @@ from dddpy.domain.todo.value_objects import (
     TodoTitle,
 )
 
+ALREADY_COMPLETED_ERROR_MESSAGE = 'Already completed'
 
+
+@dataclass(eq=False)
 class Todo:
     """Represent a todo item tracked by the domain.
 
     Attributes:
-        _id: Unique identifier for the todo.
-        _title: Title describing the todo.
-        _description: Optional detailed description.
-        _status: Current lifecycle status.
-        _created_at: Timestamp when the todo was created.
-        _updated_at: Timestamp when the todo was last updated.
-        _completed_at: Optional timestamp when the todo was completed.
+        id: Unique identifier for the todo.
+        title: Title describing the todo.
+        description: Optional detailed description.
+        status: Current lifecycle status.
+        created_at: Timestamp when the todo was created.
+        updated_at: Timestamp when the todo was last updated.
+        completed_at: Optional timestamp when the todo was completed.
     """
 
-    def __init__(
-        self,
-        id: TodoId,
-        title: TodoTitle,
-        description: Optional[TodoDescription] = None,
-        status: TodoStatus = TodoStatus.NOT_STARTED,
-        created_at: datetime = datetime.now(),
-        updated_at: datetime = datetime.now(),
-        completed_at: Optional[datetime] = None,
-    ):
-        """Initialize a todo domain entity.
+    id: TodoId
+    title: TodoTitle
+    description: TodoDescription | None = None
+    status: TodoStatus = TodoStatus.NOT_STARTED
+    created_at: datetime = field(default_factory=datetime.now)
+    updated_at: datetime = field(default_factory=datetime.now)
+    completed_at: datetime | None = None
 
-        Args:
-            id: Identifier for the todo.
-            title: Title describing the todo.
-            description: Optional longer description.
-            status: Initial lifecycle status.
-            created_at: Creation timestamp in UTC.
-            updated_at: Last updated timestamp in UTC.
-            completed_at: Optional completion timestamp in UTC.
-        """
-        self._id = id
-        self._title = title
-        self._description = description
-        self._status = status
-        self._created_at = created_at
-        self._updated_at = updated_at
-        self._completed_at = completed_at
+    def __hash__(self) -> int:
+        """Return a hash value based on the entity identity."""
+        return hash(self.id)
 
     def __eq__(self, obj: object) -> bool:
+        """Compare todos by identifier."""
         if isinstance(obj, Todo):
             return self.id == obj.id
 
         return False
-
-    @property
-    def id(self) -> TodoId:
-        """Return the todo's unique identifier."""
-        return self._id
-
-    @property
-    def title(self) -> TodoTitle:
-        """Return the todo's title."""
-        return self._title
-
-    @property
-    def description(self) -> Optional[TodoDescription]:
-        """Return the todo's description if available."""
-        return self._description
-
-    @property
-    def status(self) -> TodoStatus:
-        """Return the todo's current status."""
-        return self._status
-
-    @property
-    def created_at(self) -> datetime:
-        """Return the todo's creation timestamp."""
-        return self._created_at
-
-    @property
-    def updated_at(self) -> datetime:
-        """Return the todo's last update timestamp."""
-        return self._updated_at
-
-    @property
-    def completed_at(self) -> Optional[datetime]:
-        """Return the todo's completion timestamp if set."""
-        return self._completed_at
 
     def update_title(self, new_title: TodoTitle) -> None:
         """Update the todo title and refresh timestamps.
@@ -100,22 +52,22 @@ class Todo:
         Args:
             new_title: Replacement title for the todo.
         """
-        self._title = new_title
-        self._updated_at = datetime.now()
+        self.title = new_title
+        self.updated_at = datetime.now()
 
-    def update_description(self, new_description: Optional[TodoDescription]) -> None:
+    def update_description(self, new_description: TodoDescription | None) -> None:
         """Update the todo description and refresh timestamps.
 
         Args:
             new_description: Optional replacement description.
         """
-        self._description = new_description if new_description else None
-        self._updated_at = datetime.now()
+        self.description = new_description if new_description else None
+        self.updated_at = datetime.now()
 
     def start(self) -> None:
         """Mark the todo as in progress and update timestamps."""
-        self._status = TodoStatus.IN_PROGRESS
-        self._updated_at = datetime.now()
+        self.status = TodoStatus.IN_PROGRESS
+        self.updated_at = datetime.now()
 
     def complete(self) -> None:
         """Mark the todo as completed and record completion time.
@@ -123,20 +75,20 @@ class Todo:
         Raises:
             ValueError: If the todo is already completed.
         """
-        if self._status == TodoStatus.COMPLETED:
-            raise ValueError('Already completed')
+        if self.status == TodoStatus.COMPLETED:
+            raise ValueError(ALREADY_COMPLETED_ERROR_MESSAGE)
 
-        self._status = TodoStatus.COMPLETED
-        self._completed_at = datetime.now()
-        self._updated_at = self._completed_at
+        self.status = TodoStatus.COMPLETED
+        self.completed_at = datetime.now()
+        self.updated_at = self.completed_at
 
     @property
     def is_completed(self) -> bool:
         """Return whether the todo is marked as completed."""
-        return self._status == TodoStatus.COMPLETED
+        return self.status == TodoStatus.COMPLETED
 
     def is_overdue(
-        self, deadline: datetime, current_time: Optional[datetime] = None
+        self, deadline: datetime, current_time: datetime | None = None
     ) -> bool:
         """Determine whether the todo has passed the provided deadline.
 
@@ -152,9 +104,7 @@ class Todo:
         return (current_time or datetime.now()) > deadline
 
     @staticmethod
-    def create(
-        title: TodoTitle, description: Optional[TodoDescription] = None
-    ) -> 'Todo':
+    def create(title: TodoTitle, description: TodoDescription | None = None) -> 'Todo':
         """Create a new todo entity with generated identifier.
 
         Args:

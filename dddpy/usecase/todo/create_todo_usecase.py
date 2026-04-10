@@ -1,7 +1,6 @@
 """Provide use case implementations for creating todos."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.repositories import TodoRepository
@@ -13,7 +12,7 @@ class CreateTodoUseCase(ABC):
 
     @abstractmethod
     def execute(
-        self, title: TodoTitle, description: Optional[TodoDescription] = None
+        self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:
         """Create a todo using the provided values.
 
@@ -38,7 +37,7 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
         self.todo_repository = todo_repository
 
     def execute(
-        self, title: TodoTitle, description: Optional[TodoDescription] = None
+        self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:
         """Create, persist, and return a new todo entity.
 

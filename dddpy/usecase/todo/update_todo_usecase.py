@@ -1,7 +1,6 @@
 """Provide use case implementations for updating todos."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.exceptions import TodoNotFoundError
@@ -16,8 +15,8 @@ class UpdateTodoUseCase(ABC):
     def execute(
         self,
         todo_id: TodoId,
-        title: Optional[TodoTitle] = None,
-        description: Optional[TodoDescription] = None,
+        title: TodoTitle | None = None,
+        description: TodoDescription | None = None,
     ) -> Todo:
         """Update a todo using the provided values.
 
@@ -45,8 +44,8 @@ class UpdateTodoUseCaseImpl(UpdateTodoUseCase):
     def execute(
         self,
         todo_id: TodoId,
-        title: Optional[TodoTitle] = None,
-        description: Optional[TodoDescription] = None,
+        title: TodoTitle | None = None,
+        description: TodoDescription | None = None,
     ) -> Todo:
         """Update a todo and persist the changes.
 
