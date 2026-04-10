@@ -9,7 +9,7 @@ sync:
 	uv sync
 
 venv:
-	uv venv .venv
+	uv venv .venv --clear
 
 install: venv
 	uv pip install -e ".[dev]"
