@@ -3,16 +3,28 @@ name = "dddpy"
 version = "2.0.1"
 description = "An example of Python FastAPI Domain-Driven Design and Onion Architecture."
 authors = [{ name = "iktakahiro", email = "takahiro.ikeuchi@gmail.com" }]
-dependencies = ["sqlalchemy==2.0.46", "fastapi[standard]==0.128.0"]
+dependencies = [
+    "sqlalchemy==2.0.48",
+    "fastapi[standard]==0.135.3",
+]
 readme = "README.md"
 requires-python = ">=3.13"
 
 [project.optional-dependencies]
-dev = ["mypy>=1.19.1", "pytest>=9.0.2", "ruff>=0.14.14"]
+dev = [
+    "mypy>=1.20.0",
+    "pytest>=9.0.2",
+    "ruff>=0.15.9",
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.uv]
+package = false
+# https://docs.astral.sh/uv/reference/settings/#exclude-newer
+exclude-newer = "1 week"
 
 [tool.hatch.metadata]
 allow-direct-references = true
