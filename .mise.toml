@@ -7,15 +7,15 @@ uv = "latest"
 run = "uv sync"
 
 [tasks.venv]
-run = "uv venv .venv"
+run = "uv venv .venv --allow-existing --seed"
 
 [tasks.install]
 depends = ["venv"]
-run = "uv pip install -e '.[dev]'"
+run = "uv pip install -e '.[dev]' --python .venv/bin/python"
 
 [tasks.test]
 depends = ["install"]
-run = ".venv/bin/mypy --ignore-missing-imports main.py ./dddpy/ && .venv/bin/pytest -vv"
+run = ".venv/bin/pyrefly check --summarize-errors && .venv/bin/pytest -vv"
 
 [tasks.format]
 depends = ["install"]

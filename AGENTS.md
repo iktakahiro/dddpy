@@ -95,5 +95,5 @@ This module provides a simple client for accessing user data via API.
 ## 6. Testing & Quality Gates
 
 - Run `make test` to execute Pytest.
-- Keep mypy and ruff clean for type checking and linting/formatting.
+- Keep Pyrefly and ruff clean for type checking and linting/formatting.
 - Maintain Onion Architecture boundaries when modifying or adding features.

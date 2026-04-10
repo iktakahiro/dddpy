@@ -1,21 +1,24 @@
 VENV=.venv
 PYTEST=$(VENV)/bin/pytest
-MYPY=$(VENV)/bin/mypy --ignore-missing-imports
+PYREFLY=$(VENV)/bin/pyrefly
 UVICORN=$(VENV)/bin/uvicorn
 RUFF=$(VENV)/bin/ruff
 PACKAGE=dddpy
+PYREFLY_FLAGS=--summarize-errors
 
 sync:
 	uv sync
 
 venv:
-	uv venv .venv --clear
+	uv venv $(VENV) --allow-existing --seed
 
 install: venv
-	uv pip install -e ".[dev]"
+	uv pip install -e ".[dev]" --python $(VENV)/bin/python
 
-test: install  
-	$(MYPY) main.py ./${PACKAGE}/
+typecheck: install
+	$(PYREFLY) check $(PYREFLY_FLAGS)
+
+test: typecheck
 	$(PYTEST) -vv 
 
 format: 

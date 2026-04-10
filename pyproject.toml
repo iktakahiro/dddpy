@@ -12,7 +12,7 @@ requires-python = ">=3.13"
 
 [project.optional-dependencies]
 dev = [
-    "mypy>=1.20.0",
+    "pyrefly>=0.59.1",
     "pytest>=9.0.2",
     "ruff>=0.15.9",
 ]
@@ -67,3 +67,6 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
+
+[tool.pyrefly]
+project_includes = ["main.py", "dddpy"]
