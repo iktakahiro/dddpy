@@ -1,6 +1,5 @@
 """Controller for handling Todo-related HTTP requests."""
 
-from typing import List
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -9,6 +8,7 @@ from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
     TodoAlreadyStartedError,
     TodoNotFoundError,
+    TodoNotStartedError,
 )
 from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
 from dddpy.infrastructure.di.injection import (
@@ -38,28 +38,42 @@ from dddpy.usecase.todo import (
 class TodoApiRouteHandler:
     """Register HTTP endpoints that expose todo use cases."""
 
-    def register_routes(self, app: FastAPI):
+    def register_routes(self, app: FastAPI) -> None:
         """Attach todo routes to the provided FastAPI application.
 
         Args:
             app: FastAPI instance that receives the todo routes.
         """
+        self._register_get_todos_route(app)
+        self._register_get_todo_route(app)
+        self._register_create_todo_route(app)
+        self._register_update_todo_route(app)
+        self._register_start_todo_route(app)
+        self._register_complete_todo_route(app)
+
+    @staticmethod
+    def _build_todo_description(description: str | None) -> TodoDescription | None:
+        """Convert an optional description string into a value object."""
+        return TodoDescription(description) if description else None
+
+    def _register_get_todos_route(self, app: FastAPI) -> None:
+        """Register the route that returns all todos."""
 
         @app.get(
             '/todos',
-            response_model=List[TodoSchema],
+            response_model=list[TodoSchema],
             status_code=200,
         )
         def get_todos(
             usecase: FindTodosUseCase = Depends(get_find_todos_usecase),
-        ):
+        ) -> list[TodoSchema]:
             """Return the latest todos.
 
             Args:
                 usecase: Use case responsible for retrieving todos.
 
             Returns:
-                List[TodoSchema]: Serialized todos returned to the client.
+                list[TodoSchema]: Serialized todos returned to the client.
 
             Raises:
                 HTTPException: When the use case raises an unexpected error.
@@ -71,6 +85,9 @@ class TodoApiRouteHandler:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
+
+    def _register_get_todo_route(self, app: FastAPI) -> None:
+        """Register the route that returns a single todo."""
 
         @app.get(
             '/todos/{todo_id}',
@@ -85,7 +102,7 @@ class TodoApiRouteHandler:
         def get_todo(
             todo_id: UUID,
             usecase: FindTodoByIdUseCase = Depends(get_find_todo_by_id_usecase),
-        ):
+        ) -> TodoSchema:
             """Return a single todo by identifier.
 
             Args:
@@ -112,6 +129,9 @@ class TodoApiRouteHandler:
                 ) from exc
             return TodoSchema.from_entity(todo)
 
+    def _register_create_todo_route(self, app: FastAPI) -> None:
+        """Register the route that creates a todo."""
+
         @app.post(
             '/todos',
             response_model=TodoSchema,
@@ -123,7 +143,7 @@ class TodoApiRouteHandler:
         def create_todo(
             data: TodoCreateSchema,
             usecase: CreateTodoUseCase = Depends(get_create_todo_usecase),
-        ):
+        ) -> TodoSchema:
             """Create a todo from the request payload.
 
             Args:
@@ -138,13 +158,11 @@ class TodoApiRouteHandler:
             """
             try:
                 title = TodoTitle(data.title)
-                description = (
-                    TodoDescription(data.description) if data.description else None
-                )
+                description = self._build_todo_description(data.description)
             except ValueError as e:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=e,
+                    detail=str(e),
                 ) from e
 
             try:
@@ -155,6 +173,9 @@ class TodoApiRouteHandler:
                 ) from e
 
             return TodoSchema.from_entity(todo)
+
+    def _register_update_todo_route(self, app: FastAPI) -> None:
+        """Register the route that updates an existing todo."""
 
         @app.put(
             '/todos/{todo_id}',
@@ -170,7 +191,7 @@ class TodoApiRouteHandler:
             todo_id: UUID,
             data: TodoUpdateSchema,
             usecase: UpdateTodoUseCase = Depends(get_update_todo_usecase),
-        ):
+        ) -> TodoSchema:
             """Update a todo identified by the path parameter.
 
             Args:
@@ -188,13 +209,11 @@ class TodoApiRouteHandler:
 
             try:
                 title = TodoTitle(data.title)
-                description = (
-                    TodoDescription(data.description) if data.description else None
-                )
+                description = self._build_todo_description(data.description)
             except ValueError as e:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=e,
+                    detail=str(e),
                 ) from e
 
             try:
@@ -211,6 +230,9 @@ class TodoApiRouteHandler:
 
             return TodoSchema.from_entity(todo)
 
+    def _register_start_todo_route(self, app: FastAPI) -> None:
+        """Register the route that starts a todo."""
+
         @app.patch(
             '/todos/{todo_id}/start',
             response_model=TodoSchema,
@@ -224,7 +246,7 @@ class TodoApiRouteHandler:
         def start_todo(
             todo_id: UUID,
             usecase: StartTodoUseCase = Depends(get_start_todo_usecase),
-        ):
+        ) -> TodoSchema:
             """Start a todo via the corresponding use case.
 
             Args:
@@ -250,12 +272,20 @@ class TodoApiRouteHandler:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=e.message,
                 ) from e
+            except TodoAlreadyCompletedError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=e.message,
+                ) from e
             except Exception as e:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 ) from e
 
             return TodoSchema.from_entity(todo)
+
+    def _register_complete_todo_route(self, app: FastAPI) -> None:
+        """Register the route that completes a todo."""
 
         @app.patch(
             '/todos/{todo_id}/complete',
@@ -270,7 +300,7 @@ class TodoApiRouteHandler:
         def complete_todo(
             todo_id: UUID,
             usecase: CompleteTodoUseCase = Depends(get_complete_todo_usecase),
-        ):
+        ) -> TodoSchema:
             """Complete a todo via the corresponding use case.
 
             Args:
@@ -291,7 +321,7 @@ class TodoApiRouteHandler:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=e.message,
                 ) from e
-            except TodoAlreadyStartedError as e:
+            except TodoNotStartedError as e:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=e.message,

@@ -1,7 +1,6 @@
 """Provide use case implementations for listing todos."""
 
 from abc import ABC, abstractmethod
-from typing import List
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.repositories import TodoRepository
@@ -11,7 +10,7 @@ class FindTodosUseCase(ABC):
     """Define the application boundary for listing todos."""
 
     @abstractmethod
-    def execute(self) -> List[Todo]:
+    def execute(self) -> list[Todo]:
         """Return the collection of todos managed by the system.
 
         Returns:
@@ -30,7 +29,7 @@ class FindTodosUseCaseImpl(FindTodosUseCase):
         """
         self.todo_repository = todo_repository
 
-    def execute(self) -> List[Todo]:
+    def execute(self) -> list[Todo]:
         """Return all todos ordered per repository implementation."""
         return self.todo_repository.find_all()
 

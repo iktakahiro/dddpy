@@ -5,6 +5,9 @@ UVICORN=$(VENV)/bin/uvicorn
 RUFF=$(VENV)/bin/ruff
 PACKAGE=dddpy
 PYREFLY_FLAGS=--summarize-errors
+RUFF_FLAGS=
+
+.PHONY: sync venv install lint typecheck test format dev
 
 sync:
 	uv sync
@@ -14,6 +17,9 @@ venv:
 
 install: venv
 	uv pip install -e ".[dev]" --python $(VENV)/bin/python
+
+lint: install
+	$(RUFF) check . $(RUFF_FLAGS)
 
 typecheck: install
 	$(PYREFLY) check $(PYREFLY_FLAGS)

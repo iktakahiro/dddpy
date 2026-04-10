@@ -2,16 +2,16 @@
 
 from uuid import UUID
 
-import pytest
-
 from dddpy.domain.todo.value_objects.todo_id import TodoId
+
+UUID4_VERSION = 4
 
 
 def test_generate_creates_valid_uuid():
     """Test that generate() creates a valid UUID."""
     todo_id = TodoId.generate()
     assert isinstance(todo_id.value, UUID)
-    assert todo_id.value.version == 4  # Check if it's a UUID4
+    assert todo_id.value.version == UUID4_VERSION
 
 
 def test_generate_creates_unique_ids():
