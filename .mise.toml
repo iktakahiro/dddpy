@@ -1,17 +1,16 @@
 [tools]
 python = "3.14"
-ruff = "latest"
-uv = "latest"
+ruff = "0.15.9"
+uv = "0.11.3"
 
 [tasks.sync]
-run = "uv sync"
+run = "uv sync --frozen --extra dev"
 
 [tasks.venv]
 run = "uv venv .venv --allow-existing --seed"
 
 [tasks.install]
-depends = ["venv"]
-run = "uv pip install -e '.[dev]' --python .venv/bin/python"
+depends = ["sync"]
 
 [tasks.lint]
 depends = ["install"]
@@ -19,7 +18,7 @@ run = ".venv/bin/ruff check ."
 
 [tasks.test]
 depends = ["install"]
-run = ".venv/bin/pyrefly check --summarize-errors && .venv/bin/pytest -vv"
+run = ".venv/bin/pyrefly check --summarize-errors && .venv/bin/python -m pytest -vv"
 
 [tasks.format]
 depends = ["install"]

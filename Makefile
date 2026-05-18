@@ -1,5 +1,6 @@
 VENV=.venv
-PYTEST=$(VENV)/bin/pytest
+PYTHON=$(VENV)/bin/python
+PYTEST=$(PYTHON) -m pytest
 PYREFLY=$(VENV)/bin/pyrefly
 UVICORN=$(VENV)/bin/uvicorn
 RUFF=$(VENV)/bin/ruff
@@ -10,13 +11,12 @@ RUFF_FLAGS=
 .PHONY: sync venv install lint typecheck test format dev
 
 sync:
-	uv sync
+	uv sync --frozen --extra dev
 
 venv:
 	uv venv $(VENV) --allow-existing --seed
 
-install: venv
-	uv pip install -e ".[dev]" --python $(VENV)/bin/python
+install: sync
 
 lint: install
 	$(RUFF) check . $(RUFF_FLAGS)
@@ -27,7 +27,7 @@ typecheck: install
 test: typecheck
 	$(PYTEST) -vv 
 
-format: 
+format: install
 	$(RUFF) format
 
 dev: install
