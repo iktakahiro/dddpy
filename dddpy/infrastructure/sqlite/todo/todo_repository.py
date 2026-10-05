@@ -2,7 +2,6 @@
 
 from typing import override
 
-from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
@@ -49,7 +48,7 @@ class TodoRepositoryImpl(TodoRepository):
         """
         rows = (
             self.session.query(TodoDTO)
-            .order_by(desc(TodoDTO.created_at))
+            .order_by(TodoDTO.created_at.desc())
             .limit(20)
             .all()
         )
