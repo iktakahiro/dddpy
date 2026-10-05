@@ -1,16 +1,15 @@
 """Provide use case implementations for creating todos."""
 
-from abc import ABC, abstractmethod
+from typing import Protocol, override
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoDescription, TodoTitle
 
 
-class CreateTodoUseCase(ABC):
+class CreateTodoUseCase(Protocol):
     """Define the application boundary for creating todos."""
 
-    @abstractmethod
     def execute(
         self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:
@@ -36,6 +35,7 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
         """
         self.todo_repository = todo_repository
 
+    @override
     def execute(
         self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:

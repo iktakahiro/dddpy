@@ -1,6 +1,6 @@
 """Provide use case implementations for retrieving todos by ID."""
 
-from abc import ABC, abstractmethod
+from typing import Protocol, override
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.exceptions import TodoNotFoundError
@@ -8,10 +8,9 @@ from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoId
 
 
-class FindTodoByIdUseCase(ABC):
+class FindTodoByIdUseCase(Protocol):
     """Define the application boundary for retrieving a todo by ID."""
 
-    @abstractmethod
     def execute(self, todo_id: TodoId) -> Todo:
         """Return the todo matching the provided identifier.
 
@@ -34,6 +33,7 @@ class FindTodoByIdUseCaseImpl(FindTodoByIdUseCase):
         """
         self.todo_repository = todo_repository
 
+    @override
     def execute(self, todo_id: TodoId) -> Todo:
         """Retrieve a todo by identifier or raise if absent.
 

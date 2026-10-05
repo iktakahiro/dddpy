@@ -1,5 +1,7 @@
 """SQLite implementation of Todo repository."""
 
+from typing import override
+
 from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.session import Session
@@ -21,6 +23,7 @@ class TodoRepositoryImpl(TodoRepository):
         """
         self.session = session
 
+    @override
     def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Return a todo matching the provided identifier.
 
@@ -37,6 +40,7 @@ class TodoRepositoryImpl(TodoRepository):
 
         return row.to_entity()
 
+    @override
     def find_all(self) -> list[Todo]:
         """Return todos ordered by creation date with an upper limit.
 
@@ -51,6 +55,7 @@ class TodoRepositoryImpl(TodoRepository):
         )
         return [todo_dto.to_entity() for todo_dto in rows]
 
+    @override
     def save(self, todo: Todo) -> None:
         """Persist new or updated todo data.
 
@@ -72,6 +77,7 @@ class TodoRepositoryImpl(TodoRepository):
             existing_todo.updated_at = todo_dto.updated_at
             existing_todo.completed_at = todo_dto.completed_at
 
+    @override
     def delete(self, todo_id: TodoId) -> None:
         """Remove a todo by its identifier.
 

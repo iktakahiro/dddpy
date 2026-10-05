@@ -1,15 +1,14 @@
 """Define the repository abstraction for todo entities."""
 
-from abc import ABC, abstractmethod
+from typing import Protocol
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.value_objects import TodoId
 
 
-class TodoRepository(ABC):
+class TodoRepository(Protocol):
     """Provide the abstraction for todo persistence operations."""
 
-    @abstractmethod
     def save(self, todo: Todo) -> None:
         """Persist the provided todo entity.
 
@@ -17,7 +16,6 @@ class TodoRepository(ABC):
             todo: Todo instance to store or update.
         """
 
-    @abstractmethod
     def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Retrieve a todo by its identifier.
 
@@ -28,7 +26,6 @@ class TodoRepository(ABC):
             Optional[Todo]: The matching todo when found; otherwise None.
         """
 
-    @abstractmethod
     def find_all(self) -> list[Todo]:
         """Return the collection of todos stored in the repository.
 
@@ -36,7 +33,6 @@ class TodoRepository(ABC):
             List[Todo]: All persisted todos.
         """
 
-    @abstractmethod
     def delete(self, todo_id: TodoId) -> None:
         """Remove the todo identified by the provided ID.
 

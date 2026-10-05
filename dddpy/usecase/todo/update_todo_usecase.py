@@ -1,6 +1,6 @@
 """Provide use case implementations for updating todos."""
 
-from abc import ABC, abstractmethod
+from typing import Protocol, override
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.exceptions import TodoNotFoundError
@@ -8,10 +8,9 @@ from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
 
 
-class UpdateTodoUseCase(ABC):
+class UpdateTodoUseCase(Protocol):
     """Define the application boundary for updating todos."""
 
-    @abstractmethod
     def execute(
         self,
         todo_id: TodoId,
@@ -41,6 +40,7 @@ class UpdateTodoUseCaseImpl(UpdateTodoUseCase):
         """
         self.todo_repository = todo_repository
 
+    @override
     def execute(
         self,
         todo_id: TodoId,

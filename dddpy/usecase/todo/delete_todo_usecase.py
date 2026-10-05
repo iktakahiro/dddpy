@@ -1,16 +1,15 @@
 """Provide use case implementations for deleting todos."""
 
-from abc import ABC, abstractmethod
+from typing import Protocol, override
 
 from dddpy.domain.todo.exceptions import TodoNotFoundError
 from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoId
 
 
-class DeleteTodoUseCase(ABC):
+class DeleteTodoUseCase(Protocol):
     """Define the application boundary for deleting todos."""
 
-    @abstractmethod
     def execute(self, todo_id: TodoId) -> None:
         """Delete a todo identified by the provided ID.
 
@@ -30,6 +29,7 @@ class DeleteTodoUseCaseImpl(DeleteTodoUseCase):
         """
         self.todo_repository = todo_repository
 
+    @override
     def execute(self, todo_id: TodoId) -> None:
         """Delete a todo after ensuring it exists.
 
