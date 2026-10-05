@@ -139,7 +139,7 @@ In this project, the `__eq__` method is implemented to determine instance identi
 ```python
 def __eq__(self, obj: object) -> bool:
     if isinstance(obj, Todo):
-        return self.id == obj.id # Note: Accessing via property
+        return self.id == obj.id  # Note: Accessing via property
     return False
 ```
 
@@ -350,9 +350,11 @@ def get_session() -> Iterator[Session]:
     finally:
         session.close()
 
+
 def get_todo_repository(session: Session = Depends(get_session)) -> TodoRepository:
     """Provide a repository instance bound to the current session."""
     return new_todo_repository(session)
+
 
 def get_create_todo_usecase(
     todo_repository: TodoRepository = Depends(get_todo_repository),

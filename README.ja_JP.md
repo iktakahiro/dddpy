@@ -345,9 +345,11 @@ def get_session() -> Iterator[Session]:
     finally:
         session.close()
 
+
 def get_todo_repository(session: Session = Depends(get_session)) -> TodoRepository:
     """現在のセッションに紐づくリポジトリインスタンスを提供します。"""
     return new_todo_repository(session)
+
 
 def get_create_todo_usecase(
     todo_repository: TodoRepository = Depends(get_todo_repository),
