@@ -536,6 +536,12 @@ curl --location --request PUT 'localhost:8000/todos/550e8400-e29b-41d4-a716-4466
 }'
 ```
 
+* Todoを削除する：
+
+```bash
+curl --location --request DELETE 'localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000'
+```
+
 ## 開発
 
 ### テストの実行

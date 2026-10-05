@@ -14,6 +14,7 @@ from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
 from dddpy.infrastructure.di.injection import (
     get_complete_todo_usecase,
     get_create_todo_usecase,
+    get_delete_todo_usecase,
     get_find_todo_by_id_usecase,
     get_find_todos_usecase,
     get_start_todo_usecase,
@@ -28,6 +29,7 @@ from dddpy.presentation.api.todo.schemas import (
 from dddpy.usecase.todo import (
     CompleteTodoUseCase,
     CreateTodoUseCase,
+    DeleteTodoUseCase,
     FindTodoByIdUseCase,
     FindTodosUseCase,
     StartTodoUseCase,
@@ -50,6 +52,7 @@ class TodoApiRouteHandler:
         self._register_update_todo_route(app)
         self._register_start_todo_route(app)
         self._register_complete_todo_route(app)
+        self._register_delete_todo_route(app)
 
     @staticmethod
     def _build_todo_description(description: str | None) -> TodoDescription | None:
@@ -337,3 +340,41 @@ class TodoApiRouteHandler:
                 ) from e
 
             return TodoSchema.from_entity(todo)
+
+    def _register_delete_todo_route(self, app: FastAPI) -> None:
+        """Register the route that deletes a todo."""
+
+        @app.delete(
+            '/todos/{todo_id}',
+            status_code=204,
+            responses={
+                status.HTTP_404_NOT_FOUND: {
+                    'model': ErrorMessageTodoNotFound,
+                },
+            },
+        )
+        def delete_todo(
+            todo_id: UUID,
+            usecase: DeleteTodoUseCase = Depends(get_delete_todo_usecase),
+        ) -> None:
+            """Delete a todo via the corresponding use case.
+
+            Args:
+                todo_id: Identifier of the todo to delete.
+                usecase: Use case responsible for deleting todos.
+
+            Raises:
+                HTTPException: When the todo is missing or an unexpected error occurs.
+            """
+            _id = TodoId(todo_id)
+            try:
+                usecase.execute(_id)
+            except TodoNotFoundError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=e.message,
+                ) from e
+            except Exception as e:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                ) from e

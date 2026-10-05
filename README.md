@@ -543,6 +543,12 @@ curl --location --request PUT 'localhost:8000/todos/550e8400-e29b-41d4-a716-4466
 }'
 ```
 
+* Delete a todo:
+
+```bash
+curl --location --request DELETE 'localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000'
+```
+
 ## Development
 
 ### Running Tests
