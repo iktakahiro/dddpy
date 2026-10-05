@@ -170,23 +170,22 @@ class TodoTitle:
 
 #### 3. リポジトリインターフェース
 
-リポジトリはエンティティの永続化を担当する抽象化レイヤーです。このプロジェクトでは`TodoRepository`インターフェースを次のように定義しています：
+リポジトリはエンティティの永続化を担当する抽象化レイヤーです。このプロジェクトでは`TodoRepository`インターフェース（ポート）を `typing.Protocol`（[PEP 544](https://peps.python.org/pep-0544/)）で次のように定義しています：
 
 ```python
-class TodoRepository(ABC):
-    @abstractmethod
+from typing import Protocol
+
+
+class TodoRepository(Protocol):
     def save(self, todo: Todo) -> None:
         """Save a Todo"""
 
-    @abstractmethod
-    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Find a Todo by ID"""
 
-    @abstractmethod
-    def find_all(self) -> List[Todo]:
+    def find_all(self) -> list[Todo]:
         """Get all Todos"""
 
-    @abstractmethod
     def delete(self, todo_id: TodoId) -> None:
         """Delete a Todo by ID"""
 ```
@@ -194,6 +193,35 @@ class TodoRepository(ABC):
 リポジトリの主な特徴：
 
 * エンティティの永続化を抽象化する
+
+##### なぜ `ABC` ではなく `Protocol` なのか
+
+このプロジェクトでは、リポジトリ・ユースケースを含むすべてのインターフェース（ポート）を `abc.ABC` + `@abstractmethod` ではなく `typing.Protocol` で定義しています。
+
+| 観点 | `ABC` + `@abstractmethod` | `typing.Protocol` |
+| --- | --- | --- |
+| 型付けの方式 | 名前的（継承が必要） | 構造的（メソッドの形が合えば適合） |
+| 違反の検出タイミング | 実行時（インスタンス生成時に `TypeError`） | 静的チェック（Pyrefly などの型チェッカー） |
+| アダプタ側の依存 | 抽象クラスの import と継承が必須 | 不要（明示的に継承することもできる） |
+| テスト用 fake | 継承が必要 | 形が合えばそのまま使える |
+| 共通実装の提供 | できる（テンプレートメソッドなど） | 基本的に不向き |
+
+CI で Pyrefly を回しているため、`Protocol` でも契約の強制力は `ABC` と同等以上です。`ABC` は「実行時に強制したい」「共通実装を持たせたい」ときの選択肢と位置づけています。
+
+純粋に構造的な `Protocol` には、アダプタが契約からずれていても、ポートの型として使う箇所（DI の組み立て箇所など）でしか検出されないという弱点があります。そこでこのプロジェクトでは、実装クラスが **Protocol を明示的に import して継承** し、実装したメソッドに `typing.override`（[PEP 698](https://peps.python.org/pep-0698/)）を付ける方式に統一しています：
+
+```python
+from typing import override
+
+from dddpy.domain.todo.repositories import TodoRepository
+
+
+class TodoRepositoryImpl(TodoRepository):
+    @override
+    def save(self, todo: Todo) -> None: ...
+```
+
+この方式では、実装クラスの定義箇所でシグネチャの不一致が報告され、Protocol に存在しないメソッドへの `@override` も検出され、未実装のメンバーが残ったクラスはインスタンス化できなくなります。
 
 ### インフラ層
 
@@ -218,7 +246,8 @@ class TodoRepositoryImpl(TodoRepository):
         """Initialize repository with SQLAlchemy session."""
         self.session = session
 
-    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    @override
+    def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Find a Todo by its ID."""
         try:
             row = self.session.query(TodoDTO).filter_by(id=todo_id.value).one()
@@ -227,6 +256,7 @@ class TodoRepositoryImpl(TodoRepository):
 
         return row.to_entity()
 
+    @override
     def save(self, todo: Todo) -> None:
         """Save a new Todo item."""
         todo_dto = TodoDTO.from_entity(todo)
@@ -347,12 +377,11 @@ def get_create_todo_usecase(
 各ユースケースは以下の構造に従います：
 
 ```python
-class CreateTodoUseCase:
+class CreateTodoUseCase(Protocol):
     """CreateTodoUseCase defines a use case interface for creating a new Todo."""
 
-    @abstractmethod
     def execute(
-        self, title: TodoTitle, description: Optional[TodoDescription] = None
+        self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:
         """execute creates a new Todo."""
 
@@ -363,8 +392,9 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
     def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
 
+    @override
     def execute(
-        self, title: TodoTitle, description: Optional[TodoDescription] = None
+        self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:
         """execute creates a new Todo."""
         todo = Todo.create(title=title, description=description)
@@ -376,6 +406,7 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
 
 * ユースケースごとに1つのクラスを用意
 * 単一責任の原則に従う設計
+* インターフェースは `typing.Protocol` で定義し、実装クラスが明示的に継承する
 
 #### 2. エラーハンドリング
 
@@ -385,6 +416,7 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
 class StartTodoUseCaseImpl(StartTodoUseCase):
     # ... __init__ ...
 
+    @override
     def execute(self, todo_id: TodoId) -> Todo:
         todo = self.todo_repository.find_by_id(todo_id)
 

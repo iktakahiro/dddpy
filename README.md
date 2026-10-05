@@ -173,23 +173,22 @@ Key characteristics of value objects:
 
 #### 3. Repository Interfaces
 
-Repositories are abstraction layers responsible for entity persistence. This project implements the `TodoRepository` interface:
+Repositories are abstraction layers responsible for entity persistence. This project defines the `TodoRepository` interface (port) as a `typing.Protocol` ([PEP 544](https://peps.python.org/pep-0544/)):
 
 ```python
-class TodoRepository(ABC):
-    @abstractmethod
+from typing import Protocol
+
+
+class TodoRepository(Protocol):
     def save(self, todo: Todo) -> None:
         """Save a Todo"""
 
-    @abstractmethod
-    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Find a Todo by ID"""
 
-    @abstractmethod
-    def find_all(self) -> List[Todo]:
+    def find_all(self) -> list[Todo]:
         """Get all Todos"""
 
-    @abstractmethod
     def delete(self, todo_id: TodoId) -> None:
         """Delete a Todo by ID"""
 ```
@@ -199,6 +198,35 @@ Key characteristics of repositories:
 * Abstract entity persistence
 * Define boundaries between domain and infrastructure layers
 * Concrete implementations provided in the infrastructure layer
+
+##### Why `Protocol` instead of `ABC`?
+
+All interfaces (ports) in this project, both repositories and use cases, are defined with `typing.Protocol` rather than `abc.ABC` + `@abstractmethod`.
+
+| Aspect | `ABC` + `@abstractmethod` | `typing.Protocol` |
+| --- | --- | --- |
+| Typing model | Nominal (inheritance required) | Structural (matching shape is enough) |
+| When violations are detected | At runtime (`TypeError` on instantiation) | Statically (type checker, e.g. Pyrefly) |
+| Adapter dependency | Must import and inherit the ABC | Optional (can inherit explicitly) |
+| Test fakes | Must inherit | Any object with the right shape works |
+| Shared implementation | Possible (e.g. template method) | Not a good fit |
+
+Since Pyrefly runs in CI, a `Protocol` enforces the contract at least as strictly as an `ABC`. Reach for `ABC` only when you need runtime enforcement or shared implementation.
+
+The one weakness of a purely structural `Protocol` is that a drifting adapter is only reported where it is used as the port type (e.g. in the DI wiring). To keep the relationship explicit, implementations in this project **import the protocol and inherit it explicitly**, and mark implemented methods with `typing.override` ([PEP 698](https://peps.python.org/pep-0698/)):
+
+```python
+from typing import override
+
+from dddpy.domain.todo.repositories import TodoRepository
+
+
+class TodoRepositoryImpl(TodoRepository):
+    @override
+    def save(self, todo: Todo) -> None: ...
+```
+
+With this style, the type checker reports a signature mismatch at the implementation itself, reports a method marked `@override` that does not exist in the protocol, and refuses instantiation of a class that leaves a protocol member unimplemented.
 
 ### Infrastructure Layer
 
@@ -223,7 +251,8 @@ class TodoRepositoryImpl(TodoRepository):
         """Initialize repository with SQLAlchemy session."""
         self.session = session
 
-    def find_by_id(self, todo_id: TodoId) -> Optional[Todo]:
+    @override
+    def find_by_id(self, todo_id: TodoId) -> Todo | None:
         """Find a Todo by its ID."""
         try:
             row = self.session.query(TodoDTO).filter_by(id=todo_id.value).one()
@@ -232,6 +261,7 @@ class TodoRepositoryImpl(TodoRepository):
 
         return row.to_entity()
 
+    @override
     def save(self, todo: Todo) -> None:
         """Save a new Todo item."""
         todo_dto = TodoDTO.from_entity(todo)
@@ -352,12 +382,11 @@ In this project, each use case is implemented as a separate class with a single 
 Each use case follows this structure:
 
 ```python
-class CreateTodoUseCase:
+class CreateTodoUseCase(Protocol):
     """CreateTodoUseCase defines a use case interface for creating a new Todo."""
 
-    @abstractmethod
     def execute(
-        self, title: TodoTitle, description: Optional[TodoDescription] = None
+        self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:
         """execute creates a new Todo."""
 
@@ -368,8 +397,9 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
     def __init__(self, todo_repository: TodoRepository):
         self.todo_repository = todo_repository
 
+    @override
     def execute(
-        self, title: TodoTitle, description: Optional[TodoDescription] = None
+        self, title: TodoTitle, description: TodoDescription | None = None
     ) -> Todo:
         """execute creates a new Todo."""
         todo = Todo.create(title=title, description=description)
@@ -381,7 +411,7 @@ Key characteristics of use cases:
 
 * One class per use case
 * Single responsibility principle
-* Clear interface definition
+* Clear interface definition (`typing.Protocol`, explicitly inherited by the implementation)
 * Dependency injection through constructor
 * Factory function for instantiation
 
@@ -393,7 +423,8 @@ Use cases handle domain-specific errors:
 class StartTodoUseCaseImpl(StartTodoUseCase):
     # ... __init__ ...
 
-    def execute(self, todo_id: TodoId) -> Todo: # Corrected return type
+    @override
+    def execute(self, todo_id: TodoId) -> Todo:
         todo = self.todo_repository.find_by_id(todo_id)
 
         if todo is None:
@@ -407,7 +438,7 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
 
         todo.start()
         self.todo_repository.save(todo)
-        return todo # Return the updated Todo
+        return todo
 ```
 
 ### Presentation Layer
