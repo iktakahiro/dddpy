@@ -1,6 +1,6 @@
 """Provide use case implementations for starting todos."""
 
-from abc import ABC, abstractmethod
+from typing import Protocol, override
 
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.exceptions import (
@@ -12,10 +12,9 @@ from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoId, TodoStatus
 
 
-class StartTodoUseCase(ABC):
+class StartTodoUseCase(Protocol):
     """Define the application boundary for starting todos."""
 
-    @abstractmethod
     def execute(self, todo_id: TodoId) -> Todo:
         """Start a todo identified by the provided ID.
 
@@ -38,6 +37,7 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
         """
         self.todo_repository = todo_repository
 
+    @override
     def execute(self, todo_id: TodoId) -> Todo:
         """Start a todo after validating its current lifecycle state.
 

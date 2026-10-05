@@ -97,3 +97,6 @@ This module provides a simple client for accessing user data via API.
 - Run `make test` to execute Pytest.
 - Keep Pyrefly and ruff clean for type checking and linting/formatting.
 - Maintain Onion Architecture boundaries when modifying or adding features.
+- Define interfaces (ports) such as repositories and use cases with `typing.Protocol`, not `abc.ABC` + `@abstractmethod`.
+  - Implementations import and explicitly inherit the protocol (e.g., `class TodoRepositoryImpl(TodoRepository)`).
+  - Mark implemented methods with `@typing.override` so Pyrefly checks them against the protocol.
