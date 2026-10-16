@@ -1,6 +1,6 @@
 [tools]
 python = "3.14"
-ruff = "0.16.9"
+ruff = "0.17.0"
 uv = "0.12.19"
 
 [tasks.sync]
