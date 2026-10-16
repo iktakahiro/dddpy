@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title='DDD Todo API',
     description='A RESTful API for managing todos using Domain-Driven Design principles.',
-    version='2.0.1',
+    version='2.0.2',
     lifespan=lifespan,
 )
 
