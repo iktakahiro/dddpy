@@ -1,6 +1,6 @@
 [project]
 name = "dddpy"
-version = "2.0.1"
+version = "2.0.2"
 description = "An example of Python FastAPI Domain-Driven Design and Onion Architecture."
 authors = [{ name = "iktakahiro", email = "takahiro.ikeuchi@gmail.com" }]
 dependencies = [
