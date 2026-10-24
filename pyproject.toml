@@ -22,9 +22,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.uv]
+required-version = ">=0.13.4"
 package = false
 # https://docs.astral.sh/uv/reference/settings/#exclude-newer
 exclude-newer = "1 week"
+# Exempt certifi (the CA bundle) from the cooldown so trust-store fixes such as
+# the emSign CA distrust are picked up immediately.
+# https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2
+exclude-newer-package = { certifi = false }
 
 [tool.hatch.metadata]
 allow-direct-references = true
