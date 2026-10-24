@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:0.12.19 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.5 AS uv
 
 FROM debian:bookworm
 
