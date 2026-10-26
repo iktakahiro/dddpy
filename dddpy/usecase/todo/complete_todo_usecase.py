@@ -3,13 +3,9 @@
 from typing import Protocol, override
 
 from dddpy.domain.todo.entities import Todo
-from dddpy.domain.todo.exceptions import (
-    TodoAlreadyCompletedError,
-    TodoNotFoundError,
-    TodoNotStartedError,
-)
+from dddpy.domain.todo.exceptions import TodoNotFoundError
 from dddpy.domain.todo.repositories import TodoRepository
-from dddpy.domain.todo.value_objects import TodoId, TodoStatus
+from dddpy.domain.todo.value_objects import TodoId
 
 
 class CompleteTodoUseCase(Protocol):
@@ -39,7 +35,7 @@ class CompleteTodoUseCaseImpl(CompleteTodoUseCase):
 
     @override
     def execute(self, todo_id: TodoId) -> Todo:
-        """Complete a todo after validating its lifecycle state.
+        """Complete a todo, delegating lifecycle rules to the entity.
 
         Args:
             todo_id: Identifier of the todo to complete.
@@ -56,12 +52,6 @@ class CompleteTodoUseCaseImpl(CompleteTodoUseCase):
 
         if todo is None:
             raise TodoNotFoundError
-
-        if todo.status == TodoStatus.NOT_STARTED:
-            raise TodoNotStartedError
-
-        if todo.is_completed:
-            raise TodoAlreadyCompletedError
 
         todo.complete()
         self.todo_repository.save(todo)
