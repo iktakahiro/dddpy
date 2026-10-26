@@ -5,7 +5,7 @@ description = "An example of Python FastAPI Domain-Driven Design and Onion Archi
 authors = [{ name = "iktakahiro", email = "takahiro.ikeuchi@gmail.com" }]
 dependencies = [
     "sqlalchemy==2.1.5",
-    "fastapi[standard]==0.143.3",
+    "fastapi[standard]==0.149.0",
 ]
 readme = "README.md"
 requires-python = ">=3.13"
