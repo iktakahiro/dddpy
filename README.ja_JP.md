@@ -128,6 +128,7 @@ class Todo:
 
 * 一意の識別子（`id`）を持つ
 * 状態を変更できる（例: `update_title`, `update_description`, `start`, `complete` メソッド）
+* 自身のライフサイクルルールを保証する（例: `start` や `complete` は不正な状態遷移に対してドメインエラーを送出する）
 * 識別子によって同一性が決定される（`__eq__`メソッドの実装）
 * ファクトリメソッド（例: `create`）を通じて生成されることがある
 
@@ -412,7 +413,7 @@ class CreateTodoUseCaseImpl(CreateTodoUseCase):
 
 #### 2. エラーハンドリング
 
-ユースケースはドメイン固有のエラーを処理します：
+ライフサイクルに関するルール（例: 完了済みのTodoは開始できない）は `Todo` エンティティが保持し、不正な状態遷移に対してドメイン固有のエラーを送出します。ユースケースはエンティティの存在確認（存在しない場合は `TodoNotFoundError` を送出）とメソッド呼び出し・保存のみを行い、発生したドメインエラーはそのままプレゼンテーション層へ伝播させます：
 
 ```python
 class StartTodoUseCaseImpl(StartTodoUseCase):
@@ -425,12 +426,8 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
         if todo is None:
             raise TodoNotFoundError
 
-        if todo.is_completed:
-            raise TodoAlreadyCompletedError
-
-        if todo.status == TodoStatus.IN_PROGRESS:
-            raise TodoAlreadyStartedError
-
+        # Raises TodoAlreadyCompletedError or TodoAlreadyStartedError
+        # if the state transition is invalid.
         todo.start()
         self.todo_repository.save(todo)
         return todo

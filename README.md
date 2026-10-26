@@ -131,6 +131,7 @@ Key characteristics of entities:
 
 * Have a unique identifier (`id`)
 * Can change state (e.g., `update_title`, `update_description`, `start`, `complete` methods)
+* Enforce their own lifecycle rules (e.g., `start` and `complete` raise domain errors on invalid state transitions)
 * Identity is determined by the identifier (`__eq__` method implementation)
 * May be created through factory methods (e.g., `create`)
 
@@ -419,7 +420,7 @@ Key characteristics of use cases:
 
 #### 2. Error Handling
 
-Use cases handle domain-specific errors:
+Lifecycle rules (e.g., a completed Todo cannot be started) live in the `Todo` entity, which raises domain errors when a transition is invalid. The use case checks that the entity exists (raising `TodoNotFoundError` if not), delegates the state change to the entity, saves it, and lets domain errors propagate to the presentation layer:
 
 ```python
 class StartTodoUseCaseImpl(StartTodoUseCase):
@@ -432,12 +433,8 @@ class StartTodoUseCaseImpl(StartTodoUseCase):
         if todo is None:
             raise TodoNotFoundError
 
-        if todo.is_completed:
-            raise TodoAlreadyCompletedError
-
-        if todo.status == TodoStatus.IN_PROGRESS:
-            raise TodoAlreadyStartedError
-
+        # Raises TodoAlreadyCompletedError or TodoAlreadyStartedError
+        # if the state transition is invalid.
         todo.start()
         self.todo_repository.save(todo)
         return todo
