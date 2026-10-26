@@ -5,6 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from dddpy.domain.todo.entities import Todo
+from dddpy.domain.todo.exceptions import TodoNotStartedError
 from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoId, TodoStatus, TodoTitle
 from dddpy.usecase.todo.complete_todo_usecase import CompleteTodoUseCaseImpl
@@ -73,3 +74,19 @@ def test_complete_already_completed_todo(
     with pytest.raises(Exception) as exc_info:
         complete_todo_usecase.execute(todo.id)
     assert 'The Todo is already completed' in str(exc_info.value)
+
+
+def test_complete_not_started_todo(complete_todo_usecase, todo_repository_mock):
+    """Test completing a Todo that has not been started."""
+    # Arrange
+    todo = Todo(
+        id=TodoId.generate(),
+        title=TodoTitle('Test Todo'),
+        status=TodoStatus.NOT_STARTED,
+    )
+    todo_repository_mock.find_by_id.return_value = todo
+
+    # Act & Assert
+    with pytest.raises(TodoNotStartedError):
+        complete_todo_usecase.execute(todo.id)
+    todo_repository_mock.save.assert_not_called()

@@ -5,6 +5,11 @@ from datetime import datetime
 import pytest
 
 from dddpy.domain.todo.entities.todo import Todo
+from dddpy.domain.todo.exceptions import (
+    TodoAlreadyCompletedError,
+    TodoAlreadyStartedError,
+    TodoNotStartedError,
+)
 from dddpy.domain.todo.value_objects import (
     TodoDescription,
     TodoId,
@@ -86,19 +91,57 @@ def test_clear_description():
     assert todo.updated_at > todo.created_at
 
 
+def _todo_with_status(status: TodoStatus) -> Todo:
+    """Build a todo that is in the given lifecycle status."""
+    todo = Todo.create(TodoTitle('Test Todo'))
+    if status in (TodoStatus.IN_PROGRESS, TodoStatus.COMPLETED):
+        todo.start()
+    if status == TodoStatus.COMPLETED:
+        todo.complete()
+    return todo
+
+
 def test_start_todo():
-    """Test starting a Todo."""
+    """Test starting a not started Todo."""
     todo = Todo.create(TodoTitle('Test Todo'))
 
     todo.start()
 
     assert todo.status == TodoStatus.IN_PROGRESS
     assert todo.updated_at > todo.created_at
+    assert todo.completed_at is None
+
+
+def test_start_in_progress_todo():
+    """Test that starting an in-progress Todo is rejected and changes nothing."""
+    todo = _todo_with_status(TodoStatus.IN_PROGRESS)
+    updated_at = todo.updated_at
+
+    with pytest.raises(TodoAlreadyStartedError):
+        todo.start()
+
+    assert todo.status == TodoStatus.IN_PROGRESS
+    assert todo.updated_at == updated_at
+    assert todo.completed_at is None
+
+
+def test_start_completed_todo():
+    """Test that starting a completed Todo is rejected and changes nothing."""
+    todo = _todo_with_status(TodoStatus.COMPLETED)
+    updated_at = todo.updated_at
+    completed_at = todo.completed_at
+
+    with pytest.raises(TodoAlreadyCompletedError):
+        todo.start()
+
+    assert todo.status == TodoStatus.COMPLETED
+    assert todo.updated_at == updated_at
+    assert todo.completed_at == completed_at
 
 
 def test_complete_todo():
-    """Test completing a Todo."""
-    todo = Todo.create(TodoTitle('Test Todo'))
+    """Test completing an in-progress Todo."""
+    todo = _todo_with_status(TodoStatus.IN_PROGRESS)
 
     todo.complete()
 
@@ -108,13 +151,53 @@ def test_complete_todo():
     assert todo.updated_at == todo.completed_at
 
 
-def test_complete_already_completed_todo():
-    """Test attempting to complete an already completed Todo."""
+def test_complete_not_started_todo():
+    """Test that completing a not started Todo is rejected and changes nothing."""
     todo = Todo.create(TodoTitle('Test Todo'))
-    todo.complete()
+    updated_at = todo.updated_at
 
-    with pytest.raises(ValueError, match='Already completed'):
+    with pytest.raises(TodoNotStartedError):
         todo.complete()
+
+    assert todo.status == TodoStatus.NOT_STARTED
+    assert todo.updated_at == updated_at
+    assert todo.completed_at is None
+
+
+def test_complete_already_completed_todo():
+    """Test that completing a completed Todo is rejected and changes nothing."""
+    todo = _todo_with_status(TodoStatus.COMPLETED)
+    updated_at = todo.updated_at
+    completed_at = todo.completed_at
+
+    with pytest.raises(TodoAlreadyCompletedError):
+        todo.complete()
+
+    assert todo.status == TodoStatus.COMPLETED
+    assert todo.updated_at == updated_at
+    assert todo.completed_at == completed_at
+
+
+def test_complete_already_completed_todo_is_value_error():
+    """Test that callers catching ValueError from complete() keep working."""
+    todo = _todo_with_status(TodoStatus.COMPLETED)
+
+    with pytest.raises(ValueError, match='already completed'):
+        todo.complete()
+
+
+@pytest.mark.parametrize(
+    ('error', 'expected'),
+    [
+        (TodoAlreadyCompletedError, 'The Todo is already completed.'),
+        (TodoAlreadyStartedError, 'The Todo is already started.'),
+        (TodoNotStartedError, 'The Todo is not started.'),
+    ],
+)
+def test_exception_messages_are_unchanged(error, expected: str):
+    """Test that lifecycle exceptions keep their message and string form."""
+    assert error.message == expected
+    assert str(error()) == expected
 
 
 def test_is_overdue():
@@ -138,6 +221,7 @@ def test_is_overdue():
     assert todo.is_overdue(deadline, current_time)
 
     # Test case 3: Completed todo should never be overdue, even if completed after deadline
+    todo.start()
     todo.complete()
     assert not todo.is_overdue(deadline, current_time)
 
@@ -148,6 +232,7 @@ def test_is_overdue():
         created_at=created_at,
         updated_at=created_at,
     )
+    todo.start()
     todo.complete()
     assert not todo.is_overdue(deadline, current_time)
 

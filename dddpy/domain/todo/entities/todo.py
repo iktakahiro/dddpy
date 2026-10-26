@@ -3,6 +3,11 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from dddpy.domain.todo.exceptions import (
+    TodoAlreadyCompletedError,
+    TodoAlreadyStartedError,
+    TodoNotStartedError,
+)
 from dddpy.domain.todo.value_objects import (
     TodoDescription,
     TodoId,
@@ -10,6 +15,8 @@ from dddpy.domain.todo.value_objects import (
     TodoTitle,
 )
 
+# No longer raised by Todo.complete(), which now raises TodoAlreadyCompletedError.
+# Kept only for backward compatibility with existing external imports.
 ALREADY_COMPLETED_ERROR_MESSAGE = 'Already completed'
 
 
@@ -65,7 +72,18 @@ class Todo:
         self.updated_at = datetime.now()
 
     def start(self) -> None:
-        """Mark the todo as in progress and update timestamps."""
+        """Mark the todo as in progress and update timestamps.
+
+        Raises:
+            TodoAlreadyCompletedError: If the todo is already completed.
+            TodoAlreadyStartedError: If the todo is already in progress.
+        """
+        if self.status == TodoStatus.COMPLETED:
+            raise TodoAlreadyCompletedError
+
+        if self.status == TodoStatus.IN_PROGRESS:
+            raise TodoAlreadyStartedError
+
         self.status = TodoStatus.IN_PROGRESS
         self.updated_at = datetime.now()
 
@@ -73,10 +91,14 @@ class Todo:
         """Mark the todo as completed and record completion time.
 
         Raises:
-            ValueError: If the todo is already completed.
+            TodoNotStartedError: If the todo has not been started yet.
+            TodoAlreadyCompletedError: If the todo is already completed.
         """
+        if self.status == TodoStatus.NOT_STARTED:
+            raise TodoNotStartedError
+
         if self.status == TodoStatus.COMPLETED:
-            raise ValueError(ALREADY_COMPLETED_ERROR_MESSAGE)
+            raise TodoAlreadyCompletedError
 
         self.status = TodoStatus.COMPLETED
         self.completed_at = datetime.now()
