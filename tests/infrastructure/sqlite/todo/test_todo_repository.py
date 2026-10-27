@@ -101,6 +101,7 @@ def test_save_naive_local_datetimes_round_trip_as_same_instant(
     """Test that naive datetimes, as produced by Todo.create, keep their instant."""
     naive = datetime(2026, 3, 4, 5, 6, 7, 891000)
     todo = _make_todo(created_at=naive)
+    todo.start()
     todo.complete()
     todo.completed_at = naive + timedelta(seconds=1)
     todo.updated_at = todo.completed_at
