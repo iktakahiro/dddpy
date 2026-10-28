@@ -102,28 +102,31 @@ Here's how each component is implemented in this project:
 Entities are domain models with unique identifiers. In this project, the `Todo` class is implemented as an entity:
 
 ```python
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+
+
+def _now() -> datetime:
+    return datetime.now(UTC)
+
+
+@dataclass(eq=False)
 class Todo:
-    def __init__(
-        self,
-        id: TodoId,
-        title: TodoTitle,
-        description: Optional[TodoDescription] = None,
-        status: TodoStatus = TodoStatus.NOT_STARTED,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-        completed_at: Optional[datetime] = None,
-    ):
-        self._id = id
-        self._title = title
-        self._description = description
-        self._status = status
-        self._created_at = created_at if created_at is not None else datetime.now(UTC)
-        self._updated_at = updated_at if updated_at is not None else datetime.now(UTC)
-        self._completed_at = completed_at
+    id: TodoId
+    title: TodoTitle
+    description: TodoDescription | None = None
+    status: TodoStatus = TodoStatus.NOT_STARTED
+    created_at: datetime = field(default_factory=_now)
+    updated_at: datetime = field(default_factory=_now)
+    completed_at: datetime | None = None
+
+    def __post_init__(self) -> None:
+        # Naive datetimes are read as local time and normalized to aware UTC.
+        ...
 
     def __eq__(self, obj: object) -> bool:
         if isinstance(obj, Todo):
-            return self._id == obj._id
+            return self.id == obj.id
         return False
 ```
 
