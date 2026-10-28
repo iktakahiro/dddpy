@@ -11,6 +11,7 @@ from dddpy.domain.todo.value_objects import (
     TodoTitle,
 )
 from dddpy.infrastructure.sqlite.todo import TodoDTO
+from dddpy.presentation.api.todo.schemas.todo_schema import TodoSchema
 
 CREATED_AT = datetime(2026, 1, 2, 3, 4, 5, 678000, tzinfo=UTC)
 UPDATED_AT = datetime(2026, 1, 2, 3, 5, 6, 789000, tzinfo=UTC)
@@ -92,3 +93,20 @@ def test_dto_round_trip_preserves_timestamps_and_overdue_comparison():
     assert restored.updated_at == UPDATED_AT
     assert restored.completed_at == COMPLETED_AT
     assert restored.is_overdue(restored.created_at)
+
+
+def test_epoch_completion_round_trips_to_entity_and_response():
+    """Test an epoch completion timestamp remains zero across conversions."""
+    dto = TodoDTO(
+        id=uuid4(),
+        title='title',
+        description=None,
+        status='completed',
+        created_at=0,
+        updated_at=0,
+        completed_at=0,
+    )
+    todo = dto.to_entity()
+    assert todo.completed_at == datetime(1970, 1, 1, tzinfo=UTC)
+    assert TodoDTO.from_entity(todo).completed_at == 0
+    assert TodoSchema.from_entity(todo).completed_at == 0

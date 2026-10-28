@@ -39,6 +39,6 @@ class TodoSchema(BaseModel):
             created_at=int(todo.created_at.timestamp() * 1000),
             updated_at=int(todo.updated_at.timestamp() * 1000),
             completed_at=int(todo.completed_at.timestamp() * 1000)
-            if todo.completed_at
+            if todo.completed_at is not None
             else None,
         )
