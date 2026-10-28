@@ -1,6 +1,6 @@
 """Test cases for the Todo entity."""
 
-from datetime import datetime
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 
@@ -54,8 +54,8 @@ def test_todo_properties():
     assert todo.title == title
     assert todo.description == description
     assert todo.status == TodoStatus.NOT_STARTED
-    assert todo.created_at == created_at
-    assert todo.updated_at == updated_at
+    assert todo.created_at == created_at.astimezone(UTC)
+    assert todo.updated_at == updated_at.astimezone(UTC)
     assert todo.completed_at is None
 
 
@@ -256,3 +256,90 @@ def test_todo_equality():
     assert todo1 != todo2  # Different IDs
     assert todo3 == todo4  # Same ID, different titles
     assert todo1 != 'not a todo'  # Different type
+
+
+def test_generated_timestamps_are_utc():
+    """Test timestamps generated during the todo lifecycle use UTC."""
+    todo = Todo.create(TodoTitle('Test Todo'))
+    assert todo.created_at.tzinfo is UTC
+    assert todo.updated_at.tzinfo is UTC
+    todo.update_title(TodoTitle('New title'))
+    assert todo.updated_at.tzinfo is UTC
+    todo.update_description(TodoDescription('Description'))
+    assert todo.updated_at.tzinfo is UTC
+    todo.start()
+    assert todo.updated_at.tzinfo is UTC
+    todo.complete()
+    assert todo.completed_at is not None
+    assert todo.completed_at.tzinfo is UTC
+
+
+def _naive_local(value: datetime) -> datetime:
+    """Return the naive local wall-clock representation of an aware datetime."""
+    return value.astimezone().replace(tzinfo=None)
+
+
+def test_is_overdue_interprets_naive_inputs_as_local_time():
+    """Test naive deadlines are read as server local time."""
+    todo = Todo.create(TodoTitle('Test Todo'))
+    now = datetime.now(UTC)
+    past = _naive_local(now - timedelta(hours=1))
+    future = _naive_local(now + timedelta(hours=1))
+    assert todo.is_overdue(past)
+    assert not todo.is_overdue(future)
+    assert todo.is_overdue(past, _naive_local(now))
+    assert not todo.is_overdue(future, _naive_local(now))
+
+
+def test_is_overdue_keeps_instant_of_aware_inputs():
+    """Test aware inputs are compared by instant regardless of their offset."""
+    todo = Todo.create(TodoTitle('Test Todo'))
+    jst = timezone(timedelta(hours=9))
+    deadline = datetime(2025, 1, 1, 9, tzinfo=jst)  # 2025-01-01 00:00 UTC
+    assert todo.is_overdue(deadline, datetime(2025, 1, 1, 0, 0, 1, tzinfo=UTC))
+    assert not todo.is_overdue(deadline, datetime(2024, 12, 31, 23, 59, tzinfo=UTC))
+    assert todo.is_overdue(datetime.now(UTC) - timedelta(days=1))
+
+
+def test_naive_timestamps_are_normalized_to_aware_utc():
+    """Test naive constructor timestamps become aware UTC with the same instant."""
+    created_at = datetime(2025, 3, 22, 10, 0, 0)
+    updated_at = datetime(2025, 3, 22, 11, 0, 0)
+    completed_at = datetime(2025, 3, 22, 12, 0, 0)
+    todo = Todo(
+        TodoId.generate(),
+        TodoTitle('Test Todo'),
+        created_at=created_at,
+        updated_at=updated_at,
+        completed_at=completed_at,
+    )
+    assert todo.created_at.tzinfo is UTC
+    assert todo.created_at == created_at.astimezone(UTC)
+    assert todo.updated_at == updated_at.astimezone(UTC)
+    assert todo.completed_at is not None
+    assert todo.completed_at.tzinfo is UTC
+    assert todo.completed_at == completed_at.astimezone(UTC)
+
+
+def test_naive_timestamps_survive_start_and_complete():
+    """Test lifecycle transitions work on a todo built from naive timestamps."""
+    naive = datetime(2025, 3, 22, 10, 0, 0)
+    todo = Todo(
+        TodoId.generate(), TodoTitle('Test Todo'), created_at=naive, updated_at=naive
+    )
+    todo.start()
+    todo.complete()
+    assert todo.created_at == naive.astimezone(UTC)
+    assert todo.created_at.tzinfo is UTC
+    assert todo.created_at < todo.updated_at
+    assert todo.completed_at is not None
+    assert todo.completed_at.tzinfo is UTC
+
+
+def test_aware_timestamps_keep_their_instant():
+    """Test aware constructor timestamps are not altered."""
+    jst = timezone(timedelta(hours=9))
+    created_at = datetime(2025, 3, 22, 10, 0, 0, tzinfo=jst)
+    todo = Todo(TodoId.generate(), TodoTitle('Test Todo'), created_at=created_at)
+    assert todo.created_at == created_at
+    assert todo.created_at.utcoffset() == timedelta(hours=9)

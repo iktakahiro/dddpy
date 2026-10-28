@@ -104,24 +104,32 @@ make dev
 エンティティは一意の識別子を持つドメインモデルです。このプロジェクトでは、`Todo`クラスがエンティティとして実装されています：
 
 ```python
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+
+
+def _now() -> datetime:
+    return datetime.now(UTC)
+
+
+@dataclass(eq=False)
 class Todo:
-    def __init__(
-        self,
-        id: TodoId,
-        title: TodoTitle,
-        description: Optional[TodoDescription] = None,
-        status: TodoStatus = TodoStatus.NOT_STARTED,
-        created_at: datetime = datetime.now(),
-        updated_at: datetime = datetime.now(),
-        completed_at: Optional[datetime] = None,
-    ):
-        self._id = id
-        self._title = title
-        self._description = description
-        self._status = status
-        self._created_at = created_at
-        self._updated_at = updated_at
-        self._completed_at = completed_at
+    id: TodoId
+    title: TodoTitle
+    description: TodoDescription | None = None
+    status: TodoStatus = TodoStatus.NOT_STARTED
+    created_at: datetime = field(default_factory=_now)
+    updated_at: datetime = field(default_factory=_now)
+    completed_at: datetime | None = None
+
+    def __post_init__(self) -> None:
+        # Naive datetimes are read as local time and normalized to aware UTC.
+        ...
+
+    def __eq__(self, obj: object) -> bool:
+        if isinstance(obj, Todo):
+            return self.id == obj.id
+        return False
 ```
 
 エンティティの主な特徴：
@@ -307,7 +315,7 @@ class TodoDTO(Base):
             datetime.fromtimestamp(self.created_at / 1000, tz=timezone.utc),
             datetime.fromtimestamp(self.updated_at / 1000, tz=timezone.utc),
             datetime.fromtimestamp(self.completed_at / 1000, tz=timezone.utc)
-            if self.completed_at
+            if self.completed_at is not None
             else None,
         )
 
@@ -322,7 +330,7 @@ class TodoDTO(Base):
             created_at=int(todo.created_at.timestamp() * 1000),
             updated_at=int(todo.updated_at.timestamp() * 1000),
             completed_at=int(todo.completed_at.timestamp() * 1000)
-            if todo.completed_at
+            if todo.completed_at is not None
             else None,
         )
 ```

@@ -1,6 +1,6 @@
 """Expose read-side schemas for todo resources."""
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from dddpy.domain.todo.entities import Todo
 
@@ -16,10 +16,7 @@ class TodoSchema(BaseModel):
     updated_at: int = Field(examples=[1136214245000])
     completed_at: int | None = Field(examples=[1136214245000])
 
-    class Config:
-        """Configure ORM compatibility for the schema."""
-
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
     @staticmethod
     def from_entity(todo: Todo) -> 'TodoSchema':
@@ -39,6 +36,6 @@ class TodoSchema(BaseModel):
             created_at=int(todo.created_at.timestamp() * 1000),
             updated_at=int(todo.updated_at.timestamp() * 1000),
             completed_at=int(todo.completed_at.timestamp() * 1000)
-            if todo.completed_at
+            if todo.completed_at is not None
             else None,
         )
