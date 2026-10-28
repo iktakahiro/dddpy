@@ -25,6 +25,17 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
+def _to_utc(value: datetime) -> datetime:
+    """Return an aware datetime, reading naive values as server local time.
+
+    This matches the persistence layer, which converts naive datetimes with
+    ``datetime.timestamp()``. Aware values are returned unchanged.
+    """
+    if value.utcoffset() is None:
+        return value.astimezone(UTC)
+    return value
+
+
 @dataclass(eq=False)
 class Todo:
     """Represent a todo item tracked by the domain.
@@ -37,6 +48,10 @@ class Todo:
         created_at: Timestamp when the todo was created.
         updated_at: Timestamp when the todo was last updated.
         completed_at: Optional timestamp when the todo was completed.
+
+    Naive ``created_at``, ``updated_at`` and ``completed_at`` values are
+    interpreted as server local time and normalized to aware UTC datetimes.
+    Aware values keep their instant.
     """
 
     id: TodoId
@@ -46,6 +61,13 @@ class Todo:
     created_at: datetime = field(default_factory=_now)
     updated_at: datetime = field(default_factory=_now)
     completed_at: datetime | None = None
+
+    def __post_init__(self) -> None:
+        """Normalize naive timestamps so values are never a mix of naive and aware."""
+        self.created_at = _to_utc(self.created_at)
+        self.updated_at = _to_utc(self.updated_at)
+        if self.completed_at is not None:
+            self.completed_at = _to_utc(self.completed_at)
 
     def __hash__(self) -> int:
         """Return a hash value based on the entity identity."""
@@ -119,7 +141,8 @@ class Todo:
     ) -> bool:
         """Determine whether the todo has passed the provided deadline.
 
-        Naive deadline and current-time inputs are interpreted as UTC.
+        Naive deadline and current-time inputs are interpreted as server local
+        time and converted to UTC. Aware inputs keep their instant.
 
         Args:
             deadline: Deadline timestamp used for comparison.
@@ -130,12 +153,8 @@ class Todo:
         """
         if self.is_completed:
             return False
-        now = current_time if current_time is not None else _now()
-        if now.utcoffset() is None:
-            now = now.replace(tzinfo=UTC)
-        if deadline.utcoffset() is None:
-            deadline = deadline.replace(tzinfo=UTC)
-        return now > deadline
+        now = _to_utc(current_time) if current_time is not None else _now()
+        return now > _to_utc(deadline)
 
     @staticmethod
     def create(title: TodoTitle, description: TodoDescription | None = None) -> 'Todo':
