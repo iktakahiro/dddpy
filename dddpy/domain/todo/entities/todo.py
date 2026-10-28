@@ -1,7 +1,7 @@
 """Define the Todo entity used throughout the domain layer."""
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 
 from dddpy.domain.todo.exceptions import (
     TodoAlreadyCompletedError,
@@ -18,6 +18,11 @@ from dddpy.domain.todo.value_objects import (
 # No longer raised by Todo.complete(), which now raises TodoAlreadyCompletedError.
 # Kept only for backward compatibility with existing external imports.
 ALREADY_COMPLETED_ERROR_MESSAGE = 'Already completed'
+
+
+def _now() -> datetime:
+    """Return the current time in UTC."""
+    return datetime.now(UTC)
 
 
 @dataclass(eq=False)
@@ -38,8 +43,8 @@ class Todo:
     title: TodoTitle
     description: TodoDescription | None = None
     status: TodoStatus = TodoStatus.NOT_STARTED
-    created_at: datetime = field(default_factory=datetime.now)
-    updated_at: datetime = field(default_factory=datetime.now)
+    created_at: datetime = field(default_factory=_now)
+    updated_at: datetime = field(default_factory=_now)
     completed_at: datetime | None = None
 
     def __hash__(self) -> int:
@@ -60,7 +65,7 @@ class Todo:
             new_title: Replacement title for the todo.
         """
         self.title = new_title
-        self.updated_at = datetime.now()
+        self.updated_at = _now()
 
     def update_description(self, new_description: TodoDescription | None) -> None:
         """Update the todo description and refresh timestamps.
@@ -69,7 +74,7 @@ class Todo:
             new_description: Optional replacement description.
         """
         self.description = new_description if new_description else None
-        self.updated_at = datetime.now()
+        self.updated_at = _now()
 
     def start(self) -> None:
         """Mark the todo as in progress and update timestamps.
@@ -85,7 +90,7 @@ class Todo:
             raise TodoAlreadyStartedError
 
         self.status = TodoStatus.IN_PROGRESS
-        self.updated_at = datetime.now()
+        self.updated_at = _now()
 
     def complete(self) -> None:
         """Mark the todo as completed and record completion time.
@@ -101,7 +106,7 @@ class Todo:
             raise TodoAlreadyCompletedError
 
         self.status = TodoStatus.COMPLETED
-        self.completed_at = datetime.now()
+        self.completed_at = _now()
         self.updated_at = self.completed_at
 
     @property
@@ -114,6 +119,8 @@ class Todo:
     ) -> bool:
         """Determine whether the todo has passed the provided deadline.
 
+        Naive deadline and current-time inputs are interpreted as UTC.
+
         Args:
             deadline: Deadline timestamp used for comparison.
             current_time: Current timestamp to compare against the deadline.
@@ -123,7 +130,12 @@ class Todo:
         """
         if self.is_completed:
             return False
-        return (current_time or datetime.now()) > deadline
+        now = current_time if current_time is not None else _now()
+        if now.utcoffset() is None:
+            now = now.replace(tzinfo=UTC)
+        if deadline.utcoffset() is None:
+            deadline = deadline.replace(tzinfo=UTC)
+        return now > deadline
 
     @staticmethod
     def create(title: TodoTitle, description: TodoDescription | None = None) -> 'Todo':

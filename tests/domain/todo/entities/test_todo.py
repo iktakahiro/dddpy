@@ -1,6 +1,6 @@
 """Test cases for the Todo entity."""
 
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -256,3 +256,29 @@ def test_todo_equality():
     assert todo1 != todo2  # Different IDs
     assert todo3 == todo4  # Same ID, different titles
     assert todo1 != 'not a todo'  # Different type
+
+
+def test_generated_timestamps_are_utc():
+    """Test timestamps generated during the todo lifecycle use UTC."""
+    todo = Todo.create(TodoTitle('Test Todo'))
+    assert todo.created_at.tzinfo is UTC
+    assert todo.updated_at.tzinfo is UTC
+    todo.update_title(TodoTitle('New title'))
+    assert todo.updated_at.tzinfo is UTC
+    todo.update_description(TodoDescription('Description'))
+    assert todo.updated_at.tzinfo is UTC
+    todo.start()
+    assert todo.updated_at.tzinfo is UTC
+    todo.complete()
+    assert todo.completed_at is not None
+    assert todo.completed_at.tzinfo is UTC
+
+
+def test_is_overdue_interprets_naive_inputs_as_utc():
+    """Test mixed naive and aware comparison inputs."""
+    todo = Todo.create(TodoTitle('Test Todo'))
+    deadline = datetime(2025, 1, 1)
+    now = datetime(2025, 1, 1, 1, tzinfo=UTC)
+    assert todo.is_overdue(deadline, now)
+    assert todo.is_overdue(deadline.replace(tzinfo=UTC), now.replace(tzinfo=None))
+    assert todo.is_overdue(datetime.now(UTC) - timedelta(days=1))

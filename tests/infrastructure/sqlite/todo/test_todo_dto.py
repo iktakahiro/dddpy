@@ -76,3 +76,19 @@ def test_to_entity_restores_aware_utc_datetimes():
     assert todo.created_at.tzinfo is UTC
     assert todo.updated_at == UPDATED_AT
     assert todo.completed_at is None
+
+
+def test_dto_round_trip_preserves_timestamps_and_overdue_comparison():
+    """Test UTC timestamps survive conversion and can be compared."""
+    todo = Todo(
+        TodoId(uuid4()),
+        TodoTitle('title'),
+        created_at=CREATED_AT,
+        updated_at=UPDATED_AT,
+        completed_at=COMPLETED_AT,
+    )
+    restored = TodoDTO.from_entity(todo).to_entity()
+    assert restored.created_at == CREATED_AT
+    assert restored.updated_at == UPDATED_AT
+    assert restored.completed_at == COMPLETED_AT
+    assert restored.is_overdue(restored.created_at)

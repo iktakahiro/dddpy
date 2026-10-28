@@ -111,16 +111,16 @@ class Todo:
         title: TodoTitle,
         description: Optional[TodoDescription] = None,
         status: TodoStatus = TodoStatus.NOT_STARTED,
-        created_at: datetime = datetime.now(),
-        updated_at: datetime = datetime.now(),
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
         completed_at: Optional[datetime] = None,
     ):
         self._id = id
         self._title = title
         self._description = description
         self._status = status
-        self._created_at = created_at
-        self._updated_at = updated_at
+        self._created_at = created_at if created_at is not None else datetime.now(UTC)
+        self._updated_at = updated_at if updated_at is not None else datetime.now(UTC)
         self._completed_at = completed_at
 ```
 
