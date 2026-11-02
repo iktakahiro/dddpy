@@ -1,14 +1,24 @@
 """Test cases for StartTodoUseCaseImpl."""
 
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
 
 from dddpy.domain.todo.entities import Todo
-from dddpy.domain.todo.exceptions import TodoAlreadyStartedError
+from dddpy.domain.todo.exceptions import (
+    TodoAlreadyCompletedError,
+    TodoAlreadyStartedError,
+    TodoNotFoundError,
+)
 from dddpy.domain.todo.repositories import TodoRepository
 from dddpy.domain.todo.value_objects import TodoId, TodoStatus, TodoTitle
-from dddpy.usecase.todo.start_todo_usecase import StartTodoUseCaseImpl
+from dddpy.usecase.todo.start_todo_usecase import (
+    StartTodoUseCaseImpl,
+    new_start_todo_usecase,
+)
+
+OLD_TIMESTAMP = datetime(2020, 1, 1, tzinfo=UTC)
 
 
 @pytest.fixture
@@ -30,6 +40,8 @@ def todo():
         id=TodoId.generate(),
         title=TodoTitle('Test Todo'),
         status=TodoStatus.NOT_STARTED,
+        created_at=OLD_TIMESTAMP,
+        updated_at=OLD_TIMESTAMP,
     )
 
 
@@ -43,6 +55,8 @@ def test_start_todo_success(start_todo_usecase, todo_repository_mock, todo):
 
     # Assert
     assert result.status == TodoStatus.IN_PROGRESS
+    assert result.completed_at is None
+    assert result.updated_at > OLD_TIMESTAMP
     todo_repository_mock.find_by_id.assert_called_once_with(todo.id)
     todo_repository_mock.save.assert_called_once_with(result)
 
@@ -54,9 +68,11 @@ def test_start_todo_not_found(start_todo_usecase, todo_repository_mock):
     todo_repository_mock.find_by_id.return_value = None
 
     # Act & Assert
-    with pytest.raises(Exception) as exc_info:
+    with pytest.raises(TodoNotFoundError) as exc_info:
         start_todo_usecase.execute(todo_id)
     assert 'The Todo you specified does not exist' in str(exc_info.value)
+    todo_repository_mock.find_by_id.assert_called_once_with(todo_id)
+    todo_repository_mock.save.assert_not_called()
 
 
 def test_start_completed_todo(start_todo_usecase, todo_repository_mock, todo):
@@ -67,9 +83,11 @@ def test_start_completed_todo(start_todo_usecase, todo_repository_mock, todo):
     todo_repository_mock.find_by_id.return_value = todo
 
     # Act & Assert
-    with pytest.raises(Exception) as exc_info:
+    with pytest.raises(TodoAlreadyCompletedError) as exc_info:
         start_todo_usecase.execute(todo.id)
     assert 'The Todo is already completed' in str(exc_info.value)
+    assert todo.status == TodoStatus.COMPLETED
+    todo_repository_mock.save.assert_not_called()
 
 
 def test_start_in_progress_todo(start_todo_usecase, todo_repository_mock, todo):
@@ -81,4 +99,20 @@ def test_start_in_progress_todo(start_todo_usecase, todo_repository_mock, todo):
     # Act & Assert
     with pytest.raises(TodoAlreadyStartedError):
         start_todo_usecase.execute(todo.id)
+    assert todo.status == TodoStatus.IN_PROGRESS
     todo_repository_mock.save.assert_not_called()
+
+
+def test_new_start_todo_usecase(todo_repository_mock, todo):
+    """Test the factory returns a working use case bound to the repository."""
+    # Arrange
+    todo_repository_mock.find_by_id.return_value = todo
+
+    # Act
+    usecase = new_start_todo_usecase(todo_repository_mock)
+    result = usecase.execute(todo.id)
+
+    # Assert
+    assert isinstance(usecase, StartTodoUseCaseImpl)
+    assert result.status == TodoStatus.IN_PROGRESS
+    todo_repository_mock.save.assert_called_once_with(result)
