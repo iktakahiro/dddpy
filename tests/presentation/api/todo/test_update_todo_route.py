@@ -10,6 +10,9 @@ from fastapi.testclient import TestClient
 from dddpy.domain.todo.entities import Todo
 from dddpy.domain.todo.exceptions import TodoNotFoundError
 from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
+from dddpy.domain.todo.value_objects.todo_description import (
+    DESCRIPTION_TOO_LONG_ERROR_MESSAGE,
+)
 from dddpy.domain.todo.value_objects.todo_title import TITLE_REQUIRED_ERROR_MESSAGE
 from dddpy.infrastructure.di.injection import get_update_todo_usecase
 from dddpy.presentation.api.todo.handlers import todo_api_route_handler
@@ -70,22 +73,38 @@ def test_update_todo_without_description(client, update_todo_usecase_mock):
     )
 
 
-def test_update_todo_invalid_title(client, update_todo_usecase_mock, monkeypatch):
+@pytest.mark.parametrize(
+    ('target', 'message'),
+    [
+        ('TodoTitle', TITLE_REQUIRED_ERROR_MESSAGE),
+        ('_build_todo_description', DESCRIPTION_TOO_LONG_ERROR_MESSAGE),
+    ],
+)
+def test_update_todo_domain_validation_error(
+    client, update_todo_usecase_mock, monkeypatch, target, message
+):
     """Test a domain validation error is mapped to 400.
 
-    The request schema already rejects empty and over-long titles with 422, so
-    the value object is made to fail to exercise the 400 mapping directly.
+    The request schema already rejects invalid titles and descriptions with 422,
+    so the title and description builders are made to fail to exercise the 400
+    mapping directly.
     """
 
-    def raise_value_error(_value: str) -> TodoTitle:
-        raise ValueError(TITLE_REQUIRED_ERROR_MESSAGE)
+    def raise_value_error(*_args: object) -> None:
+        raise ValueError(message)
 
-    monkeypatch.setattr(todo_api_route_handler, 'TodoTitle', raise_value_error)
+    monkeypatch.setattr(
+        TodoApiRouteHandler if target.startswith('_') else todo_api_route_handler,
+        target,
+        raise_value_error,
+    )
 
-    response = client.put(f'/todos/{uuid4()}', json={'title': 'title'})
+    response = client.put(
+        f'/todos/{uuid4()}', json={'title': 'title', 'description': 'description'}
+    )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json() == {'detail': TITLE_REQUIRED_ERROR_MESSAGE}
+    assert response.json() == {'detail': message}
     update_todo_usecase_mock.execute.assert_not_called()
 
 
