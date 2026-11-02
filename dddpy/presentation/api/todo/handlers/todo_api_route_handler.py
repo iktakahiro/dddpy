@@ -29,6 +29,7 @@ from dddpy.infrastructure.di.injection import (
     get_update_todo_usecase,
 )
 from dddpy.presentation.api.todo.error_messages import (
+    ErrorMessageInvalidTodo,
     ErrorMessageTodoAlreadyCompleted,
     ErrorMessageTodoAlreadyStarted,
     ErrorMessageTodoNotFound,
@@ -106,9 +107,11 @@ _COMPLETE_BAD_REQUEST_RESPONSE: dict[str, Any] = {
 
 _INVALID_TODO_FIELDS_RESPONSE: dict[str, Any] = {
     'description': (
-        'The title or description violates a domain rule. '
-        'Request bodies rejected by schema validation return 422 instead.'
+        'Defensive domain-level validation of the title and description. '
+        'It is normally pre-empted by request schema validation, which returns '
+        '422 for the same violations, so clients should not expect this response.'
     ),
+    'model': ErrorMessageInvalidTodo,
     'content': {
         'application/json': {
             'examples': _error_examples(
