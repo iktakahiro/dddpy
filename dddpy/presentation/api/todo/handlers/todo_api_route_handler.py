@@ -12,13 +12,6 @@ from dddpy.domain.todo.exceptions import (
     TodoNotStartedError,
 )
 from dddpy.domain.todo.value_objects import TodoDescription, TodoId, TodoTitle
-from dddpy.domain.todo.value_objects.todo_description import (
-    DESCRIPTION_TOO_LONG_ERROR_MESSAGE,
-)
-from dddpy.domain.todo.value_objects.todo_title import (
-    TITLE_REQUIRED_ERROR_MESSAGE,
-    TITLE_TOO_LONG_ERROR_MESSAGE,
-)
 from dddpy.infrastructure.di.injection import (
     get_complete_todo_usecase,
     get_create_todo_usecase,
@@ -29,7 +22,6 @@ from dddpy.infrastructure.di.injection import (
     get_update_todo_usecase,
 )
 from dddpy.presentation.api.todo.error_messages import (
-    ErrorMessageInvalidTodo,
     ErrorMessageTodoAlreadyCompleted,
     ErrorMessageTodoAlreadyStarted,
     ErrorMessageTodoNotFound,
@@ -61,6 +53,8 @@ def _error_examples(*errors: tuple[str, str, str]) -> dict[str, Any]:
 
 # A 400 can carry several distinct messages, so each lifecycle response declares
 # the possible error models (rendered as an ``anyOf``) and one example per message.
+# The create/update 400 (domain validation of title and description) is
+# intentionally not declared: request schema validation returns 422 first.
 _START_BAD_REQUEST_RESPONSE: dict[str, Any] = {
     'description': 'The todo cannot be started because of its current lifecycle state.',
     'model': ErrorMessageTodoAlreadyStarted | ErrorMessageTodoAlreadyCompleted,
@@ -99,32 +93,6 @@ _COMPLETE_BAD_REQUEST_RESPONSE: dict[str, Any] = {
                     'already_completed',
                     'The todo is already completed',
                     TodoAlreadyCompletedError.message,
-                ),
-            ),
-        },
-    },
-}
-
-_INVALID_TODO_FIELDS_RESPONSE: dict[str, Any] = {
-    'description': (
-        'Defensive domain-level validation of the title and description. '
-        'It is normally pre-empted by request schema validation, which returns '
-        '422 for the same violations, so clients should not expect this response.'
-    ),
-    'model': ErrorMessageInvalidTodo,
-    'content': {
-        'application/json': {
-            'examples': _error_examples(
-                ('title_required', 'The title is empty', TITLE_REQUIRED_ERROR_MESSAGE),
-                (
-                    'title_too_long',
-                    'The title is too long',
-                    TITLE_TOO_LONG_ERROR_MESSAGE,
-                ),
-                (
-                    'description_too_long',
-                    'The description is too long',
-                    DESCRIPTION_TOO_LONG_ERROR_MESSAGE,
                 ),
             ),
         },
@@ -234,9 +202,6 @@ class TodoApiRouteHandler:
             '/todos',
             response_model=TodoSchema,
             status_code=201,
-            responses={
-                status.HTTP_400_BAD_REQUEST: _INVALID_TODO_FIELDS_RESPONSE,
-            },
         )
         def create_todo(
             data: TodoCreateSchema,
@@ -280,7 +245,6 @@ class TodoApiRouteHandler:
             response_model=TodoSchema,
             status_code=200,
             responses={
-                status.HTTP_400_BAD_REQUEST: _INVALID_TODO_FIELDS_RESPONSE,
                 status.HTTP_404_NOT_FOUND: {
                     'model': ErrorMessageTodoNotFound,
                 },

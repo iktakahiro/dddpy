@@ -8,13 +8,6 @@ from dddpy.domain.todo.exceptions import (
     TodoAlreadyStartedError,
     TodoNotStartedError,
 )
-from dddpy.domain.todo.value_objects.todo_description import (
-    DESCRIPTION_TOO_LONG_ERROR_MESSAGE,
-)
-from dddpy.domain.todo.value_objects.todo_title import (
-    TITLE_REQUIRED_ERROR_MESSAGE,
-    TITLE_TOO_LONG_ERROR_MESSAGE,
-)
 from dddpy.presentation.api.todo.handlers.todo_api_route_handler import (
     TodoApiRouteHandler,
 )
@@ -75,15 +68,11 @@ def test_lifecycle_routes_document_400(
     ('path', 'method'),
     [('/todos', 'post'), ('/todos/{todo_id}', 'put')],
 )
-def test_write_routes_document_400(openapi_schema, path, method):
-    """Test create and update routes list a 400 model and every domain message."""
-    response = openapi_schema['paths'][path][method]['responses']['400']
+def test_write_routes_do_not_declare_400(openapi_schema, path, method):
+    """Test create and update routes leave the unreachable 400 undocumented.
 
-    assert _ref_names(response['content']['application/json']['schema']) == {
-        'ErrorMessageInvalidTodo'
-    }
-    assert _example_details(response) == {
-        TITLE_REQUIRED_ERROR_MESSAGE,
-        TITLE_TOO_LONG_ERROR_MESSAGE,
-        DESCRIPTION_TOO_LONG_ERROR_MESSAGE,
-    }
+    Request schema validation returns 422 before the domain-level 400 can occur.
+    """
+    responses = openapi_schema['paths'][path][method]['responses']
+
+    assert '400' not in responses
