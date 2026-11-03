@@ -1,5 +1,6 @@
 """Controller for handling Todo-related HTTP requests."""
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -20,7 +21,12 @@ from dddpy.infrastructure.di.injection import (
     get_start_todo_usecase,
     get_update_todo_usecase,
 )
-from dddpy.presentation.api.todo.error_messages import ErrorMessageTodoNotFound
+from dddpy.presentation.api.todo.error_messages import (
+    ErrorMessageTodoAlreadyCompleted,
+    ErrorMessageTodoAlreadyStarted,
+    ErrorMessageTodoNotFound,
+    ErrorMessageTodoNotStarted,
+)
 from dddpy.presentation.api.todo.schemas import (
     TodoCreateSchema,
     TodoSchema,
@@ -35,6 +41,63 @@ from dddpy.usecase.todo import (
     StartTodoUseCase,
     UpdateTodoUseCase,
 )
+
+
+def _error_examples(*errors: tuple[str, str, str]) -> dict[str, Any]:
+    """Build OpenAPI media-type examples from ``(key, summary, detail)`` tuples."""
+    return {
+        key: {'summary': summary, 'value': {'detail': detail}}
+        for key, summary, detail in errors
+    }
+
+
+# A 400 can carry several distinct messages, so each lifecycle response declares
+# the possible error models (rendered as an ``anyOf``) and one example per message.
+# The create/update 400 (domain validation of title and description) is
+# intentionally not declared: request schema validation returns 422 first.
+_START_BAD_REQUEST_RESPONSE: dict[str, Any] = {
+    'description': 'The todo cannot be started because of its current lifecycle state.',
+    'model': ErrorMessageTodoAlreadyStarted | ErrorMessageTodoAlreadyCompleted,
+    'content': {
+        'application/json': {
+            'examples': _error_examples(
+                (
+                    'already_started',
+                    'The todo is already started',
+                    TodoAlreadyStartedError.message,
+                ),
+                (
+                    'already_completed',
+                    'The todo is already completed',
+                    TodoAlreadyCompletedError.message,
+                ),
+            ),
+        },
+    },
+}
+
+_COMPLETE_BAD_REQUEST_RESPONSE: dict[str, Any] = {
+    'description': (
+        'The todo cannot be completed because of its current lifecycle state.'
+    ),
+    'model': ErrorMessageTodoNotStarted | ErrorMessageTodoAlreadyCompleted,
+    'content': {
+        'application/json': {
+            'examples': _error_examples(
+                (
+                    'not_started',
+                    'The todo is not started',
+                    TodoNotStartedError.message,
+                ),
+                (
+                    'already_completed',
+                    'The todo is already completed',
+                    TodoAlreadyCompletedError.message,
+                ),
+            ),
+        },
+    },
+}
 
 
 class TodoApiRouteHandler:
@@ -139,9 +202,6 @@ class TodoApiRouteHandler:
             '/todos',
             response_model=TodoSchema,
             status_code=201,
-            responses={
-                status.HTTP_400_BAD_REQUEST: {},
-            },
         )
         def create_todo(
             data: TodoCreateSchema,
@@ -241,6 +301,7 @@ class TodoApiRouteHandler:
             response_model=TodoSchema,
             status_code=200,
             responses={
+                status.HTTP_400_BAD_REQUEST: _START_BAD_REQUEST_RESPONSE,
                 status.HTTP_404_NOT_FOUND: {
                     'model': ErrorMessageTodoNotFound,
                 },
@@ -295,6 +356,7 @@ class TodoApiRouteHandler:
             response_model=TodoSchema,
             status_code=200,
             responses={
+                status.HTTP_400_BAD_REQUEST: _COMPLETE_BAD_REQUEST_RESPONSE,
                 status.HTTP_404_NOT_FOUND: {
                     'model': ErrorMessageTodoNotFound,
                 },
